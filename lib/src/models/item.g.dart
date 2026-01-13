@@ -22,9 +22,9 @@ const ItemSchema = CollectionSchema(
       name: r'barcode',
       type: IsarType.string,
     ),
-    r'category': PropertySchema(
+    r'categoryName': PropertySchema(
       id: 1,
-      name: r'category',
+      name: r'categoryName',
       type: IsarType.string,
     ),
     r'expiryDate': PropertySchema(
@@ -42,9 +42,9 @@ const ItemSchema = CollectionSchema(
       name: r'isConsumed',
       type: IsarType.bool,
     ),
-    r'location': PropertySchema(
+    r'locationName': PropertySchema(
       id: 5,
-      name: r'location',
+      name: r'locationName',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
@@ -87,34 +87,34 @@ const ItemSchema = CollectionSchema(
         )
       ],
     ),
-    r'category': IndexSchema(
-      id: -7560358558326323820,
-      name: r'category',
+    r'locationName': IndexSchema(
+      id: 6386693373177518139,
+      name: r'locationName',
       unique: false,
       replace: false,
       properties: [
         IndexPropertySchema(
-          name: r'category',
-          type: IndexType.hash,
-          caseSensitive: true,
-        )
-      ],
-    ),
-    r'location': IndexSchema(
-      id: -2052452620202604545,
-      name: r'location',
-      unique: false,
-      replace: false,
-      properties: [
-        IndexPropertySchema(
-          name: r'location',
+          name: r'locationName',
           type: IndexType.hash,
           caseSensitive: true,
         )
       ],
     )
   },
-  links: {},
+  links: {
+    r'categoryLink': LinkSchema(
+      id: 6957444951610738393,
+      name: r'categoryLink',
+      target: r'Category',
+      single: true,
+    ),
+    r'locationLink': LinkSchema(
+      id: 6661253427868031950,
+      name: r'locationLink',
+      target: r'Location',
+      single: true,
+    )
+  },
   embeddedSchemas: {},
   getId: _itemGetId,
   getLinks: _itemGetLinks,
@@ -134,14 +134,14 @@ int _itemEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
-  bytesCount += 3 + object.category.length * 3;
+  bytesCount += 3 + object.categoryName.length * 3;
   {
     final value = object.imagePath;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
     }
   }
-  bytesCount += 3 + object.location.length * 3;
+  bytesCount += 3 + object.locationName.length * 3;
   bytesCount += 3 + object.name.length * 3;
   bytesCount += 3 + object.unit.length * 3;
   return bytesCount;
@@ -154,11 +154,11 @@ void _itemSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.barcode);
-  writer.writeString(offsets[1], object.category);
+  writer.writeString(offsets[1], object.categoryName);
   writer.writeDateTime(offsets[2], object.expiryDate);
   writer.writeString(offsets[3], object.imagePath);
   writer.writeBool(offsets[4], object.isConsumed);
-  writer.writeString(offsets[5], object.location);
+  writer.writeString(offsets[5], object.locationName);
   writer.writeString(offsets[6], object.name);
   writer.writeDateTime(offsets[7], object.purchaseDate);
   writer.writeDouble(offsets[8], object.quantity);
@@ -173,11 +173,11 @@ Item _itemDeserialize(
 ) {
   final object = Item(
     barcode: reader.readStringOrNull(offsets[0]),
-    category: reader.readStringOrNull(offsets[1]) ?? 'Uncategorized',
+    categoryName: reader.readStringOrNull(offsets[1]) ?? 'Unknown',
     expiryDate: reader.readDateTimeOrNull(offsets[2]),
     imagePath: reader.readStringOrNull(offsets[3]),
     isConsumed: reader.readBoolOrNull(offsets[4]) ?? false,
-    location: reader.readStringOrNull(offsets[5]) ?? 'Pantry',
+    locationName: reader.readStringOrNull(offsets[5]) ?? 'Unknown',
     name: reader.readString(offsets[6]),
     purchaseDate: reader.readDateTime(offsets[7]),
     quantity: reader.readDoubleOrNull(offsets[8]) ?? 1.0,
@@ -197,7 +197,7 @@ P _itemDeserializeProp<P>(
     case 0:
       return (reader.readStringOrNull(offset)) as P;
     case 1:
-      return (reader.readStringOrNull(offset) ?? 'Uncategorized') as P;
+      return (reader.readStringOrNull(offset) ?? 'Unknown') as P;
     case 2:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 3:
@@ -205,7 +205,7 @@ P _itemDeserializeProp<P>(
     case 4:
       return (reader.readBoolOrNull(offset) ?? false) as P;
     case 5:
-      return (reader.readStringOrNull(offset) ?? 'Pantry') as P;
+      return (reader.readStringOrNull(offset) ?? 'Unknown') as P;
     case 6:
       return (reader.readString(offset)) as P;
     case 7:
@@ -224,11 +224,15 @@ Id _itemGetId(Item object) {
 }
 
 List<IsarLinkBase<dynamic>> _itemGetLinks(Item object) {
-  return [];
+  return [object.categoryLink, object.locationLink];
 }
 
 void _itemAttach(IsarCollection<dynamic> col, Id id, Item object) {
   object.id = id;
+  object.categoryLink
+      .attach(col, col.isar.collection<Category>(), r'categoryLink', id);
+  object.locationLink
+      .attach(col, col.isar.collection<Location>(), r'locationLink', id);
 }
 
 extension ItemQueryWhereSort on QueryBuilder<Item, Item, QWhere> {
@@ -447,88 +451,45 @@ extension ItemQueryWhere on QueryBuilder<Item, Item, QWhereClause> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterWhereClause> categoryEqualTo(String category) {
+  QueryBuilder<Item, Item, QAfterWhereClause> locationNameEqualTo(
+      String locationName) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'category',
-        value: [category],
+        indexName: r'locationName',
+        value: [locationName],
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterWhereClause> categoryNotEqualTo(
-      String category) {
+  QueryBuilder<Item, Item, QAfterWhereClause> locationNameNotEqualTo(
+      String locationName) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'category',
+              indexName: r'locationName',
               lower: [],
-              upper: [category],
+              upper: [locationName],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'category',
-              lower: [category],
+              indexName: r'locationName',
+              lower: [locationName],
               includeLower: false,
               upper: [],
             ));
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'category',
-              lower: [category],
+              indexName: r'locationName',
+              lower: [locationName],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'category',
+              indexName: r'locationName',
               lower: [],
-              upper: [category],
-              includeUpper: false,
-            ));
-      }
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterWhereClause> locationEqualTo(String location) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'location',
-        value: [location],
-      ));
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterWhereClause> locationNotEqualTo(
-      String location) {
-    return QueryBuilder.apply(this, (query) {
-      if (query.whereSort == Sort.asc) {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'location',
-              lower: [],
-              upper: [location],
-              includeUpper: false,
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'location',
-              lower: [location],
-              includeLower: false,
-              upper: [],
-            ));
-      } else {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'location',
-              lower: [location],
-              includeLower: false,
-              upper: [],
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'location',
-              lower: [],
-              upper: [location],
+              upper: [locationName],
               includeUpper: false,
             ));
       }
@@ -681,20 +642,20 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> categoryEqualTo(
+  QueryBuilder<Item, Item, QAfterFilterCondition> categoryNameEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'category',
+        property: r'categoryName',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> categoryGreaterThan(
+  QueryBuilder<Item, Item, QAfterFilterCondition> categoryNameGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -702,14 +663,14 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'category',
+        property: r'categoryName',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> categoryLessThan(
+  QueryBuilder<Item, Item, QAfterFilterCondition> categoryNameLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -717,14 +678,14 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'category',
+        property: r'categoryName',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> categoryBetween(
+  QueryBuilder<Item, Item, QAfterFilterCondition> categoryNameBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -733,7 +694,7 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'category',
+        property: r'categoryName',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -743,68 +704,69 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> categoryStartsWith(
+  QueryBuilder<Item, Item, QAfterFilterCondition> categoryNameStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'category',
+        property: r'categoryName',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> categoryEndsWith(
+  QueryBuilder<Item, Item, QAfterFilterCondition> categoryNameEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'category',
+        property: r'categoryName',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> categoryContains(String value,
+  QueryBuilder<Item, Item, QAfterFilterCondition> categoryNameContains(
+      String value,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
-        property: r'category',
+        property: r'categoryName',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> categoryMatches(
+  QueryBuilder<Item, Item, QAfterFilterCondition> categoryNameMatches(
       String pattern,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
-        property: r'category',
+        property: r'categoryName',
         wildcard: pattern,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> categoryIsEmpty() {
+  QueryBuilder<Item, Item, QAfterFilterCondition> categoryNameIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'category',
+        property: r'categoryName',
         value: '',
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> categoryIsNotEmpty() {
+  QueryBuilder<Item, Item, QAfterFilterCondition> categoryNameIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'category',
+        property: r'categoryName',
         value: '',
       ));
     });
@@ -1087,20 +1049,20 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> locationEqualTo(
+  QueryBuilder<Item, Item, QAfterFilterCondition> locationNameEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'location',
+        property: r'locationName',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> locationGreaterThan(
+  QueryBuilder<Item, Item, QAfterFilterCondition> locationNameGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -1108,14 +1070,14 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'location',
+        property: r'locationName',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> locationLessThan(
+  QueryBuilder<Item, Item, QAfterFilterCondition> locationNameLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -1123,14 +1085,14 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'location',
+        property: r'locationName',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> locationBetween(
+  QueryBuilder<Item, Item, QAfterFilterCondition> locationNameBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -1139,7 +1101,7 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'location',
+        property: r'locationName',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -1149,68 +1111,69 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> locationStartsWith(
+  QueryBuilder<Item, Item, QAfterFilterCondition> locationNameStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'location',
+        property: r'locationName',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> locationEndsWith(
+  QueryBuilder<Item, Item, QAfterFilterCondition> locationNameEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'location',
+        property: r'locationName',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> locationContains(String value,
+  QueryBuilder<Item, Item, QAfterFilterCondition> locationNameContains(
+      String value,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
-        property: r'location',
+        property: r'locationName',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> locationMatches(
+  QueryBuilder<Item, Item, QAfterFilterCondition> locationNameMatches(
       String pattern,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
-        property: r'location',
+        property: r'locationName',
         wildcard: pattern,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> locationIsEmpty() {
+  QueryBuilder<Item, Item, QAfterFilterCondition> locationNameIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'location',
+        property: r'locationName',
         value: '',
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> locationIsNotEmpty() {
+  QueryBuilder<Item, Item, QAfterFilterCondition> locationNameIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'location',
+        property: r'locationName',
         value: '',
       ));
     });
@@ -1590,7 +1553,33 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
 
 extension ItemQueryObject on QueryBuilder<Item, Item, QFilterCondition> {}
 
-extension ItemQueryLinks on QueryBuilder<Item, Item, QFilterCondition> {}
+extension ItemQueryLinks on QueryBuilder<Item, Item, QFilterCondition> {
+  QueryBuilder<Item, Item, QAfterFilterCondition> categoryLink(
+      FilterQuery<Category> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'categoryLink');
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> categoryLinkIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'categoryLink', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> locationLink(
+      FilterQuery<Location> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'locationLink');
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> locationLinkIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'locationLink', 0, true, 0, true);
+    });
+  }
+}
 
 extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
   QueryBuilder<Item, Item, QAfterSortBy> sortByBarcode() {
@@ -1605,15 +1594,15 @@ extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterSortBy> sortByCategory() {
+  QueryBuilder<Item, Item, QAfterSortBy> sortByCategoryName() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'category', Sort.asc);
+      return query.addSortBy(r'categoryName', Sort.asc);
     });
   }
 
-  QueryBuilder<Item, Item, QAfterSortBy> sortByCategoryDesc() {
+  QueryBuilder<Item, Item, QAfterSortBy> sortByCategoryNameDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'category', Sort.desc);
+      return query.addSortBy(r'categoryName', Sort.desc);
     });
   }
 
@@ -1653,15 +1642,15 @@ extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterSortBy> sortByLocation() {
+  QueryBuilder<Item, Item, QAfterSortBy> sortByLocationName() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'location', Sort.asc);
+      return query.addSortBy(r'locationName', Sort.asc);
     });
   }
 
-  QueryBuilder<Item, Item, QAfterSortBy> sortByLocationDesc() {
+  QueryBuilder<Item, Item, QAfterSortBy> sortByLocationNameDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'location', Sort.desc);
+      return query.addSortBy(r'locationName', Sort.desc);
     });
   }
 
@@ -1727,15 +1716,15 @@ extension ItemQuerySortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterSortBy> thenByCategory() {
+  QueryBuilder<Item, Item, QAfterSortBy> thenByCategoryName() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'category', Sort.asc);
+      return query.addSortBy(r'categoryName', Sort.asc);
     });
   }
 
-  QueryBuilder<Item, Item, QAfterSortBy> thenByCategoryDesc() {
+  QueryBuilder<Item, Item, QAfterSortBy> thenByCategoryNameDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'category', Sort.desc);
+      return query.addSortBy(r'categoryName', Sort.desc);
     });
   }
 
@@ -1787,15 +1776,15 @@ extension ItemQuerySortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterSortBy> thenByLocation() {
+  QueryBuilder<Item, Item, QAfterSortBy> thenByLocationName() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'location', Sort.asc);
+      return query.addSortBy(r'locationName', Sort.asc);
     });
   }
 
-  QueryBuilder<Item, Item, QAfterSortBy> thenByLocationDesc() {
+  QueryBuilder<Item, Item, QAfterSortBy> thenByLocationNameDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'location', Sort.desc);
+      return query.addSortBy(r'locationName', Sort.desc);
     });
   }
 
@@ -1856,10 +1845,10 @@ extension ItemQueryWhereDistinct on QueryBuilder<Item, Item, QDistinct> {
     });
   }
 
-  QueryBuilder<Item, Item, QDistinct> distinctByCategory(
+  QueryBuilder<Item, Item, QDistinct> distinctByCategoryName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'category', caseSensitive: caseSensitive);
+      return query.addDistinctBy(r'categoryName', caseSensitive: caseSensitive);
     });
   }
 
@@ -1882,10 +1871,10 @@ extension ItemQueryWhereDistinct on QueryBuilder<Item, Item, QDistinct> {
     });
   }
 
-  QueryBuilder<Item, Item, QDistinct> distinctByLocation(
+  QueryBuilder<Item, Item, QDistinct> distinctByLocationName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'location', caseSensitive: caseSensitive);
+      return query.addDistinctBy(r'locationName', caseSensitive: caseSensitive);
     });
   }
 
@@ -1929,9 +1918,9 @@ extension ItemQueryProperty on QueryBuilder<Item, Item, QQueryProperty> {
     });
   }
 
-  QueryBuilder<Item, String, QQueryOperations> categoryProperty() {
+  QueryBuilder<Item, String, QQueryOperations> categoryNameProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'category');
+      return query.addPropertyName(r'categoryName');
     });
   }
 
@@ -1953,9 +1942,9 @@ extension ItemQueryProperty on QueryBuilder<Item, Item, QQueryProperty> {
     });
   }
 
-  QueryBuilder<Item, String, QQueryOperations> locationProperty() {
+  QueryBuilder<Item, String, QQueryOperations> locationNameProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'location');
+      return query.addPropertyName(r'locationName');
     });
   }
 

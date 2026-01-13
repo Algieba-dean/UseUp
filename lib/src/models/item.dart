@@ -1,6 +1,8 @@
 import 'package:isar/isar.dart';
+import 'location.dart';
+import 'category.dart';
 
-part 'item.g.dart'; // Isar generator will build this
+part 'item.g.dart';
 
 @collection
 class Item {
@@ -19,11 +21,14 @@ class Item {
   
   DateTime purchaseDate;
 
-  @Index()
-  String category; // "Vegetable", "Dairy"
+  final categoryLink = IsarLink<Category>();
+  String categoryName; // 缓存显示用
   
+  // locationName 只是为了在列表页显示方便（缓存）
   @Index()
-  String location; // "Fridge", "Pantry" - PRD 3.3
+  String locationName; 
+  
+  final locationLink = IsarLink<Location>(); 
 
   String? imagePath; // Local path to image
 
@@ -36,8 +41,8 @@ class Item {
     this.unit = 'pcs',
     this.expiryDate,
     required this.purchaseDate,
-    this.category = 'Uncategorized',
-    this.location = 'Pantry',
+    this.categoryName = 'Unknown',
+    this.locationName = 'Unknown', 
     this.imagePath,
     this.isConsumed = false,
   });
