@@ -27,7 +27,7 @@ dependencies:
   path_provider: ^2.1.2
 
   # Features
-  mobile_scanner: ^5.0.0
+  mobile_scanner: ^7.1.4
   image_picker: ^1.0.7
   uuid: ^4.3.3
   
