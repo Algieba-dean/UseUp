@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:use_up/src/localization/app_localizations.dart';
-import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart'; 
 import '../../config/theme.dart';
 import '../../providers/locale_provider.dart';
 
@@ -13,7 +13,6 @@ class SettingsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeProvider);
     
-    // 获取当前语言显示的文本
     String currentLanguageText;
     if (currentLocale?.languageCode == 'zh') {
       currentLanguageText = '简体中文';
@@ -22,22 +21,47 @@ class SettingsScreen extends ConsumerWidget {
     }
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5), // 保持背景灰白
       appBar: AppBar(
-        title: Text(l10n.settingsTitle),
-        backgroundColor: AppTheme.neutralWhite,
+        title: Text(l10n.settingsTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
       body: ListView(
         children: [
-          ListTile(
-            leading: const Icon(Icons.language, color: AppTheme.primaryGreen),
-            title: Text(l10n.language),
-            subtitle: Text(currentLanguageText), // 显示当前语言
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              // 点击弹出底部选择框
-              _showLanguagePicker(context, ref);
-            },
+          const SizedBox(height: 12),
+          
+          // 1. 语言设置
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              leading: const Icon(Icons.language, color: AppTheme.primaryGreen),
+              title: Text(l10n.language),
+              subtitle: Text(currentLanguageText),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              onTap: () {
+                _showLanguagePicker(context, ref);
+              },
+            ),
           ),
+          
+          const SizedBox(height: 12), // 分隔开一点，更有层次感
+
+          // 2. 历史记录 (新增入口)
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              leading: const Icon(Icons.history, color: AppTheme.primaryGreen),
+              title: Text(l10n.history), // 对应 "历史记录"
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              onTap: () {
+                // 点击跳转到历史页
+                context.push('/history');
+              },
+            ),
+          ),
+          
+          // 这里以后还可以加 "About", "Export Data" 等
         ],
       ),
     );
@@ -61,7 +85,7 @@ class SettingsScreen extends ConsumerWidget {
                     : null,
                 onTap: () {
                   ref.read(localeProvider.notifier).state = const Locale('en');
-                  context.pop(); // 关闭弹窗
+                  context.pop(); 
                 },
               ),
               ListTile(
@@ -71,7 +95,7 @@ class SettingsScreen extends ConsumerWidget {
                     : null,
                 onTap: () {
                   ref.read(localeProvider.notifier).state = const Locale('zh');
-                  context.pop(); // 关闭弹窗
+                  context.pop();
                 },
               ),
             ],

@@ -43,5 +43,9 @@
   "locationName": "位置名称",
   "delete": "删除",
   "deleteConfirm": "该位置包含物品或子位置，无法删除。",
-  "confirm": "确认"
+  "confirm": "确认",
+  "markAsUsed": "标记已用",
+  "itemConsumed": "物品已标记为消耗！",
+  "history": "历史记录",
+  "restock": "重新补货"
 }

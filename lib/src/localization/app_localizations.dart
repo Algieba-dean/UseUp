@@ -367,6 +367,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Confirm'**
   String get confirm;
+
+  /// No description provided for @markAsUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Used'**
+  String get markAsUsed;
+
+  /// No description provided for @itemConsumed.
+  ///
+  /// In en, this message translates to:
+  /// **'Item marked as consumed!'**
+  String get itemConsumed;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// No description provided for @restock.
+  ///
+  /// In en, this message translates to:
+  /// **'Restock'**
+  String get restock;
 }
 
 class _AppLocalizationsDelegate

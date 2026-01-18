@@ -43,5 +43,9 @@
   "locationName": "Location Name",
   "delete": "Delete",
   "deleteConfirm": "This location contains items or sub-locations. Cannot delete.",
-  "confirm": "Confirm"
+  "confirm": "Confirm",
+  "markAsUsed": "Mark as Used",
+  "itemConsumed": "Item marked as consumed!",
+  "history": "History",
+  "restock": "Restock"
 }

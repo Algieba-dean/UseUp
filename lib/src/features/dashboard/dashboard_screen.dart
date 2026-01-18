@@ -122,6 +122,9 @@ class DashboardScreen extends ConsumerWidget {
                       
                       return Card(
                         child: ListTile(
+                          onTap: () {
+                            context.push('/item/${item.id}');
+                          },
                           leading: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(

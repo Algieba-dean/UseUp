@@ -151,4 +151,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get confirm => '确认';
+
+  @override
+  String get markAsUsed => '标记已用';
+
+  @override
+  String get itemConsumed => '物品已标记为消耗！';
+
+  @override
+  String get history => '历史记录';
+
+  @override
+  String get restock => '重新补货';
 }

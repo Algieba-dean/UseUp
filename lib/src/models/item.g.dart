@@ -27,43 +27,48 @@ const ItemSchema = CollectionSchema(
       name: r'categoryName',
       type: IsarType.string,
     ),
-    r'expiryDate': PropertySchema(
+    r'consumedDate': PropertySchema(
       id: 2,
+      name: r'consumedDate',
+      type: IsarType.dateTime,
+    ),
+    r'expiryDate': PropertySchema(
+      id: 3,
       name: r'expiryDate',
       type: IsarType.dateTime,
     ),
     r'imagePath': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'imagePath',
       type: IsarType.string,
     ),
     r'isConsumed': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'isConsumed',
       type: IsarType.bool,
     ),
     r'locationName': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'locationName',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'name',
       type: IsarType.string,
     ),
     r'purchaseDate': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'purchaseDate',
       type: IsarType.dateTime,
     ),
     r'quantity': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'quantity',
       type: IsarType.double,
     ),
     r'unit': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'unit',
       type: IsarType.string,
     )
@@ -155,14 +160,15 @@ void _itemSerialize(
 ) {
   writer.writeString(offsets[0], object.barcode);
   writer.writeString(offsets[1], object.categoryName);
-  writer.writeDateTime(offsets[2], object.expiryDate);
-  writer.writeString(offsets[3], object.imagePath);
-  writer.writeBool(offsets[4], object.isConsumed);
-  writer.writeString(offsets[5], object.locationName);
-  writer.writeString(offsets[6], object.name);
-  writer.writeDateTime(offsets[7], object.purchaseDate);
-  writer.writeDouble(offsets[8], object.quantity);
-  writer.writeString(offsets[9], object.unit);
+  writer.writeDateTime(offsets[2], object.consumedDate);
+  writer.writeDateTime(offsets[3], object.expiryDate);
+  writer.writeString(offsets[4], object.imagePath);
+  writer.writeBool(offsets[5], object.isConsumed);
+  writer.writeString(offsets[6], object.locationName);
+  writer.writeString(offsets[7], object.name);
+  writer.writeDateTime(offsets[8], object.purchaseDate);
+  writer.writeDouble(offsets[9], object.quantity);
+  writer.writeString(offsets[10], object.unit);
 }
 
 Item _itemDeserialize(
@@ -174,14 +180,15 @@ Item _itemDeserialize(
   final object = Item(
     barcode: reader.readStringOrNull(offsets[0]),
     categoryName: reader.readStringOrNull(offsets[1]) ?? 'Unknown',
-    expiryDate: reader.readDateTimeOrNull(offsets[2]),
-    imagePath: reader.readStringOrNull(offsets[3]),
-    isConsumed: reader.readBoolOrNull(offsets[4]) ?? false,
-    locationName: reader.readStringOrNull(offsets[5]) ?? 'Unknown',
-    name: reader.readString(offsets[6]),
-    purchaseDate: reader.readDateTime(offsets[7]),
-    quantity: reader.readDoubleOrNull(offsets[8]) ?? 1.0,
-    unit: reader.readStringOrNull(offsets[9]) ?? 'pcs',
+    consumedDate: reader.readDateTimeOrNull(offsets[2]),
+    expiryDate: reader.readDateTimeOrNull(offsets[3]),
+    imagePath: reader.readStringOrNull(offsets[4]),
+    isConsumed: reader.readBoolOrNull(offsets[5]) ?? false,
+    locationName: reader.readStringOrNull(offsets[6]) ?? 'Unknown',
+    name: reader.readString(offsets[7]),
+    purchaseDate: reader.readDateTime(offsets[8]),
+    quantity: reader.readDoubleOrNull(offsets[9]) ?? 1.0,
+    unit: reader.readStringOrNull(offsets[10]) ?? 'pcs',
   );
   object.id = id;
   return object;
@@ -201,18 +208,20 @@ P _itemDeserializeProp<P>(
     case 2:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 3:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 4:
-      return (reader.readBoolOrNull(offset) ?? false) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 5:
-      return (reader.readStringOrNull(offset) ?? 'Unknown') as P;
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     case 6:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset) ?? 'Unknown') as P;
     case 7:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 8:
-      return (reader.readDoubleOrNull(offset) ?? 1.0) as P;
+      return (reader.readDateTime(offset)) as P;
     case 9:
+      return (reader.readDoubleOrNull(offset) ?? 1.0) as P;
+    case 10:
       return (reader.readStringOrNull(offset) ?? 'pcs') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -768,6 +777,75 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'categoryName',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> consumedDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'consumedDate',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> consumedDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'consumedDate',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> consumedDateEqualTo(
+      DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'consumedDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> consumedDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'consumedDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> consumedDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'consumedDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> consumedDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'consumedDate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -1606,6 +1684,18 @@ extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
     });
   }
 
+  QueryBuilder<Item, Item, QAfterSortBy> sortByConsumedDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'consumedDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByConsumedDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'consumedDate', Sort.desc);
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterSortBy> sortByExpiryDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'expiryDate', Sort.asc);
@@ -1725,6 +1815,18 @@ extension ItemQuerySortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
   QueryBuilder<Item, Item, QAfterSortBy> thenByCategoryNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'categoryName', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByConsumedDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'consumedDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByConsumedDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'consumedDate', Sort.desc);
     });
   }
 
@@ -1852,6 +1954,12 @@ extension ItemQueryWhereDistinct on QueryBuilder<Item, Item, QDistinct> {
     });
   }
 
+  QueryBuilder<Item, Item, QDistinct> distinctByConsumedDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'consumedDate');
+    });
+  }
+
   QueryBuilder<Item, Item, QDistinct> distinctByExpiryDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'expiryDate');
@@ -1921,6 +2029,12 @@ extension ItemQueryProperty on QueryBuilder<Item, Item, QQueryProperty> {
   QueryBuilder<Item, String, QQueryOperations> categoryNameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'categoryName');
+    });
+  }
+
+  QueryBuilder<Item, DateTime?, QQueryOperations> consumedDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'consumedDate');
     });
   }
 

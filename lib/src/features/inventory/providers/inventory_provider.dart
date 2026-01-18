@@ -10,7 +10,8 @@ final inventoryProvider = StreamProvider<List<Item>>((ref) {
   // 2. 按过期时间排序 (expiryDate)
   // 3. 监听变化 (.watch(fireImmediately: true))
   return isarInstance.items
-      .where()
+      .filter()
+      .isConsumedEqualTo(false) // Only show active items
       .sortByExpiryDate() // Isar 自动生成的方法
       .watch(fireImmediately: true);
 });

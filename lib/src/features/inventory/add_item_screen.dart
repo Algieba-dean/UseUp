@@ -12,7 +12,9 @@ import 'location_selector.dart';
 import 'widgets/date_input_field.dart';
 
 class AddItemScreen extends ConsumerStatefulWidget {
-  const AddItemScreen({super.key});
+  final Item? itemToEdit;
+
+  const AddItemScreen({super.key, this.itemToEdit});
 
   @override
   ConsumerState<AddItemScreen> createState() => _AddItemScreenState();
@@ -20,8 +22,8 @@ class AddItemScreen extends ConsumerStatefulWidget {
 
 class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _quantityController = TextEditingController(text: '1');
+  late TextEditingController _nameController;
+  late TextEditingController _quantityController;
   
   String _selectedUnit = 'pcs'; 
   final List<String> _units = ['pcs', 'kg', 'g', 'L', 'ml', 'pack'];
@@ -33,6 +35,41 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   String _locationNameDisplay = "";
   
   DateTime? _expiryDate;
+
+  @override
+  void initState() {
+    super.initState();
+    final item = widget.itemToEdit;
+
+    if (item != null) {
+      _nameController = TextEditingController(text: item.name);
+      _quantityController = TextEditingController(
+          text: item.quantity % 1 == 0 
+              ? item.quantity.toInt().toString() 
+              : item.quantity.toString());
+      _selectedUnit = item.unit;
+      
+      _categoryNameDisplay = item.categoryName;
+      _locationNameDisplay = item.locationName;
+      // Note: Direct object assignment might need fresh fetch if object not loaded, 
+      // but assuming item comes from ISAR watch, links should be available or we rely on names.
+      // Ideally we check if link is loaded.
+      _selectedCategoryObj = item.categoryLink.value;
+      _selectedLocationObj = item.locationLink.value;
+      
+      _expiryDate = item.expiryDate;
+    } else {
+      _nameController = TextEditingController();
+      _quantityController = TextEditingController(text: '1');
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _quantityController.dispose();
+    super.dispose();
+  }
 
   // 获取翻译后的单位
   String _getLocalizedUnit(String key, AppLocalizations l10n) {
@@ -49,35 +86,52 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
 
   Future<void> _saveItem() async {
       if (_formKey.currentState!.validate()) {
-          final newItem = Item(
-            name: _nameController.text,
-            quantity: double.tryParse(_quantityController.text) ?? 1.0,
-            unit: _selectedUnit,
-            categoryName: _categoryNameDisplay.isEmpty ? 'Unknown' : _categoryNameDisplay,
-            locationName: _locationNameDisplay.isEmpty ? 'Unknown' : _locationNameDisplay,
-            purchaseDate: DateTime.now(),
-            expiryDate: _expiryDate,
-          );
-          
-          // 关键：关联 Link
-          if (_selectedCategoryObj != null) {
-            newItem.categoryLink.value = _selectedCategoryObj;
-          }
-          if (_selectedLocationObj != null) {
-             newItem.locationLink.value = _selectedLocationObj;
-          }
+          final name = _nameController.text;
+          final quantity = double.tryParse(_quantityController.text) ?? 1.0;
 
           await isarInstance.writeTxn(() async {
-            await isarInstance.items.put(newItem);
-            // 必须保存 Link
-            await newItem.categoryLink.save();
-            await newItem.locationLink.save();
+            Item itemToSave;
+
+            if (widget.itemToEdit != null) {
+              // Edit Mode
+              itemToSave = widget.itemToEdit!;
+              itemToSave.name = name;
+              itemToSave.quantity = quantity;
+              itemToSave.unit = _selectedUnit;
+              itemToSave.expiryDate = _expiryDate;
+              // preserve purchaseDate or update if needed
+            } else {
+              // Create Mode
+              itemToSave = Item(
+                name: name,
+                quantity: quantity,
+                unit: _selectedUnit,
+                purchaseDate: DateTime.now(),
+                expiryDate: _expiryDate,
+              );
+            }
+
+            // Update common fields
+            itemToSave.categoryName = _categoryNameDisplay.isEmpty ? 'Unknown' : _categoryNameDisplay;
+            itemToSave.locationName = _locationNameDisplay.isEmpty ? 'Unknown' : _locationNameDisplay;
+            
+            // Update Links
+            // Note: assign value only if selected, otherwise it might clear existing link if null?
+            // Logic: if user selected something, update. If user didn't touch it, 
+            // in edit mode: _selectedCategoryObj is init from item.categoryLink.value, so it preserves.
+            // in add mode: it's null.
+            itemToSave.categoryLink.value = _selectedCategoryObj;
+            itemToSave.locationLink.value = _selectedLocationObj;
+
+            await isarInstance.items.put(itemToSave);
+            await itemToSave.categoryLink.save();
+            await itemToSave.locationLink.save();
           });
           
           if(mounted) {
              context.pop();
              ScaffoldMessenger.of(context).showSnackBar(
-               SnackBar(content: Text('${newItem.name} Saved!')),
+               SnackBar(content: Text('${name} Saved!')),
              );
           }
       }
@@ -161,11 +215,12 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final title = widget.itemToEdit != null ? "Edit Item" : l10n.addItem;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9), // 浅灰背景，突显白色卡片
       appBar: AppBar(
-        title: Text(l10n.addItem, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -295,6 +350,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             // 5. Date
             DateInputField(
               label: l10n.expiryDate,
+              initialDate: _expiryDate,
               onDateChanged: (date) => _expiryDate = date,
             ),
             

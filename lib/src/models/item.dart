@@ -33,6 +33,8 @@ class Item {
   String? imagePath; // Local path to image
 
   bool isConsumed; // For History/Archive - PRD 3.5
+  
+  DateTime? consumedDate; // Time when consumed
 
   Item({
     required this.name,
@@ -45,5 +47,6 @@ class Item {
     this.locationName = 'Unknown', 
     this.imagePath,
     this.isConsumed = false,
+    this.consumedDate,
   });
 }

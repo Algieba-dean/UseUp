@@ -152,4 +152,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirm => 'Confirm';
+
+  @override
+  String get markAsUsed => 'Mark as Used';
+
+  @override
+  String get itemConsumed => 'Item marked as consumed!';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get restock => 'Restock';
 }
