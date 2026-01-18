@@ -57,10 +57,10 @@ const ItemSchema = CollectionSchema(
       name: r'name',
       type: IsarType.string,
     ),
-    r'notifyDaysBefore': PropertySchema(
+    r'notifyDaysList': PropertySchema(
       id: 8,
-      name: r'notifyDaysBefore',
-      type: IsarType.long,
+      name: r'notifyDaysList',
+      type: IsarType.longList,
     ),
     r'price': PropertySchema(
       id: 9,
@@ -168,6 +168,7 @@ int _itemEstimateSize(
   }
   bytesCount += 3 + object.locationName.length * 3;
   bytesCount += 3 + object.name.length * 3;
+  bytesCount += 3 + object.notifyDaysList.length * 8;
   bytesCount += 3 + object.unit.length * 3;
   return bytesCount;
 }
@@ -186,7 +187,7 @@ void _itemSerialize(
   writer.writeBool(offsets[5], object.isConsumed);
   writer.writeString(offsets[6], object.locationName);
   writer.writeString(offsets[7], object.name);
-  writer.writeLong(offsets[8], object.notifyDaysBefore);
+  writer.writeLongList(offsets[8], object.notifyDaysList);
   writer.writeDouble(offsets[9], object.price);
   writer.writeDateTime(offsets[10], object.productionDate);
   writer.writeDateTime(offsets[11], object.purchaseDate);
@@ -210,7 +211,7 @@ Item _itemDeserialize(
     isConsumed: reader.readBoolOrNull(offsets[5]) ?? false,
     locationName: reader.readStringOrNull(offsets[6]) ?? 'Other',
     name: reader.readString(offsets[7]),
-    notifyDaysBefore: reader.readLongOrNull(offsets[8]) ?? 3,
+    notifyDaysList: reader.readLongList(offsets[8]) ?? const [1, 3],
     price: reader.readDoubleOrNull(offsets[9]),
     productionDate: reader.readDateTimeOrNull(offsets[10]),
     purchaseDate: reader.readDateTime(offsets[11]),
@@ -246,7 +247,7 @@ P _itemDeserializeProp<P>(
     case 7:
       return (reader.readString(offset)) as P;
     case 8:
-      return (reader.readLongOrNull(offset) ?? 3) as P;
+      return (reader.readLongList(offset) ?? const [1, 3]) as P;
     case 9:
       return (reader.readDoubleOrNull(offset)) as P;
     case 10:
@@ -1429,43 +1430,44 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysBeforeEqualTo(
+  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysListElementEqualTo(
       int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'notifyDaysBefore',
+        property: r'notifyDaysList',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysBeforeGreaterThan(
+  QueryBuilder<Item, Item, QAfterFilterCondition>
+      notifyDaysListElementGreaterThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'notifyDaysBefore',
+        property: r'notifyDaysList',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysBeforeLessThan(
+  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysListElementLessThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'notifyDaysBefore',
+        property: r'notifyDaysList',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysBeforeBetween(
+  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysListElementBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -1473,12 +1475,97 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'notifyDaysBefore',
+        property: r'notifyDaysList',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysListLengthEqualTo(
+      int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'notifyDaysList',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysListIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'notifyDaysList',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysListIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'notifyDaysList',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysListLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'notifyDaysList',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition>
+      notifyDaysListLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'notifyDaysList',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysListLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'notifyDaysList',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 
@@ -2069,18 +2156,6 @@ extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterSortBy> sortByNotifyDaysBefore() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'notifyDaysBefore', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterSortBy> sortByNotifyDaysBeforeDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'notifyDaysBefore', Sort.desc);
-    });
-  }
-
   QueryBuilder<Item, Item, QAfterSortBy> sortByPrice() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'price', Sort.asc);
@@ -2263,18 +2338,6 @@ extension ItemQuerySortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterSortBy> thenByNotifyDaysBefore() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'notifyDaysBefore', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterSortBy> thenByNotifyDaysBeforeDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'notifyDaysBefore', Sort.desc);
-    });
-  }
-
   QueryBuilder<Item, Item, QAfterSortBy> thenByPrice() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'price', Sort.asc);
@@ -2402,9 +2465,9 @@ extension ItemQueryWhereDistinct on QueryBuilder<Item, Item, QDistinct> {
     });
   }
 
-  QueryBuilder<Item, Item, QDistinct> distinctByNotifyDaysBefore() {
+  QueryBuilder<Item, Item, QDistinct> distinctByNotifyDaysList() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'notifyDaysBefore');
+      return query.addDistinctBy(r'notifyDaysList');
     });
   }
 
@@ -2501,9 +2564,9 @@ extension ItemQueryProperty on QueryBuilder<Item, Item, QQueryProperty> {
     });
   }
 
-  QueryBuilder<Item, int, QQueryOperations> notifyDaysBeforeProperty() {
+  QueryBuilder<Item, List<int>, QQueryOperations> notifyDaysListProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'notifyDaysBefore');
+      return query.addPropertyName(r'notifyDaysList');
     });
   }
 

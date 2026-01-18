@@ -50,7 +50,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   DateTime _purchaseDate = DateTime.now();
   DateTime? _productionDate;
   
-  int _notifyDays = 3; 
+  List<int> _selectedNotifyDays = [1, 3]; 
   String? _imagePath;
   
   bool _isProductionMode = false; 
@@ -116,7 +116,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       _purchaseDate = item.purchaseDate;
       _expiryDate = item.expiryDate;
       _productionDate = item.productionDate;
-      _notifyDays = item.notifyDaysBefore;
+      _selectedNotifyDays = List.from(item.notifyDaysList);
       
       _isProductionMode = item.productionDate != null;
 
@@ -225,7 +225,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         itemToSave.expiryDate = _expiryDate;
         itemToSave.productionDate = _isProductionMode ? _productionDate : null;
         itemToSave.shelfLifeDays = _isProductionMode ? shelfLife : null;
-        itemToSave.notifyDaysBefore = _notifyDays;
+        itemToSave.notifyDaysList = _selectedNotifyDays;
         itemToSave.imagePath = _imagePath;
         itemToSave.categoryName = _categoryNameDisplay; 
         itemToSave.locationName = _locationNameDisplay;
@@ -239,7 +239,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
           expiryDate: _expiryDate,
           productionDate: _isProductionMode ? _productionDate : null,
           shelfLifeDays: _isProductionMode ? shelfLife : null,
-          notifyDaysBefore: _notifyDays,
+          notifyDaysList: _selectedNotifyDays,
           imagePath: _imagePath,
           categoryName: _categoryNameDisplay,
           locationName: _locationNameDisplay,
@@ -322,6 +322,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isEditing = widget.itemToEdit != null;
+    String currency = Localizations.localeOf(context).languageCode == 'zh' ? '¥' : '\$';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
@@ -429,20 +430,24 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               
               const Divider(),
 
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.notifications_outlined, color: Colors.grey),
-                  const SizedBox(width: 12),
-                  Expanded(child: Text(l10n.reminderLabel)),
-                  DropdownButton<int>(
-                    value: _notifyDays,
-                    underline: const SizedBox(),
-                    items: [
-                      DropdownMenuItem(value: 1, child: Text(l10n.reminder1Day)),
-                      DropdownMenuItem(value: 3, child: Text(l10n.reminder3Days)),
-                      DropdownMenuItem(value: 7, child: Text(l10n.reminder7Days)),
+                  Row(
+                    children: [
+                      const Icon(Icons.notifications_outlined, color: Colors.grey),
+                      const SizedBox(width: 12),
+                      Text(l10n.reminderLabel, style: const TextStyle(color: Colors.black87)),
                     ],
-                    onChanged: (v) => setState(() => _notifyDays = v!),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      _buildFilterChip(l10n.reminder1Day, 1),
+                      _buildFilterChip(l10n.reminder3Days, 3),
+                      _buildFilterChip(l10n.reminder7Days, 7),
+                    ],
                   ),
                 ],
               ),
@@ -525,7 +530,11 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                     child: TextFormField(
                       controller: _priceController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: InputDecoration(labelText: l10n.price, border: InputBorder.none),
+                      decoration: InputDecoration(
+                        labelText: l10n.price, 
+                        border: InputBorder.none,
+                        prefixText: currency,
+                      ),
                     ),
                   ),
                 ],
@@ -569,6 +578,29 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, int days) {
+    final isSelected = _selectedNotifyDays.contains(days);
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (bool selected) {
+        setState(() {
+          if (selected) {
+            _selectedNotifyDays.add(days);
+          } else {
+            _selectedNotifyDays.remove(days);
+          }
+        });
+      },
+      selectedColor: AppTheme.primaryGreen.withOpacity(0.2),
+      checkmarkColor: AppTheme.primaryGreen,
+      labelStyle: TextStyle(
+        color: isSelected ? AppTheme.primaryGreen : Colors.black87,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
     );
   }

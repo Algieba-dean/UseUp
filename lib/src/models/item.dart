@@ -22,7 +22,7 @@ class Item {
   DateTime purchaseDate; // 二级：购买日期 (默认今天)
   DateTime? expiryDate; // 一级：到期时间 (核心)
 
-  int notifyDaysBefore; // 一级：提前几天提醒 (默认 3)
+  List<int> notifyDaysList; // 一级：提前几天提醒 (支持多选)
 
   // 关联
   final categoryLink = IsarLink<Category>();
@@ -49,7 +49,7 @@ class Item {
     this.expiryDate,
     this.productionDate,
     this.shelfLifeDays,
-    this.notifyDaysBefore = 3, // 默认提前3天
+    this.notifyDaysList = const [1, 3], // 默认提前1天和3天
     this.categoryName = 'Unknown',
     this.locationName = 'Other', // 默认位置名为 Other
     this.isConsumed = false, 

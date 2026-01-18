@@ -6,7 +6,9 @@ import 'src/app.dart';
 import 'src/models/item.dart';
 import 'src/models/location.dart';
 import 'src/models/category.dart';
+import 'src/models/app_setting.dart';
 import 'src/services/notification_service.dart';
+import 'src/providers/locale_provider.dart';
 
 // 定义一个全局 Provider 来获取 Isar 实例
 late Isar isarInstance;
@@ -19,7 +21,7 @@ void main() async {
 
   // 2. 打开 Isar 数据库
   isarInstance = await Isar.open(
-    [ItemSchema, LocationSchema, CategorySchema], 
+    [ItemSchema, LocationSchema, CategorySchema, AppSettingSchema], 
     directory: dir.path,
   );
 
@@ -64,9 +66,19 @@ void main() async {
   await notificationService.init();
   await notificationService.requestPermissions();
 
+  // 4. 预读取语言设置
+  final savedSettings = await isarInstance.appSettings.get(0);
+  Locale? initialLocale;
+  if (savedSettings?.languageCode != null) {
+    initialLocale = Locale(savedSettings!.languageCode!);
+  }
+
   runApp(
-    const ProviderScope(
-      child: UseUpApp(),
+    ProviderScope(
+      overrides: [
+        localeProvider.overrideWith((ref) => LocaleNotifier(initialLocale)),
+      ],
+      child: const UseUpApp(),
     ),
   );
 }

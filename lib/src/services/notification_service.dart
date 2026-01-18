@@ -22,13 +22,15 @@ class NotificationService {
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
     // iOS 设置 (请求权限)
-    const DarwinInitializationSettings initializationSettingsDarwin =
-        DarwinInitializationSettings(
+        const DarwinInitializationSettings initializationSettingsDarwin =
+            DarwinInitializationSettings(
           requestSoundPermission: true,
           requestBadgePermission: true,
           requestAlertPermission: true,
+          defaultPresentAlert: true,
+          defaultPresentBadge: true,
+          defaultPresentSound: true,
         );
-
     const InitializationSettings initializationSettings =
         InitializationSettings(
           android: initializationSettingsAndroid,
@@ -98,7 +100,11 @@ class NotificationService {
           importance: Importance.max,
           priority: Priority.high,
         ),
-        iOS: DarwinNotificationDetails(),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
       ),
       // 改为非精确模式，避免 Android 12+ 崩溃
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -123,14 +129,51 @@ class NotificationService {
       priority: Priority.high,
       ticker: 'ticker',
     );
+    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
+        DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+    
     const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
+        NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: iOSPlatformChannelSpecifics,
+    );
         
     await flutterLocalNotificationsPlugin.show(
       999,
       'UseUp Test',
       'Notifications are working correctly! 🎉',
       platformChannelSpecifics,
+    );
+  }
+
+  // 6. Delayed Test Notification (10 seconds)
+  Future<void> showDelayedNotification() async {
+    final tz.TZDateTime scheduledDate = tz.TZDateTime.now(tz.local).add(const Duration(seconds: 10));
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      998,
+      'UseUp Delayed Test',
+      'This notification was sent 10 seconds ago! ⏳',
+      scheduledDate,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'test_channel',
+          'Test Notifications',
+          importance: Importance.max,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
     );
   }
 }

@@ -14,10 +14,13 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final currentLocale = ref.watch(localeProvider);
+    final providerLocale = ref.watch(localeProvider);
+    
+    // 如果 provider 为空（跟随系统），则获取当前上下文的 locale
+    final effectiveLocale = providerLocale ?? Localizations.localeOf(context);
     
     String currentLanguageText;
-    if (currentLocale?.languageCode == 'zh') {
+    if (effectiveLocale.languageCode == 'zh') {
       currentLanguageText = '简体中文';
     } else {
       currentLanguageText = 'English';
@@ -108,30 +111,14 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          
-          const Divider(),
-
-          // 测试通知按钮
-          Container(
-            color: Colors.white,
-            child: ListTile(
-              leading: const Icon(Icons.notifications_active, color: Colors.orange),
-              title: Text(l10n.testNotification),
-              subtitle: Text(l10n.testNotificationSubtitle),
-              onTap: () async {
-                await NotificationService().showInstantNotification();
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
+                                 );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
   void _showLanguagePicker(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
@@ -149,7 +136,7 @@ class SettingsScreen extends ConsumerWidget {
                     ? const Icon(Icons.check, color: AppTheme.primaryGreen) 
                     : null,
                 onTap: () {
-                  ref.read(localeProvider.notifier).state = const Locale('en');
+                  ref.read(localeProvider.notifier).setLocale(const Locale('en'));
                   context.pop(); 
                 },
               ),
@@ -159,7 +146,7 @@ class SettingsScreen extends ConsumerWidget {
                     ? const Icon(Icons.check, color: AppTheme.primaryGreen) 
                     : null,
                 onTap: () {
-                  ref.read(localeProvider.notifier).state = const Locale('zh');
+                  ref.read(localeProvider.notifier).setLocale(const Locale('zh'));
                   context.pop();
                 },
               ),
