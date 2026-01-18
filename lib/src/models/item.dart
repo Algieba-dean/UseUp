@@ -1,52 +1,60 @@
 import 'package:isar/isar.dart';
 import 'location.dart';
-import 'category.dart';
+import 'category.dart'; 
 
 part 'item.g.dart';
 
-@collection
+ @collection
 class Item {
   Id id = Isar.autoIncrement;
 
   @Index(type: IndexType.value)
-  late String name;
+  late String name; // 一级：物品名
 
-  String? barcode; // Barcode for scanning
+  double quantity; // 二级：数量 (默认 1)
+  String unit; // 二级：单位
 
-  double quantity; // Supports 1.5 kg etc.
-  
-  String unit; // "pcs", "kg", "L"
+  double? price; // 二级：单价 (新增)
 
-  DateTime? expiryDate; // Critical for UseUp logic
-  
-  DateTime purchaseDate;
+  DateTime? productionDate; // 二级：生产日期 (新增)
+  int? shelfLifeDays; // 二级：保质期天数 (新增，用于计算)
 
+  DateTime purchaseDate; // 二级：购买日期 (默认今天)
+  DateTime? expiryDate; // 一级：到期时间 (核心)
+
+  int notifyDaysBefore; // 一级：提前几天提醒 (默认 3)
+
+  // 关联
   final categoryLink = IsarLink<Category>();
-  String categoryName; // 缓存显示用
-  
-  // locationName 只是为了在列表页显示方便（缓存）
-  @Index()
-  String locationName; 
-  
+  String categoryName; 
+
   final locationLink = IsarLink<Location>(); 
+  String locationName;
 
   String? imagePath; // Local path to image
 
-  bool isConsumed; // For History/Archive - PRD 3.5
-  
-  DateTime? consumedDate; // Time when consumed
+  // 状态
+  @Index()
+  bool isConsumed; 
+  DateTime? consumedDate; 
+
+  String? barcode; // 保留之前的 barcode 字段
 
   Item({
     required this.name,
-    this.barcode,
     this.quantity = 1.0,
     this.unit = 'pcs',
-    this.expiryDate,
+    this.price,
     required this.purchaseDate,
+    this.expiryDate,
+    this.productionDate,
+    this.shelfLifeDays,
+    this.notifyDaysBefore = 3, // 默认提前3天
     this.categoryName = 'Unknown',
-    this.locationName = 'Unknown', 
-    this.imagePath,
-    this.isConsumed = false,
+    this.locationName = 'Other', // 默认位置名为 Other
+    this.isConsumed = false, 
     this.consumedDate,
+    this.imagePath,
+    this.barcode,
   });
 }

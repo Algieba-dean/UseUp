@@ -57,18 +57,38 @@ const ItemSchema = CollectionSchema(
       name: r'name',
       type: IsarType.string,
     ),
-    r'purchaseDate': PropertySchema(
+    r'notifyDaysBefore': PropertySchema(
       id: 8,
+      name: r'notifyDaysBefore',
+      type: IsarType.long,
+    ),
+    r'price': PropertySchema(
+      id: 9,
+      name: r'price',
+      type: IsarType.double,
+    ),
+    r'productionDate': PropertySchema(
+      id: 10,
+      name: r'productionDate',
+      type: IsarType.dateTime,
+    ),
+    r'purchaseDate': PropertySchema(
+      id: 11,
       name: r'purchaseDate',
       type: IsarType.dateTime,
     ),
     r'quantity': PropertySchema(
-      id: 9,
+      id: 12,
       name: r'quantity',
       type: IsarType.double,
     ),
+    r'shelfLifeDays': PropertySchema(
+      id: 13,
+      name: r'shelfLifeDays',
+      type: IsarType.long,
+    ),
     r'unit': PropertySchema(
-      id: 10,
+      id: 14,
       name: r'unit',
       type: IsarType.string,
     )
@@ -92,16 +112,16 @@ const ItemSchema = CollectionSchema(
         )
       ],
     ),
-    r'locationName': IndexSchema(
-      id: 6386693373177518139,
-      name: r'locationName',
+    r'isConsumed': IndexSchema(
+      id: 1265324810271792707,
+      name: r'isConsumed',
       unique: false,
       replace: false,
       properties: [
         IndexPropertySchema(
-          name: r'locationName',
-          type: IndexType.hash,
-          caseSensitive: true,
+          name: r'isConsumed',
+          type: IndexType.value,
+          caseSensitive: false,
         )
       ],
     )
@@ -166,9 +186,13 @@ void _itemSerialize(
   writer.writeBool(offsets[5], object.isConsumed);
   writer.writeString(offsets[6], object.locationName);
   writer.writeString(offsets[7], object.name);
-  writer.writeDateTime(offsets[8], object.purchaseDate);
-  writer.writeDouble(offsets[9], object.quantity);
-  writer.writeString(offsets[10], object.unit);
+  writer.writeLong(offsets[8], object.notifyDaysBefore);
+  writer.writeDouble(offsets[9], object.price);
+  writer.writeDateTime(offsets[10], object.productionDate);
+  writer.writeDateTime(offsets[11], object.purchaseDate);
+  writer.writeDouble(offsets[12], object.quantity);
+  writer.writeLong(offsets[13], object.shelfLifeDays);
+  writer.writeString(offsets[14], object.unit);
 }
 
 Item _itemDeserialize(
@@ -184,11 +208,15 @@ Item _itemDeserialize(
     expiryDate: reader.readDateTimeOrNull(offsets[3]),
     imagePath: reader.readStringOrNull(offsets[4]),
     isConsumed: reader.readBoolOrNull(offsets[5]) ?? false,
-    locationName: reader.readStringOrNull(offsets[6]) ?? 'Unknown',
+    locationName: reader.readStringOrNull(offsets[6]) ?? 'Other',
     name: reader.readString(offsets[7]),
-    purchaseDate: reader.readDateTime(offsets[8]),
-    quantity: reader.readDoubleOrNull(offsets[9]) ?? 1.0,
-    unit: reader.readStringOrNull(offsets[10]) ?? 'pcs',
+    notifyDaysBefore: reader.readLongOrNull(offsets[8]) ?? 3,
+    price: reader.readDoubleOrNull(offsets[9]),
+    productionDate: reader.readDateTimeOrNull(offsets[10]),
+    purchaseDate: reader.readDateTime(offsets[11]),
+    quantity: reader.readDoubleOrNull(offsets[12]) ?? 1.0,
+    shelfLifeDays: reader.readLongOrNull(offsets[13]),
+    unit: reader.readStringOrNull(offsets[14]) ?? 'pcs',
   );
   object.id = id;
   return object;
@@ -214,14 +242,22 @@ P _itemDeserializeProp<P>(
     case 5:
       return (reader.readBoolOrNull(offset) ?? false) as P;
     case 6:
-      return (reader.readStringOrNull(offset) ?? 'Unknown') as P;
+      return (reader.readStringOrNull(offset) ?? 'Other') as P;
     case 7:
       return (reader.readString(offset)) as P;
     case 8:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readLongOrNull(offset) ?? 3) as P;
     case 9:
-      return (reader.readDoubleOrNull(offset) ?? 1.0) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 10:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 11:
+      return (reader.readDateTime(offset)) as P;
+    case 12:
+      return (reader.readDoubleOrNull(offset) ?? 1.0) as P;
+    case 13:
+      return (reader.readLongOrNull(offset)) as P;
+    case 14:
       return (reader.readStringOrNull(offset) ?? 'pcs') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -255,6 +291,14 @@ extension ItemQueryWhereSort on QueryBuilder<Item, Item, QWhere> {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         const IndexWhereClause.any(indexName: r'name'),
+      );
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterWhere> anyIsConsumed() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'isConsumed'),
       );
     });
   }
@@ -460,45 +504,45 @@ extension ItemQueryWhere on QueryBuilder<Item, Item, QWhereClause> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterWhereClause> locationNameEqualTo(
-      String locationName) {
+  QueryBuilder<Item, Item, QAfterWhereClause> isConsumedEqualTo(
+      bool isConsumed) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'locationName',
-        value: [locationName],
+        indexName: r'isConsumed',
+        value: [isConsumed],
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterWhereClause> locationNameNotEqualTo(
-      String locationName) {
+  QueryBuilder<Item, Item, QAfterWhereClause> isConsumedNotEqualTo(
+      bool isConsumed) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'locationName',
+              indexName: r'isConsumed',
               lower: [],
-              upper: [locationName],
+              upper: [isConsumed],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'locationName',
-              lower: [locationName],
+              indexName: r'isConsumed',
+              lower: [isConsumed],
               includeLower: false,
               upper: [],
             ));
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'locationName',
-              lower: [locationName],
+              indexName: r'isConsumed',
+              lower: [isConsumed],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'locationName',
+              indexName: r'isConsumed',
               lower: [],
-              upper: [locationName],
+              upper: [isConsumed],
               includeUpper: false,
             ));
       }
@@ -1385,6 +1429,206 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysBeforeEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'notifyDaysBefore',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysBeforeGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'notifyDaysBefore',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysBeforeLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'notifyDaysBefore',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> notifyDaysBeforeBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'notifyDaysBefore',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> priceIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'price',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> priceIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'price',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> priceEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'price',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> priceGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'price',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> priceLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'price',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> priceBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'price',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> productionDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'productionDate',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> productionDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'productionDate',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> productionDateEqualTo(
+      DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'productionDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> productionDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'productionDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> productionDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'productionDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> productionDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'productionDate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterFilterCondition> purchaseDateEqualTo(
       DateTime value) {
     return QueryBuilder.apply(this, (query) {
@@ -1496,6 +1740,75 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
         upper: upper,
         includeUpper: includeUpper,
         epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> shelfLifeDaysIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'shelfLifeDays',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> shelfLifeDaysIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'shelfLifeDays',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> shelfLifeDaysEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'shelfLifeDays',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> shelfLifeDaysGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'shelfLifeDays',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> shelfLifeDaysLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'shelfLifeDays',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> shelfLifeDaysBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'shelfLifeDays',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -1756,6 +2069,42 @@ extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
     });
   }
 
+  QueryBuilder<Item, Item, QAfterSortBy> sortByNotifyDaysBefore() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notifyDaysBefore', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByNotifyDaysBeforeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notifyDaysBefore', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByPrice() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'price', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByPriceDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'price', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByProductionDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'productionDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByProductionDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'productionDate', Sort.desc);
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterSortBy> sortByPurchaseDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'purchaseDate', Sort.asc);
@@ -1777,6 +2126,18 @@ extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
   QueryBuilder<Item, Item, QAfterSortBy> sortByQuantityDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'quantity', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByShelfLifeDays() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'shelfLifeDays', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByShelfLifeDaysDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'shelfLifeDays', Sort.desc);
     });
   }
 
@@ -1902,6 +2263,42 @@ extension ItemQuerySortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Item, Item, QAfterSortBy> thenByNotifyDaysBefore() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notifyDaysBefore', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByNotifyDaysBeforeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notifyDaysBefore', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByPrice() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'price', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByPriceDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'price', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByProductionDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'productionDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByProductionDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'productionDate', Sort.desc);
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterSortBy> thenByPurchaseDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'purchaseDate', Sort.asc);
@@ -1923,6 +2320,18 @@ extension ItemQuerySortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
   QueryBuilder<Item, Item, QAfterSortBy> thenByQuantityDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'quantity', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByShelfLifeDays() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'shelfLifeDays', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByShelfLifeDaysDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'shelfLifeDays', Sort.desc);
     });
   }
 
@@ -1993,6 +2402,24 @@ extension ItemQueryWhereDistinct on QueryBuilder<Item, Item, QDistinct> {
     });
   }
 
+  QueryBuilder<Item, Item, QDistinct> distinctByNotifyDaysBefore() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'notifyDaysBefore');
+    });
+  }
+
+  QueryBuilder<Item, Item, QDistinct> distinctByPrice() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'price');
+    });
+  }
+
+  QueryBuilder<Item, Item, QDistinct> distinctByProductionDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'productionDate');
+    });
+  }
+
   QueryBuilder<Item, Item, QDistinct> distinctByPurchaseDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'purchaseDate');
@@ -2002,6 +2429,12 @@ extension ItemQueryWhereDistinct on QueryBuilder<Item, Item, QDistinct> {
   QueryBuilder<Item, Item, QDistinct> distinctByQuantity() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'quantity');
+    });
+  }
+
+  QueryBuilder<Item, Item, QDistinct> distinctByShelfLifeDays() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'shelfLifeDays');
     });
   }
 
@@ -2068,6 +2501,24 @@ extension ItemQueryProperty on QueryBuilder<Item, Item, QQueryProperty> {
     });
   }
 
+  QueryBuilder<Item, int, QQueryOperations> notifyDaysBeforeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'notifyDaysBefore');
+    });
+  }
+
+  QueryBuilder<Item, double?, QQueryOperations> priceProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'price');
+    });
+  }
+
+  QueryBuilder<Item, DateTime?, QQueryOperations> productionDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'productionDate');
+    });
+  }
+
   QueryBuilder<Item, DateTime, QQueryOperations> purchaseDateProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'purchaseDate');
@@ -2077,6 +2528,12 @@ extension ItemQueryProperty on QueryBuilder<Item, Item, QQueryProperty> {
   QueryBuilder<Item, double, QQueryOperations> quantityProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'quantity');
+    });
+  }
+
+  QueryBuilder<Item, int?, QQueryOperations> shelfLifeDaysProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'shelfLifeDays');
     });
   }
 
