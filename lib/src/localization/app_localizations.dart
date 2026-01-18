@@ -110,6 +110,24 @@ abstract class AppLocalizations {
   /// **'Good Morning'**
   String get welcomeGreeting;
 
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navSettings;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
   /// No description provided for @sectionExpiringSoon.
   ///
   /// In en, this message translates to:
@@ -158,23 +176,203 @@ abstract class AppLocalizations {
   /// **'Safe'**
   String get statusSafe;
 
-  /// No description provided for @navHome.
+  /// No description provided for @name.
   ///
   /// In en, this message translates to:
-  /// **'Home'**
-  String get navHome;
+  /// **'Name'**
+  String get name;
 
-  /// No description provided for @navSettings.
+  /// No description provided for @quantity.
   ///
   /// In en, this message translates to:
-  /// **'Settings'**
-  String get navSettings;
+  /// **'Quantity'**
+  String get quantity;
+
+  /// No description provided for @category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
+
+  /// No description provided for @price.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit Price'**
+  String get price;
+
+  /// No description provided for @expiryDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry Date'**
+  String get expiryDate;
+
+  /// No description provided for @productionDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Production Date'**
+  String get productionDate;
+
+  /// No description provided for @shelfLife.
+  ///
+  /// In en, this message translates to:
+  /// **'Shelf Life (Days)'**
+  String get shelfLife;
+
+  /// No description provided for @purchaseDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase Date'**
+  String get purchaseDate;
+
+  /// No description provided for @pickDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick Date'**
+  String get pickDate;
+
+  /// No description provided for @toggleExpiryDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry Date'**
+  String get toggleExpiryDate;
+
+  /// No description provided for @toggleProductionDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Prod. Date + Shelf Life'**
+  String get toggleProductionDate;
+
+  /// No description provided for @reminderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get reminderLabel;
+
+  /// No description provided for @reminder1Day.
+  ///
+  /// In en, this message translates to:
+  /// **'1 day before'**
+  String get reminder1Day;
+
+  /// No description provided for @reminder3Days.
+  ///
+  /// In en, this message translates to:
+  /// **'3 days before'**
+  String get reminder3Days;
+
+  /// No description provided for @reminder7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'1 week before'**
+  String get reminder7Days;
+
+  /// No description provided for @advancedDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Details'**
+  String get advancedDetails;
+
+  /// No description provided for @advancedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity, Location, Price...'**
+  String get advancedSubtitle;
+
+  /// No description provided for @calculatedExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculated Expiry: {date}'**
+  String calculatedExpiry(Object date);
+
+  /// No description provided for @testNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Notification'**
+  String get testNotification;
+
+  /// No description provided for @testNotificationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to fire an instant alert'**
+  String get testNotificationSubtitle;
 
   /// No description provided for @addItem.
   ///
   /// In en, this message translates to:
   /// **'Add Item'**
   String get addItem;
+
+  /// No description provided for @editItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Item'**
+  String get editItem;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @saveAndNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Save & Next'**
+  String get saveAndNext;
+
+  /// No description provided for @updateItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Item'**
+  String get updateItem;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @markAsUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Used'**
+  String get markAsUsed;
+
+  /// No description provided for @restock.
+  ///
+  /// In en, this message translates to:
+  /// **'Restock'**
+  String get restock;
+
+  /// No description provided for @filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
 
   /// No description provided for @settingsTitle.
   ///
@@ -200,53 +398,173 @@ abstract class AppLocalizations {
   /// **'Select Language'**
   String get selectLanguage;
 
-  /// No description provided for @cancel.
+  /// No description provided for @manageCategories.
   ///
   /// In en, this message translates to:
-  /// **'Cancel'**
-  String get cancel;
+  /// **'Manage Categories'**
+  String get manageCategories;
 
-  /// No description provided for @save.
+  /// No description provided for @manageLocations.
   ///
   /// In en, this message translates to:
-  /// **'Save'**
-  String get save;
+  /// **'Manage Locations'**
+  String get manageLocations;
 
-  /// No description provided for @name.
+  /// No description provided for @manageMode.
   ///
   /// In en, this message translates to:
-  /// **'Name'**
-  String get name;
+  /// **'Manage Mode'**
+  String get manageMode;
 
-  /// No description provided for @quantity.
+  /// No description provided for @locationSelect.
   ///
   /// In en, this message translates to:
-  /// **'Quantity'**
-  String get quantity;
+  /// **'Select Location'**
+  String get locationSelect;
 
-  /// No description provided for @category.
+  /// No description provided for @locationAdd.
   ///
   /// In en, this message translates to:
-  /// **'Category'**
-  String get category;
+  /// **'Add Location'**
+  String get locationAdd;
 
-  /// No description provided for @location.
+  /// No description provided for @locationAddSub.
   ///
   /// In en, this message translates to:
-  /// **'Location'**
-  String get location;
+  /// **'Add Sub-Location'**
+  String get locationAddSub;
 
-  /// No description provided for @expiryDate.
+  /// No description provided for @locationRename.
   ///
   /// In en, this message translates to:
-  /// **'Expiry Date'**
-  String get expiryDate;
+  /// **'Rename Location'**
+  String get locationRename;
 
-  /// No description provided for @pickDate.
+  /// No description provided for @locationDeleteTitle.
   ///
   /// In en, this message translates to:
-  /// **'Pick Date'**
-  String get pickDate;
+  /// **'Delete Location?'**
+  String get locationDeleteTitle;
+
+  /// No description provided for @locationName.
+  ///
+  /// In en, this message translates to:
+  /// **'Location Name'**
+  String get locationName;
+
+  /// No description provided for @categorySelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Category'**
+  String get categorySelect;
+
+  /// No description provided for @categoryAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Category'**
+  String get categoryAdd;
+
+  /// No description provided for @categoryAddSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Sub-Category'**
+  String get categoryAddSub;
+
+  /// No description provided for @categoryRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename Category'**
+  String get categoryRename;
+
+  /// No description provided for @categoryDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Category?'**
+  String get categoryDeleteTitle;
+
+  /// No description provided for @itemConsumed.
+  ///
+  /// In en, this message translates to:
+  /// **'Item marked as consumed!'**
+  String get itemConsumed;
+
+  /// No description provided for @deleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This location/category contains items or sub-items. Cannot delete.'**
+  String get deleteConfirm;
+
+  /// No description provided for @confirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete?'**
+  String get confirmDelete;
+
+  /// No description provided for @deleteEmptyConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This item is empty and will be deleted directly.'**
+  String get deleteEmptyConfirm;
+
+  /// No description provided for @deleteMoveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Contains {count} items. Items will be moved to {target}.'**
+  String deleteMoveConfirm(Object count, Object target);
+
+  /// No description provided for @confirmAndMove.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm & Move'**
+  String get confirmAndMove;
+
+  /// No description provided for @cannotDeleteDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot delete the default item!'**
+  String get cannotDeleteDefault;
+
+  /// No description provided for @containsSubItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Contains sub-items. Delete them first.'**
+  String get containsSubItems;
+
+  /// No description provided for @errorDefaultNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: Default {name} not found.'**
+  String errorDefaultNotFound(Object name);
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search items...'**
+  String get searchHint;
+
+  /// No description provided for @noItemsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No items found'**
+  String get noItemsFound;
+
+  /// No description provided for @noItemsFoundFor.
+  ///
+  /// In en, this message translates to:
+  /// **'No items found for {query}'**
+  String noItemsFoundFor(Object query);
+
+  /// No description provided for @filtersHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters: '**
+  String get filtersHeader;
+
+  /// No description provided for @emptyList.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty'**
+  String get emptyList;
 
   /// No description provided for @catVegetable.
   ///
@@ -332,65 +650,59 @@ abstract class AppLocalizations {
   /// **'pack'**
   String get unitPack;
 
-  /// No description provided for @locationSelect.
+  /// No description provided for @unitBox.
   ///
   /// In en, this message translates to:
-  /// **'Select Location'**
-  String get locationSelect;
+  /// **'box'**
+  String get unitBox;
 
-  /// No description provided for @locationAdd.
+  /// No description provided for @valOther.
   ///
   /// In en, this message translates to:
-  /// **'Add Location'**
-  String get locationAdd;
+  /// **'Other'**
+  String get valOther;
 
-  /// No description provided for @locationName.
+  /// No description provided for @valMisc.
   ///
   /// In en, this message translates to:
-  /// **'Location Name'**
-  String get locationName;
+  /// **'Misc'**
+  String get valMisc;
 
-  /// No description provided for @delete.
+  /// No description provided for @valKitchen.
   ///
   /// In en, this message translates to:
-  /// **'Delete'**
-  String get delete;
+  /// **'Kitchen'**
+  String get valKitchen;
 
-  /// No description provided for @deleteConfirm.
+  /// No description provided for @valFridge.
   ///
   /// In en, this message translates to:
-  /// **'This location contains items or sub-locations. Cannot delete.'**
-  String get deleteConfirm;
+  /// **'Fridge'**
+  String get valFridge;
 
-  /// No description provided for @confirm.
+  /// No description provided for @valPantry.
   ///
   /// In en, this message translates to:
-  /// **'Confirm'**
-  String get confirm;
+  /// **'Pantry'**
+  String get valPantry;
 
-  /// No description provided for @markAsUsed.
+  /// No description provided for @valBathroom.
   ///
   /// In en, this message translates to:
-  /// **'Mark as Used'**
-  String get markAsUsed;
+  /// **'Bathroom'**
+  String get valBathroom;
 
-  /// No description provided for @itemConsumed.
+  /// No description provided for @valFood.
   ///
   /// In en, this message translates to:
-  /// **'Item marked as consumed!'**
-  String get itemConsumed;
+  /// **'Food'**
+  String get valFood;
 
-  /// No description provided for @history.
+  /// No description provided for @valBattery.
   ///
   /// In en, this message translates to:
-  /// **'History'**
-  String get history;
-
-  /// No description provided for @restock.
-  ///
-  /// In en, this message translates to:
-  /// **'Restock'**
-  String get restock;
+  /// **'Battery'**
+  String get valBattery;
 }
 
 class _AppLocalizationsDelegate

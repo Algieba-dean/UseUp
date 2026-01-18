@@ -70,14 +70,14 @@ class SettingsScreen extends ConsumerWidget {
             color: Colors.white,
             child: ListTile(
               leading: const Icon(Icons.category, color: AppTheme.primaryGreen),
-              title: const Text("Manage Categories"),
+              title: Text(l10n.manageCategories),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (ctx) => Scaffold(
-                      appBar: AppBar(title: const Text("Manage Categories")),
+                      appBar: AppBar(title: Text(l10n.manageCategories)),
                       body: CategorySelector(
                         isManageMode: true,
                         onSelected: (_) {},
@@ -94,14 +94,14 @@ class SettingsScreen extends ConsumerWidget {
             color: Colors.white,
             child: ListTile(
               leading: const Icon(Icons.kitchen, color: AppTheme.primaryGreen),
-              title: const Text("Manage Locations"),
+              title: Text(l10n.manageLocations),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
               onTap: () {
                  Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (ctx) => Scaffold(
-                      appBar: AppBar(title: const Text("Manage Locations")),
+                      appBar: AppBar(title: Text(l10n.manageLocations)),
                       body: LocationSelector(
                         isManageMode: true,
                         onSelected: (_) {},
@@ -120,8 +120,8 @@ class SettingsScreen extends ConsumerWidget {
             color: Colors.white,
             child: ListTile(
               leading: const Icon(Icons.notifications_active, color: Colors.orange),
-              title: const Text('Test Notification'),
-              subtitle: const Text('Click to fire an instant alert'),
+              title: Text(l10n.testNotification),
+              subtitle: Text(l10n.testNotificationSubtitle),
               onTap: () async {
                 await NotificationService().showInstantNotification();
               },

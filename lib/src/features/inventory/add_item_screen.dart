@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // 用于震动
+import 'package:flutter/services.dart'; 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -16,6 +16,7 @@ import '../../models/category.dart';
 import '../../models/location.dart';
 import '../../../main.dart';
 import '../../services/notification_service.dart';
+import '../../utils/localized_utils.dart'; // Import LocalizedUtils
 import 'category_selector.dart';
 import 'location_selector.dart';
 
@@ -30,30 +31,28 @@ class AddItemScreen extends ConsumerStatefulWidget {
 class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   final _formKey = GlobalKey<FormState>();
   
-  // --- Controllers ---
   late TextEditingController _nameController;
   late TextEditingController _quantityController;
-  late TextEditingController _priceController; // 新增：价格
-  late TextEditingController _shelfLifeController; // 新增：保质期天数
+  late TextEditingController _priceController;
+  late TextEditingController _shelfLifeController;
 
-  // --- State Variables ---
   String _selectedUnit = 'pcs';
-  final List<String> _units = ['pcs', 'kg', 'g', 'L', 'ml', 'pack', 'box'];
+  // Use keys for logic, display names will be localized
+  final List<String> _unitKeys = ['pcs', 'kg', 'g', 'L', 'ml', 'pack', 'box'];
 
   Category? _selectedCategoryObj;
   String _categoryNameDisplay = "";
   
   Location? _selectedLocationObj;
-  String _locationNameDisplay = "Other"; // 默认显示 Other
+  String _locationNameDisplay = "Other"; 
 
   DateTime? _expiryDate;
-  DateTime _purchaseDate = DateTime.now(); // 默认今天
+  DateTime _purchaseDate = DateTime.now();
   DateTime? _productionDate;
   
-  int _notifyDays = 3; // 默认提前3天
+  int _notifyDays = 3; 
   String? _imagePath;
   
-  // 模式切换：直接输入过期日 OR 生产日期+保质期
   bool _isProductionMode = false; 
 
   final ImagePicker _picker = ImagePicker();
@@ -68,7 +67,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   }
 
   Future<void> _loadDefaultSelections() async {
-    // 笨办法：分开查，确保不报错
     var defaultLoc = await isarInstance.locations
         .filter()
         .nameEqualTo('其他')
@@ -120,9 +118,8 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       _productionDate = item.productionDate;
       _notifyDays = item.notifyDaysBefore;
       
-      _isProductionMode = item.productionDate != null; // 如果有生产日期，默认开启该模式
+      _isProductionMode = item.productionDate != null;
 
-      // 关联加载
       item.categoryLink.loadSync();
       _selectedCategoryObj = item.categoryLink.value;
       _categoryNameDisplay = item.categoryLink.value?.name ?? item.categoryName;
@@ -133,9 +130,8 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       
       _imagePath = item.imagePath;
     } else {
-      // 新建默认值
       _nameController = TextEditingController();
-      _quantityController = TextEditingController(text: '1'); // 默认 1
+      _quantityController = TextEditingController(text: '1');
       _priceController = TextEditingController();
       _shelfLifeController = TextEditingController();
       _locationNameDisplay = "Other"; 
@@ -152,7 +148,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     super.dispose();
   }
 
-  // --- Logic: Image ---
   Future<void> _pickImage(ImageSource source) async {
     try {
       final XFile? pickedFile = await _picker.pickImage(source: source, imageQuality: 50);
@@ -181,7 +176,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     );
   }
 
-  // --- Logic: Date Calculation ---
   void _calculateExpiryFromProduction() {
     if (_productionDate != null && _shelfLifeController.text.isNotEmpty) {
       final days = int.tryParse(_shelfLifeController.text);
@@ -193,7 +187,21 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     }
   }
 
-  // --- Logic: Save ---
+  // 获取单位的本地化显示名称
+  String _getUnitDisplayName(String key) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (key) {
+      case 'pcs': return l10n.unitPcs;
+      case 'kg': return l10n.unitKg;
+      case 'g': return l10n.unitG;
+      case 'L': return l10n.unitL;
+      case 'ml': return l10n.unitMl;
+      case 'pack': return l10n.unitPack;
+      case 'box': return l10n.unitBox;
+      default: return key;
+    }
+  }
+
   Future<void> _saveItem({bool addNext = false}) async {
     if (_formKey.currentState!.validate()) {
       if (_expiryDate == null) {
@@ -206,9 +214,8 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       final price = double.tryParse(_priceController.text);
       final shelfLife = int.tryParse(_shelfLifeController.text);
 
-      // Prepare item object (Outside transaction)
       Item itemToSave;
-      if (widget.itemToEdit != null && !addNext) { // 编辑模式且不是"下一个"
+      if (widget.itemToEdit != null && !addNext) {
         itemToSave = widget.itemToEdit!;
         itemToSave.name = name;
         itemToSave.quantity = quantity;
@@ -220,10 +227,9 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         itemToSave.shelfLifeDays = _isProductionMode ? shelfLife : null;
         itemToSave.notifyDaysBefore = _notifyDays;
         itemToSave.imagePath = _imagePath;
-        itemToSave.categoryName = _categoryNameDisplay; // Ensure strings updated
+        itemToSave.categoryName = _categoryNameDisplay; 
         itemToSave.locationName = _locationNameDisplay;
       } else {
-        // 新建模式
         itemToSave = Item(
           name: name,
           quantity: quantity,
@@ -240,23 +246,16 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         );
       }
       
-      // Update link values
       itemToSave.categoryLink.value = _selectedCategoryObj;
       itemToSave.locationLink.value = _selectedLocationObj;
 
       await isarInstance.writeTxn(() async {
-        // 存数据库
         await isarInstance.items.put(itemToSave);
-        
-        // 存 Links
         await itemToSave.categoryLink.save();
         await itemToSave.locationLink.save();
-        
-        // Save again to ensure consistency (optional but safe)
         await isarInstance.items.put(itemToSave);
       });
       
-      // 设通知 (Outside transaction)
       try {
         await NotificationService().scheduleExpiryNotification(itemToSave);
       } catch (e) {
@@ -265,22 +264,18 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
 
       if (mounted) {
         if (addNext) {
-          // --- 连续添加逻辑 ---
-          HapticFeedback.mediumImpact(); // 震动反馈
+          HapticFeedback.mediumImpact(); 
+          // 这里的提示也可以本地化，暂留
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('"$name" saved! Ready for next.')));
           
-          // 重置表单，保留部分习惯 (如分类、位置、购买日期可能是一样的)
           _nameController.clear();
           _priceController.clear();
           _shelfLifeController.clear();
-          // _quantityController.text = '1'; // 保持默认
           setState(() {
             _imagePath = null;
             _expiryDate = null;
             _productionDate = null;
-            // 保留 Category 和 Location，方便批量录入
           });
-          // 滚动回顶部
           FocusScope.of(context).unfocus();
         } else {
           context.pop();
@@ -289,10 +284,8 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     }
   }
 
-  // --- UI Widgets ---
-
-  // 通用白色卡片背景
   Widget _buildSection({required List<Widget> children, bool isAdvanced = false}) {
+    final l10n = AppLocalizations.of(context)!;
     if (isAdvanced) {
       return Container(
         margin: const EdgeInsets.only(top: 16),
@@ -304,8 +297,9 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         child: Theme(
           data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
           child: ExpansionTile(
-            title: const Text("Advanced Details", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-            subtitle: const Text("Quantity, Location, Price...", style: TextStyle(fontSize: 12, color: Colors.grey)),
+            // Localized Title & Subtitle
+            title: Text(l10n.advancedDetails, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+            subtitle: Text(l10n.advancedSubtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
             childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             children: children,
           ),
@@ -313,7 +307,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       );
     }
     
-    // Level 1 Section
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -333,7 +326,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       appBar: AppBar(
-        title: Text(isEditing ? "Edit Item" : l10n.addItem, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(isEditing ? l10n.editItem : l10n.addItem, style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
@@ -341,9 +334,8 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 100), // 底部留出按钮空间
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 100), 
           children: [
-            // 0. 图片区域 (保持不变，视觉重心)
             Center(
               child: GestureDetector(
                 onTap: _showImageSourceActionSheet,
@@ -363,9 +355,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               ),
             ),
 
-            // --- Level 1: 核心信息 (Name, Expiry, Notify) ---
             _buildSection(children: [
-              // 1.1 物品名称 (必填)
               TextFormField(
                 controller: _nameController,
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -379,23 +369,20 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               ),
               const Divider(),
 
-              // 1.2 日期模式切换 (Tab)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   children: [
-                    _buildModeTab("Expiry Date", !_isProductionMode, () => setState(() => _isProductionMode = false)),
+                    _buildModeTab(l10n.toggleExpiryDate, !_isProductionMode, () => setState(() => _isProductionMode = false)),
                     const SizedBox(width: 12),
-                    _buildModeTab("Prod. Date + Shelf Life", _isProductionMode, () => setState(() => _isProductionMode = true)),
+                    _buildModeTab(l10n.toggleProductionDate, _isProductionMode, () => setState(() => _isProductionMode = true)),
                   ],
                 ),
               ),
 
-              // 1.3 日期输入区域
               if (!_isProductionMode)
-                // 模式 A: 直接输入过期时间
                 _buildDateRow(
-                  label: "Expiry Date *",
+                  label: "${l10n.expiryDate} *",
                   value: _expiryDate,
                   onTap: () async {
                     final d = await showDatePicker(context: context, initialDate: _expiryDate ?? DateTime.now(), firstDate: DateTime(2020), lastDate: DateTime(2030));
@@ -403,11 +390,10 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                   },
                 )
               else
-                // 模式 B: 生产日期 + 保质期
                 Column(
                   children: [
                     _buildDateRow(
-                      label: "Production Date",
+                      label: l10n.productionDate,
                       value: _productionDate,
                       onTap: () async {
                         final d = await showDatePicker(context: context, initialDate: _productionDate ?? DateTime.now(), firstDate: DateTime(2020), lastDate: DateTime.now());
@@ -426,7 +412,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                           child: TextFormField(
                             controller: _shelfLifeController,
                             keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(labelText: "Shelf Life (Days)", border: InputBorder.none),
+                            decoration: InputDecoration(labelText: l10n.shelfLife, border: InputBorder.none),
                             onChanged: (_) => _calculateExpiryFromProduction(),
                           ),
                         ),
@@ -435,7 +421,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                     if (_expiryDate != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 8, left: 36),
-                        child: Text("Calculated Expiry: ${DateFormat('yyyy-MM-dd').format(_expiryDate!)}", 
+                        child: Text(l10n.calculatedExpiry(DateFormat('yyyy-MM-dd').format(_expiryDate!)), 
                           style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
                       ),
                   ],
@@ -443,19 +429,18 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               
               const Divider(),
 
-              // 1.4 提醒设置
               Row(
                 children: [
                   const Icon(Icons.notifications_outlined, color: Colors.grey),
                   const SizedBox(width: 12),
-                  const Expanded(child: Text("Reminder")),
+                  Expanded(child: Text(l10n.reminderLabel)),
                   DropdownButton<int>(
                     value: _notifyDays,
                     underline: const SizedBox(),
-                    items: const [
-                      DropdownMenuItem(value: 1, child: Text("1 day before")),
-                      DropdownMenuItem(value: 3, child: Text("3 days before")),
-                      DropdownMenuItem(value: 7, child: Text("1 week before")),
+                    items: [
+                      DropdownMenuItem(value: 1, child: Text(l10n.reminder1Day)),
+                      DropdownMenuItem(value: 3, child: Text(l10n.reminder3Days)),
+                      DropdownMenuItem(value: 7, child: Text(l10n.reminder7Days)),
                     ],
                     onChanged: (v) => setState(() => _notifyDays = v!),
                   ),
@@ -463,9 +448,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               ),
             ]),
 
-            // --- Level 2: 高级信息 (Advanced) ---
             _buildSection(isAdvanced: true, children: [
-              // 2.1 数量 & 单位
               Row(
                 children: [
                   const Icon(Icons.shopping_bag_outlined, color: Colors.grey),
@@ -474,23 +457,29 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                     child: TextFormField(
                       controller: _quantityController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: const InputDecoration(labelText: "Quantity", border: InputBorder.none),
+                      decoration: InputDecoration(labelText: l10n.quantity, border: InputBorder.none),
                     ),
                   ),
                   DropdownButton<String>(
                     value: _selectedUnit,
                     underline: const SizedBox(),
-                    items: _units.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
+                    // Use Localized Unit Display Name
+                    items: _unitKeys.map((key) => DropdownMenuItem(
+                      value: key, 
+                      child: Text(_getUnitDisplayName(key))
+                    )).toList(),
                     onChanged: (val) => setState(() => _selectedUnit = val!),
                   ),
                 ],
               ),
               const Divider(),
 
-              // 2.2 分类 (保留之前的 Selector)
               _buildSelectorRow(
-                label: "Category", 
-                value: _categoryNameDisplay.isEmpty ? "Unknown" : _categoryNameDisplay,
+                label: l10n.category, 
+                // Localized display value
+                value: _categoryNameDisplay.isEmpty 
+                    ? "Unknown" 
+                    : LocalizedUtils.getLocalizedName(context, _categoryNameDisplay),
                 icon: Icons.category_outlined,
                 onTap: () => showModalBottomSheet(
                   context: context, isScrollControlled: true, useSafeArea: true,
@@ -502,10 +491,12 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               ),
               const Divider(),
 
-              // 2.3 位置 (默认 Other)
               _buildSelectorRow(
-                label: "Location", 
-                value: _locationNameDisplay.isEmpty ? "Other" : _locationNameDisplay,
+                label: l10n.location, 
+                // Localized display value
+                value: _locationNameDisplay.isEmpty 
+                    ? "Other" 
+                    : LocalizedUtils.getLocalizedName(context, _locationNameDisplay),
                 icon: Icons.kitchen_outlined,
                 onTap: () => showModalBottomSheet(
                   context: context, isScrollControlled: true, useSafeArea: true,
@@ -517,9 +508,8 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               ),
               const Divider(),
 
-              // 2.4 购买日期 & 价格
               _buildDateRow(
-                label: "Purchase Date", 
+                label: l10n.purchaseDate, 
                 value: _purchaseDate, 
                 onTap: () async {
                   final d = await showDatePicker(context: context, initialDate: _purchaseDate, firstDate: DateTime(2020), lastDate: DateTime.now());
@@ -535,7 +525,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                     child: TextFormField(
                       controller: _priceController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: const InputDecoration(labelText: "Unit Price (Optional)", border: InputBorder.none),
+                      decoration: InputDecoration(labelText: l10n.price, border: InputBorder.none),
                     ),
                   ),
                 ],
@@ -545,15 +535,13 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         ),
       ),
       
-      // --- 底部双按钮 (Save & Next) ---
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, -2))]),
         child: SafeArea(
           child: Row(
             children: [
-              // Save & Add Next
-              if (!isEditing) // 只有新建时显示
+              if (!isEditing)
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => _saveItem(addNext: true),
@@ -562,12 +550,11 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                       side: const BorderSide(color: AppTheme.primaryGreen),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text("Save & Next", style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
+                    child: Text(l10n.saveAndNext, style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
                   ),
                 ),
               if (!isEditing) const SizedBox(width: 12),
               
-              // Save (Done)
               Expanded(
                 child: FilledButton(
                   onPressed: () => _saveItem(addNext: false),
@@ -576,7 +563,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                     backgroundColor: AppTheme.primaryGreen,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: Text(isEditing ? "Update Item" : "Save", style: const TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text(isEditing ? l10n.updateItem : l10n.save, style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -585,8 +572,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       ),
     );
   }
-
-  // --- UI Helpers ---
 
   Widget _buildModeTab(String text, bool isActive, VoidCallback onTap) {
     return Expanded(
@@ -614,6 +599,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   }
 
   Widget _buildDateRow({required String label, required DateTime? value, required VoidCallback onTap}) {
+    final l10n = AppLocalizations.of(context)!;
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -625,7 +611,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             Text(label, style: const TextStyle(color: Colors.black87)),
             const Spacer(),
             Text(
-              value == null ? "Select" : DateFormat('yyyy-MM-dd').format(value),
+              value == null ? l10n.pickDate : DateFormat('yyyy-MM-dd').format(value),
               style: TextStyle(
                 fontWeight: value == null ? FontWeight.normal : FontWeight.bold,
                 color: value == null ? Colors.grey : AppTheme.primaryGreen,
