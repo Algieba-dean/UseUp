@@ -1,6 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import 'package:use_up/src/localization/app_localizations.dart';
 import '../../config/theme.dart';
 import '../../models/item.dart';
@@ -10,6 +14,7 @@ import '../../../main.dart';
 import 'category_selector.dart';
 import 'location_selector.dart';
 import 'widgets/date_input_field.dart';
+import '../../services/notification_service.dart';
 
 class AddItemScreen extends ConsumerStatefulWidget {
   final Item? itemToEdit;
@@ -35,6 +40,9 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   String _locationNameDisplay = "";
   
   DateTime? _expiryDate;
+  
+  String? _imagePath; // 保存图片路径
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -58,10 +66,66 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       _selectedLocationObj = item.locationLink.value;
       
       _expiryDate = item.expiryDate;
+      _imagePath = item.imagePath;
     } else {
       _nameController = TextEditingController();
       _quantityController = TextEditingController(text: '1');
     }
+  }
+
+  // --- 新增：选择并保存图片 ---
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: source,
+        imageQuality: 50, // 压缩一下，防止数据库太卡
+      );
+
+      if (pickedFile == null) return;
+
+      // 【关键步骤】将临时缓存图片 复制到 App 的永久文档目录
+      final directory = await getApplicationDocumentsDirectory();
+      final String fileName = p.basename(pickedFile.path);
+      final String savedPath = '${directory.path}/$fileName';
+      
+      // 复制文件
+      await File(pickedFile.path).copy(savedPath);
+
+      setState(() {
+        _imagePath = savedPath;
+      });
+    } catch (e) {
+      debugPrint('Error picking image: $e');
+    }
+  }
+
+  // --- 新增：弹出选择框 (相机或相册) ---
+  void _showImageSourceActionSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: const Text('Camera'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -89,44 +153,49 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
           final name = _nameController.text;
           final quantity = double.tryParse(_quantityController.text) ?? 1.0;
 
+          // 1. Prepare the item object (OUTSIDE the transaction)
+          Item itemToSave;
+
+          if (widget.itemToEdit != null) {
+            // Edit Mode: Update existing object
+            itemToSave = widget.itemToEdit!;
+            itemToSave.name = name;
+            itemToSave.quantity = quantity;
+            itemToSave.unit = _selectedUnit;
+            itemToSave.expiryDate = _expiryDate;
+            itemToSave.imagePath = _imagePath;
+          } else {
+            // Create Mode: New object
+            itemToSave = Item(
+              name: name,
+              quantity: quantity,
+              unit: _selectedUnit,
+              purchaseDate: DateTime.now(),
+              expiryDate: _expiryDate,
+              imagePath: _imagePath,
+            );
+          }
+
+          // Update common fields
+          itemToSave.categoryName = _categoryNameDisplay.isEmpty ? 'Unknown' : _categoryNameDisplay;
+          itemToSave.locationName = _locationNameDisplay.isEmpty ? 'Unknown' : _locationNameDisplay;
+          
+          itemToSave.categoryLink.value = _selectedCategoryObj;
+          itemToSave.locationLink.value = _selectedLocationObj;
+
+          // 2. Save to DB (INSIDE the transaction)
           await isarInstance.writeTxn(() async {
-            Item itemToSave;
-
-            if (widget.itemToEdit != null) {
-              // Edit Mode
-              itemToSave = widget.itemToEdit!;
-              itemToSave.name = name;
-              itemToSave.quantity = quantity;
-              itemToSave.unit = _selectedUnit;
-              itemToSave.expiryDate = _expiryDate;
-              // preserve purchaseDate or update if needed
-            } else {
-              // Create Mode
-              itemToSave = Item(
-                name: name,
-                quantity: quantity,
-                unit: _selectedUnit,
-                purchaseDate: DateTime.now(),
-                expiryDate: _expiryDate,
-              );
-            }
-
-            // Update common fields
-            itemToSave.categoryName = _categoryNameDisplay.isEmpty ? 'Unknown' : _categoryNameDisplay;
-            itemToSave.locationName = _locationNameDisplay.isEmpty ? 'Unknown' : _locationNameDisplay;
-            
-            // Update Links
-            // Note: assign value only if selected, otherwise it might clear existing link if null?
-            // Logic: if user selected something, update. If user didn't touch it, 
-            // in edit mode: _selectedCategoryObj is init from item.categoryLink.value, so it preserves.
-            // in add mode: it's null.
-            itemToSave.categoryLink.value = _selectedCategoryObj;
-            itemToSave.locationLink.value = _selectedLocationObj;
-
             await isarInstance.items.put(itemToSave);
             await itemToSave.categoryLink.save();
             await itemToSave.locationLink.save();
           });
+          
+          // 3. Schedule Notification (OUTSIDE the transaction)
+          try {
+             await NotificationService().scheduleExpiryNotification(itemToSave);
+          } catch (e) {
+             debugPrint('Failed to schedule notification: $e');
+          }
           
           if(mounted) {
              context.pop();
@@ -237,6 +306,35 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
+            // --- 0. 图片选择区域 (新增) ---
+            Center(
+              child: GestureDetector(
+                onTap: _showImageSourceActionSheet,
+                child: Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                    ],
+                    // 如果有图显示图，没图显示 Icon
+                    image: _imagePath != null
+                        ? DecorationImage(
+                            image: FileImage(File(_imagePath!)),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: _imagePath == null
+                      ? Icon(Icons.add_a_photo, size: 40, color: Colors.grey[400])
+                      : null, // 如果有图就不显示 Icon
+                ),
+              ),
+            ),
+            const SizedBox(height: 24), // 间距
+
             // 1. Name Input
             _buildCardInput(
               child: TextFormField(

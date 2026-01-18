@@ -1,61 +1,133 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../localization/app_localizations.dart';
-import '../inventory/providers/inventory_provider.dart'; // 导入新 Provider
+import 'package:use_up/src/localization/app_localizations.dart'; // 修正后的正确路径
+import '../inventory/providers/inventory_provider.dart'; 
+import 'providers/dashboard_filter_provider.dart';
 import 'widgets/expiring_card.dart';
-import '../../config/theme.dart';
-import '../../utils/expiry_utils.dart';
+import '../../config/theme.dart';        // 修正为 ../../
+import '../../utils/expiry_utils.dart';  // 修正为 ../../
+import '../../models/item.dart';         // 修正为 ../../
 
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  bool _isSearching = false; // 控制是否显示搜索框
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  // 清空搜索
+  void _clearSearch() {
+    _searchController.clear();
+    ref.read(dashboardFilterProvider.notifier).state = DashboardFilter(searchQuery: '');
+    setState(() {
+      _isSearching = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
-    // 监听数据库流
     final inventoryAsync = ref.watch(inventoryProvider);
+    // 获取当前是否有搜索词
+    final currentQuery = ref.watch(dashboardFilterProvider).searchQuery;
 
     return Scaffold(
       backgroundColor: AppTheme.neutralGrey,
       appBar: AppBar(
         backgroundColor: AppTheme.neutralGrey,
         elevation: 0,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+        // --- 动态 AppBar ---
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'Search items...',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                ),
+                style: const TextStyle(color: Colors.black, fontSize: 18),
+                onChanged: (value) {
+                  // 实时更新 Provider
+                  ref.read(dashboardFilterProvider.notifier).state = 
+                      DashboardFilter(searchQuery: value);
+                },
+              )
+            : Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryGreen.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.eco, color: AppTheme.primaryGreen),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'UseUp',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryGreen,
+                        ),
+                  ),
+                ],
               ),
-              child: const Icon(Icons.eco, color: AppTheme.primaryGreen),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              'UseUp',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppTheme.primaryGreen,
-              ),
-            ),
-          ],
-        ),
         actions: [
-          IconButton(
-            onPressed: () => context.push('/settings'),
-            icon: const Icon(Icons.settings_outlined, color: Colors.black),
-          ),
+          // 搜索开关按钮
+          if (_isSearching)
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.grey),
+              onPressed: _clearSearch,
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.search, color: Colors.black),
+              onPressed: () {
+                setState(() {
+                  _isSearching = true;
+                });
+              },
+            ),
+            
+          if (!_isSearching)
+            IconButton(
+              onPressed: () => context.push('/settings'),
+              icon: const Icon(Icons.settings_outlined, color: Colors.black),
+            ),
         ],
       ),
       
-      // 处理异步数据状态
       body: inventoryAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
         data: (items) {
-          // 如果没数据，显示空状态
+          // --- 搜索状态下的特殊处理 ---
+          if (currentQuery.isNotEmpty) {
+             if (items.isEmpty) {
+                return Center(child: Text('No items found for "$currentQuery"'));
+             }
+             return ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: items.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
+                itemBuilder: (context, index) => _buildItemTile(context, items[index]),
+             );
+          }
+
+          // --- 正常状态 (无搜索) ---
           if (items.isEmpty) {
             return Center(
               child: Column(
@@ -69,11 +141,10 @@ class DashboardScreen extends ConsumerWidget {
             );
           }
 
-          // 筛选即将过期的物品 (有过期时间 且 剩余天数 <= 5)
           final expiringItems = items.where((i) {
             if (i.expiryDate == null) return false;
             final days = ExpiryUtils.daysRemaining(i.expiryDate!);
-            return days <= 5; // UI Doc 定义: 5天内算即将过期
+            return days <= 5; 
           }).toList();
 
           return SingleChildScrollView(
@@ -82,8 +153,7 @@ class DashboardScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- SECTION 1: Expiring Soon ---
-                  // 只有当有即将过期的物品时才显示这个区域
+                  // SECTION 1: Expiring Soon
                   if (expiringItems.isNotEmpty) ...[
                     Text(l10n.sectionExpiringSoon, style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 12),
@@ -100,13 +170,9 @@ class DashboardScreen extends ConsumerWidget {
                     const SizedBox(height: 24),
                   ],
 
-                  // --- SECTION 2: All Items ---
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(l10n.sectionAllItems, style: Theme.of(context).textTheme.titleLarge),
-                    ],
-                  ),
+                  // SECTION 2: All Items
+                  Text(l10n.sectionAllItems, style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 12),
                   
                   ListView.separated(
                     physics: const NeverScrollableScrollPhysics(),
@@ -114,48 +180,9 @@ class DashboardScreen extends ConsumerWidget {
                     itemCount: items.length,
                     separatorBuilder: (context, index) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
-                      final item = items[index];
-                      // 计算天数
-                      final days = item.expiryDate != null 
-                          ? ExpiryUtils.daysRemaining(item.expiryDate!) 
-                          : 999;
-                      
-                      return Card(
-                        child: ListTile(
-                          onTap: () {
-                            context.push('/item/${item.id}');
-                          },
-                          leading: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppTheme.softSage.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            // 这里可以根据 item.categoryName 显示不同图标
-                            child: _getCategoryIcon(item.categoryName),
-                          ),
-                          title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                          subtitle: Text('${item.quantity} ${item.unit} • ${item.locationName}'),
-                          trailing: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: ExpiryUtils.getColorForExpiry(days).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              ExpiryUtils.getExpiryString(context, days),
-                              style: TextStyle(
-                                color: ExpiryUtils.getColorForExpiry(days),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
+                      return _buildItemTile(context, items[index]);
                     },
                   ),
-                  // 底部留白，防止被 FAB 遮挡
                   const SizedBox(height: 80), 
                 ],
               ),
@@ -165,9 +192,7 @@ class DashboardScreen extends ConsumerWidget {
       ),
       
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-           context.push('/add');
-        },
+        onPressed: () => context.push('/add'),
         backgroundColor: AppTheme.primaryGreen,
         icon: const Icon(Icons.add, color: Colors.white),
         label: Text(l10n.addItem, style: const TextStyle(color: Colors.white)),
@@ -175,10 +200,53 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // 辅助方法：根据分类返回图标
+  Widget _buildItemTile(BuildContext context, Item item) {
+    final days = item.expiryDate != null 
+        ? ExpiryUtils.daysRemaining(item.expiryDate!) 
+        : 999;
+    
+    return Card(
+      child: ListTile(
+        onTap: () => context.push('/item/${item.id}'),
+        leading: Container(
+          width: 50, 
+          height: 50,
+          clipBehavior: Clip.antiAlias, // 裁剪圆角
+          decoration: BoxDecoration(
+            color: AppTheme.softSage.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: item.imagePath != null
+              ? Image.file(
+                  File(item.imagePath!),
+                  fit: BoxFit.cover,
+                  errorBuilder: (ctx, err, stack) => _getCategoryIcon(item.categoryName), // 如果图片坏了，降级显示图标
+                )
+              : _getCategoryIcon(item.categoryName), // 没图显示默认图标
+        ),
+        title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text('${item.quantity} ${item.unit} • ${item.locationName}'),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: ExpiryUtils.getColorForExpiry(days).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            ExpiryUtils.getExpiryString(context, days),
+            style: TextStyle(
+              color: ExpiryUtils.getColorForExpiry(days),
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _getCategoryIcon(String categoryName) {
     IconData icon;
-    // 简单的关键词匹配
     if (categoryName.contains('Vegetable') || categoryName.contains('蔬菜')) {
       icon = Icons.grass;
     } else if (categoryName.contains('Fruit') || categoryName.contains('水果')) {

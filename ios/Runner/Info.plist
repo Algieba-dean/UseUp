@@ -41,9 +41,13 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-</dict>
-</plist>
+	    <key>CADisableMinimumFrameDurationOnPhone</key>
+	    <true/>
+	    <key>UIApplicationSupportsIndirectInputEvents</key>
+	    <true/>
+	    <key>NSPhotoLibraryUsageDescription</key>
+	    <string>UseUp needs access to your photo library to select inventory images.</string>
+	    <key>NSCameraUsageDescription</key>
+	    <string>UseUp needs access to your camera to take photos of inventory items.</string>
+	</dict>
+	</plist>

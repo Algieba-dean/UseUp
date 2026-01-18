@@ -6,6 +6,7 @@ import 'src/app.dart';
 import 'src/models/item.dart';
 import 'src/models/location.dart';
 import 'src/models/category.dart';
+import 'src/services/notification_service.dart';
 
 // 定义一个全局 Provider 来获取 Isar 实例
 late Isar isarInstance;
@@ -25,6 +26,11 @@ void main() async {
   // 初始化默认位置数据
   await _seedDefaultLocations();
   await _seedDefaultCategories();
+
+  // 3. 初始化通知服务
+  final notificationService = NotificationService();
+  await notificationService.init();
+  await notificationService.requestPermissions();
 
   runApp(
     const ProviderScope(

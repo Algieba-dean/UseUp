@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:io';
 import 'package:use_up/src/config/theme.dart';
 import 'package:use_up/src/models/item.dart';
 import 'package:use_up/src/utils/expiry_utils.dart';
@@ -37,11 +38,16 @@ class ExpiringCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 这里的 Icon 未来可以换成 item.imagePath 图片
+            // 这里的 Icon 换成图片
             CircleAvatar(
               backgroundColor: color.withOpacity(0.1),
               foregroundColor: color,
-              child: const Icon(Icons.fastfood),
+              backgroundImage: item.imagePath != null 
+                  ? FileImage(File(item.imagePath!)) 
+                  : null,
+              child: item.imagePath == null 
+                  ? const Icon(Icons.fastfood) // 默认图标
+                  : null, 
             ),
             const Spacer(),
             Text(

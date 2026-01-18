@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
 import 'package:isar/isar.dart';
 import 'package:use_up/src/localization/app_localizations.dart';
 import '../../config/theme.dart';
@@ -9,6 +10,7 @@ import '../../models/item.dart';
 import '../../utils/expiry_utils.dart';
 import '../../../main.dart';
 import 'add_item_screen.dart';
+import '../../services/notification_service.dart';
 
 class ItemDetailScreen extends ConsumerWidget {
   final int itemId;
@@ -38,6 +40,14 @@ class ItemDetailScreen extends ConsumerWidget {
       await isarInstance.writeTxn(() async {
         await isarInstance.items.delete(itemId);
       });
+      
+      // Cancel notification outside transaction
+      try {
+        await NotificationService().cancelNotification(itemId);
+      } catch (e) {
+         debugPrint('Error canceling notification: $e');
+      }
+
       if (context.mounted) {
         context.pop(); // 退回首页
       }
@@ -55,6 +65,13 @@ class ItemDetailScreen extends ConsumerWidget {
       // 2. 保存更新
       await isarInstance.items.put(item);
     });
+
+    // 3. 取消通知 (移出事务)
+    try {
+      await NotificationService().cancelNotification(item.id);
+    } catch (e) {
+      debugPrint('Error canceling notification: $e');
+    }
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -130,6 +147,24 @@ class ItemDetailScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // --- 0. 大图展示 (新增) ---
+                if (item.imagePath != null)
+                  Container(
+                    width: double.infinity,
+                    height: 200,
+                    margin: const EdgeInsets.only(bottom: 24),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      image: DecorationImage(
+                        image: FileImage(File(item.imagePath!)),
+                        fit: BoxFit.cover,
+                      ),
+                      boxShadow: [
+                         BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
+                      ],
+                    ),
+                  ),
+
                 // 1. 大标题 (Name)
                 Text(
                   item.name,
