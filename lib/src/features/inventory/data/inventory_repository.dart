@@ -75,6 +75,40 @@ class InventoryRepository {
     await item.categoryLink.load();
     await item.locationLink.load();
   }
+
+  // 6. 递归获取子分类 ID
+  Future<List<int>> getCategoryIdsWithDescendants(int parentId) async {
+    final ids = {parentId};
+    var currentLevelIds = [parentId];
+    
+    while (currentLevelIds.isNotEmpty) {
+      final children = await _isar.categorys
+          .filter()
+          .anyOf(currentLevelIds, (q, int id) => q.parentIdEqualTo(id))
+          .findAll();
+      if (children.isEmpty) break;
+      currentLevelIds = children.map((e) => e.id).toList();
+      ids.addAll(currentLevelIds);
+    }
+    return ids.toList();
+  }
+
+  // 7. 递归获取子位置 ID
+  Future<List<int>> getLocationIdsWithDescendants(int parentId) async {
+    final ids = {parentId};
+    var currentLevelIds = [parentId];
+    
+    while (currentLevelIds.isNotEmpty) {
+      final children = await _isar.locations
+          .filter()
+          .anyOf(currentLevelIds, (q, int id) => q.parentIdEqualTo(id))
+          .findAll();
+      if (children.isEmpty) break;
+      currentLevelIds = children.map((e) => e.id).toList();
+      ids.addAll(currentLevelIds);
+    }
+    return ids.toList();
+  }
 }
 
 final inventoryRepositoryProvider = Provider<InventoryRepository>((ref) {
