@@ -5,15 +5,16 @@ import 'package:isar/isar.dart';
 import 'package:use_up/src/localization/app_localizations.dart';
 import '../../config/theme.dart';
 import '../../models/item.dart';
-import '../../../main.dart';
+import '../../data/providers/database_provider.dart';
+import '../../utils/localized_utils.dart';
 
-// 【核心修改】改为 StreamProvider，实时监听数据库变化
 final historyProvider = StreamProvider<List<Item>>((ref) {
-  return isarInstance.items
+  final isar = ref.watch(databaseProvider);
+  return isar.items
       .filter()
-      .isConsumedEqualTo(true)      // 只查询已消耗的
-      .sortByConsumedDateDesc()     // 按消耗时间倒序
-      .watch(fireImmediately: true); // 实时监听！
+      .isConsumedEqualTo(true)
+      .sortByConsumedDateDesc()
+      .watch(fireImmediately: true);
 });
 
 class HistoryScreen extends ConsumerWidget {
@@ -22,7 +23,6 @@ class HistoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    // 监听实时数据流
     final historyAsync = ref.watch(historyProvider);
 
     return Scaffold(
@@ -43,7 +43,7 @@ class HistoryScreen extends ConsumerWidget {
                 children: [
                   Icon(Icons.history, size: 64, color: Colors.grey[300]),
                   const SizedBox(height: 16),
-                  Text('No history yet', style: TextStyle(color: Colors.grey[500])),
+                  Text(l10n.emptyList, style: TextStyle(color: Colors.grey[500])),
                 ],
               ),
             );
@@ -81,7 +81,7 @@ class HistoryScreen extends ConsumerWidget {
         title: Text(
           item.name,
           style: const TextStyle(
-            decoration: TextDecoration.lineThrough, // 删除线，表示已用
+            decoration: TextDecoration.lineThrough,
             color: Colors.grey,
             fontWeight: FontWeight.bold,
           ),
@@ -101,11 +101,9 @@ class HistoryScreen extends ConsumerWidget {
           ],
         ),
         trailing: TextButton.icon(
-          onPressed: () {
-            _restockItem(context, item);
-          },
+          onPressed: () => _restockItem(ref, item, context),
           icon: const Icon(Icons.refresh, size: 16),
-          label: Text(l10n.restock), // "补货"
+          label: Text(l10n.restock),
           style: TextButton.styleFrom(
             foregroundColor: AppTheme.primaryGreen,
             backgroundColor: AppTheme.primaryGreen.withOpacity(0.1),
@@ -115,34 +113,30 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
-  // 补货逻辑
-  Future<void> _restockItem(BuildContext context, Item oldItem) async {
-    // 1. 创建新副本
+  Future<void> _restockItem(WidgetRef ref, Item oldItem, BuildContext context) async {
+    final isar = ref.read(databaseProvider);
     final newItem = Item(
       name: oldItem.name,
       quantity: oldItem.quantity,
       unit: oldItem.unit,
       purchaseDate: DateTime.now(),
-      expiryDate: null, // 过期时间重置，需要用户重新填
+      expiryDate: null,
       categoryName: oldItem.categoryName,
       locationName: oldItem.locationName,
-      isConsumed: false, // 关键：这是新的，没消耗
+      isConsumed: false,
     );
     
-    // 2. 复制 Link 关系
-    newItem.categoryLink.value = oldItem.categoryLink.value;
-    newItem.locationLink.value = oldItem.locationLink.value;
-
-    // 3. 写入
-    await isarInstance.writeTxn(() async {
-      await isarInstance.items.put(newItem);
+    await isar.writeTxn(() async {
+      await isar.items.put(newItem);
+      newItem.categoryLink.value = oldItem.categoryLink.value;
+      newItem.locationLink.value = oldItem.locationLink.value;
       await newItem.categoryLink.save();
       await newItem.locationLink.save();
     });
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${newItem.name} added back to inventory!')),
+        SnackBar(content: Text('${newItem.name} restocked!')),
       );
     }
   }
