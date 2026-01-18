@@ -23,6 +23,8 @@ class AddItemScreen extends ConsumerStatefulWidget {
 }
 
 class _AddItemScreenState extends ConsumerState<AddItemScreen> {
+  final _formKey = GlobalKey<FormState>();
+  
   late TextEditingController _nameController;
   late TextEditingController _priceController;
   late TextEditingController _shelfLifeController;
@@ -31,9 +33,15 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   @override
   void initState() {
     super.initState();
-    // 异步初始化 ViewModel
-    Future.microtask(() {
-      ref.read(addItemProvider.notifier).init(widget.itemToEdit);
+    Future.microtask(() async {
+      await ref.read(addItemProvider.notifier).init(widget.itemToEdit);
+      final state = ref.read(addItemProvider);
+      _nameController.text = state.name;
+      _priceController.text = state.price?.toString() ?? '';
+      _shelfLifeController.text = state.shelfLifeDays?.toString() ?? '';
+      _quantityController.text = state.quantity % 1 == 0 
+          ? state.quantity.toInt().toString() 
+          : state.quantity.toString();
     });
     
     _nameController = TextEditingController();
@@ -51,19 +59,17 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     super.dispose();
   }
 
-  // 同步 Controller 与 Provider (单向流：UI -> Provider)
-  void _syncControllers(AddItemState state) {
-    if (_nameController.text != state.name) _nameController.text = state.name;
-    if (_priceController.text != (state.price?.toString() ?? '')) {
-      _priceController.text = state.price?.toString() ?? '';
-    }
-    if (_shelfLifeController.text != (state.shelfLifeDays?.toString() ?? '')) {
-      _shelfLifeController.text = state.shelfLifeDays?.toString() ?? '';
-    }
-    if (_quantityController.text != state.quantity.toString()) {
-      _quantityController.text = state.quantity % 1 == 0 
-          ? state.quantity.toInt().toString() 
-          : state.quantity.toString();
+  String _getUnitDisplayName(String key) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (key) {
+      case 'pcs': return l10n.unitPcs;
+      case 'kg': return l10n.unitKg;
+      case 'g': return l10n.unitG;
+      case 'L': return l10n.unitL;
+      case 'ml': return l10n.unitMl;
+      case 'pack': return l10n.unitPack;
+      case 'box': return l10n.unitBox;
+      default: return key;
     }
   }
 
@@ -78,8 +84,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    _syncControllers(state);
-
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       appBar: AppBar(
@@ -88,19 +92,18 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         centerTitle: true,
       ),
       body: Form(
+        key: _formKey,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 100), 
           children: [
-            // 1. 图片
             _buildImagePicker(state, notifier),
 
-            // 2. 基础信息卡片
             _buildSection(children: [
               TextFormField(
                 controller: _nameController,
-                onChanged: notifier.updateName,
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(labelText: "${l10n.name} *", border: InputBorder.none, prefixIcon: const Icon(Icons.edit_outlined)),
+                validator: (v) => v == null || v.isEmpty ? 'Name is required' : null,
               ),
               const Divider(),
               _buildDateModeTabs(state, notifier, l10n),
@@ -109,7 +112,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               _buildReminderSection(state, notifier, l10n),
             ]),
 
-            // 3. 高级信息卡片
             _buildSection(isAdvanced: true, children: [
               _buildQuantityRow(state, notifier, l10n),
               const Divider(),
@@ -137,8 +139,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       bottomNavigationBar: _buildBottomButtons(state, notifier, l10n),
     );
   }
-
-  // --- UI 构建组件 (已极大简化) ---
 
   Widget _buildImagePicker(AddItemState state, AddItemNotifier notifier) {
     return Center(
@@ -228,7 +228,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     );
   }
 
-  // --- 辅助方法 ---
   void _showImageSourceSheet(AddItemNotifier notifier) {
     showModalBottomSheet(context: context, builder: (_) => SafeArea(child: Wrap(children: [
       ListTile(leading: const Icon(Icons.photo_library), title: const Text('Gallery'), onTap: () { Navigator.pop(context); notifier.pickImage(ImageSource.gallery); }),
@@ -280,10 +279,11 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   }
 
   Widget _buildDateRow({required String label, required DateTime? value, required VoidCallback onTap}) {
+    final l10n = AppLocalizations.of(context)!;
     return InkWell(onTap: onTap, child: Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: Row(children: [
       const Icon(Icons.calendar_today_outlined, color: Colors.grey), const SizedBox(width: 12),
       Text(label), const Spacer(),
-      Text(value == null ? "Select" : DateFormat('yyyy-MM-dd').format(value), style: TextStyle(fontWeight: value == null ? FontWeight.normal : FontWeight.bold, color: value == null ? Colors.grey : AppTheme.primaryGreen)),
+      Text(value == null ? l10n.pickDate : DateFormat('yyyy-MM-dd').format(value), style: TextStyle(fontWeight: value == null ? FontWeight.normal : FontWeight.bold, color: value == null ? Colors.grey : AppTheme.primaryGreen)),
       const Icon(Icons.arrow_forward_ios, size: 12, color: Colors.grey),
     ])));
   }
@@ -300,8 +300,8 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   Widget _buildQuantityRow(AddItemState state, AddItemNotifier notifier, AppLocalizations l10n) {
     return Row(children: [
       const Icon(Icons.shopping_bag_outlined, color: Colors.grey), const SizedBox(width: 12),
-      Expanded(child: TextFormField(controller: _quantityController, onChanged: notifier.updateQuantity, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: InputDecoration(labelText: l10n.quantity, border: InputBorder.none))),
-      DropdownButton<String>(value: state.unit, underline: const SizedBox(), items: ['pcs', 'kg', 'g', 'L', 'ml', 'pack', 'box'].map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(), onChanged: (v) => notifier.updateUnit(v!)),
+      Expanded(child: TextFormField(controller: _quantityController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: InputDecoration(labelText: l10n.quantity, border: InputBorder.none))),
+      DropdownButton<String>(value: state.unit, underline: const SizedBox(), items: ['pcs', 'kg', 'g', 'L', 'ml', 'pack', 'box'].map((u) => DropdownMenuItem(value: u, child: Text(_getUnitDisplayName(u)))).toList(), onChanged: (v) => notifier.updateUnit(v!)),
     ]);
   }
 
@@ -315,7 +315,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   Widget _buildPriceInput(AddItemState state, AddItemNotifier notifier, AppLocalizations l10n, String currency) {
     return Row(children: [
       const Icon(Icons.attach_money, color: Colors.grey), const SizedBox(width: 12),
-      Expanded(child: TextFormField(controller: _priceController, onChanged: notifier.updatePrice, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: InputDecoration(labelText: l10n.price, border: InputBorder.none, prefixText: currency))),
+      Expanded(child: TextFormField(controller: _priceController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: InputDecoration(labelText: l10n.price, border: InputBorder.none, prefixText: currency))),
     ]);
   }
 
@@ -323,14 +323,35 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     final isEditing = widget.itemToEdit != null;
     return Container(padding: const EdgeInsets.all(16), decoration: const BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))]), child: SafeArea(child: Row(children: [
       if (!isEditing) Expanded(child: OutlinedButton(onPressed: () async {
-        if (await notifier.save(addNext: true)) {
-          HapticFeedback.mediumImpact();
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.saveAndNext)));
+        // Sync before save
+        notifier.updateName(_nameController.text);
+        notifier.updateQuantity(_quantityController.text);
+        notifier.updatePrice(_priceController.text);
+        notifier.updateShelfLife(_shelfLifeController.text);
+        
+        if (_formKey.currentState!.validate()) {
+           if (await notifier.save(addNext: true)) {
+             HapticFeedback.mediumImpact();
+             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.saveAndNext)));
+             // Clear controllers
+             _nameController.clear();
+             _priceController.clear();
+             _shelfLifeController.clear();
+             _quantityController.text = '1';
+           }
         }
       }, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), side: const BorderSide(color: AppTheme.primaryGreen), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text(l10n.saveAndNext, style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)))),
       if (!isEditing) const SizedBox(width: 12),
       Expanded(child: FilledButton(onPressed: () async {
-        if (await notifier.save(itemToEdit: widget.itemToEdit)) context.pop();
+        // Sync before save
+        notifier.updateName(_nameController.text);
+        notifier.updateQuantity(_quantityController.text);
+        notifier.updatePrice(_priceController.text);
+        notifier.updateShelfLife(_shelfLifeController.text);
+
+        if (_formKey.currentState!.validate()) {
+           if (await notifier.save(itemToEdit: widget.itemToEdit)) context.pop();
+        }
       }, style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: AppTheme.primaryGreen, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text(isEditing ? l10n.updateItem : l10n.save, style: const TextStyle(fontWeight: FontWeight.bold)))),
     ])));
   }
