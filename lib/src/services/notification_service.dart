@@ -111,4 +111,26 @@ class NotificationService {
   Future<void> cancelNotification(int id) async {
     await flutterLocalNotificationsPlugin.cancel(id);
   }
+
+  // 5. Test Notification
+  Future<void> showInstantNotification() async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'test_channel',
+      'Test Notifications',
+      channelDescription: 'Channel for testing notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+    );
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+        
+    await flutterLocalNotificationsPlugin.show(
+      999,
+      'UseUp Test',
+      'Notifications are working correctly! 🎉',
+      platformChannelSpecifics,
+    );
+  }
 }

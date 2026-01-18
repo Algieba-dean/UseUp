@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:use_up/src/localization/app_localizations.dart';
-import 'package:go_router/go_router.dart'; 
+import 'package:go_router/go_router.dart';
+import 'package:use_up/src/localization/app_localizations.dart'; 
 import '../../config/theme.dart';
 import '../../providers/locale_provider.dart';
+import '../inventory/category_selector.dart';
+import '../inventory/location_selector.dart';
+import '../../services/notification_service.dart'; 
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -45,23 +48,85 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           
-          const SizedBox(height: 12), // 分隔开一点，更有层次感
+          const SizedBox(height: 12), 
 
-          // 2. 历史记录 (新增入口)
+          // 2. 历史记录
           Container(
             color: Colors.white,
             child: ListTile(
               leading: const Icon(Icons.history, color: AppTheme.primaryGreen),
-              title: Text(l10n.history), // 对应 "历史记录"
+              title: Text(l10n.history),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
               onTap: () {
-                // 点击跳转到历史页
                 context.push('/history');
               },
             ),
           ),
           
-          // 这里以后还可以加 "About", "Export Data" 等
+          const Divider(),
+
+          // 3. 分类管理
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              leading: const Icon(Icons.category, color: AppTheme.primaryGreen),
+              title: const Text("Manage Categories"),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (ctx) => Scaffold(
+                      appBar: AppBar(title: const Text("Manage Categories")),
+                      body: CategorySelector(
+                        isManageMode: true,
+                        onSelected: (_) {},
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // 4. 位置管理
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              leading: const Icon(Icons.kitchen, color: AppTheme.primaryGreen),
+              title: const Text("Manage Locations"),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              onTap: () {
+                 Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (ctx) => Scaffold(
+                      appBar: AppBar(title: const Text("Manage Locations")),
+                      body: LocationSelector(
+                        isManageMode: true,
+                        onSelected: (_) {},
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          
+          const Divider(),
+
+          // 测试通知按钮
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              leading: const Icon(Icons.notifications_active, color: Colors.orange),
+              title: const Text('Test Notification'),
+              subtitle: const Text('Click to fire an instant alert'),
+              onTap: () async {
+                await NotificationService().showInstantNotification();
+              },
+            ),
+          ),
         ],
       ),
     );

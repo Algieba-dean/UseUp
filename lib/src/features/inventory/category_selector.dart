@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
-import '../../localization/app_localizations.dart';
-import '../../models/category.dart';
-import '../../models/item.dart';
-import '../../../main.dart'; 
+import 'package:use_up/src/models/category.dart';
+import 'package:use_up/main.dart';
 import '../../config/theme.dart';
+import '../../models/item.dart';
 
 class CategorySelector extends StatefulWidget {
-  final Function(Category) onSelected;
+  final Function(Category)? onSelected;
+  final bool isManageMode; // 【新增】是否是管理模式
 
-  const CategorySelector({super.key, required this.onSelected});
+  const CategorySelector({
+    super.key, 
+    this.onSelected,
+    this.isManageMode = false,
+  });
 
   @override
   State<CategorySelector> createState() => _CategorySelectorState();
 }
 
 class _CategorySelectorState extends State<CategorySelector> {
-  int? _currentParentId;
-  List<Category> _categories = [];
-  Category? _currentParentCategory;
+  List<Category> _currentCategories = [];
+  Category? _parentCategory; // 当前层级的父级 (null 代表顶层)
+  final TextEditingController _addController = TextEditingController();
 
   @override
   void initState() {
@@ -27,188 +31,257 @@ class _CategorySelectorState extends State<CategorySelector> {
   }
 
   Future<void> _loadCategories() async {
-    final cats = await isarInstance.categorys
-        .filter()
-        .parentIdEqualTo(_currentParentId)
-        .findAll();
-    
-    if (_currentParentId != null) {
-      _currentParentCategory = await isarInstance.categorys.get(_currentParentId!);
+    final parentId = _parentCategory?.id;
+    List<Category> cats;
+    if (parentId == null) {
+      // 查顶层 (level 0)
+      cats = await isarInstance.categorys.filter().levelEqualTo(0).findAll();
     } else {
-      _currentParentCategory = null;
+      // 查子层
+      cats = await isarInstance.categorys.filter().parentIdEqualTo(parentId).findAll();
     }
-
-    if (mounted) {
-      setState(() {
-        _categories = cats;
-      });
-    }
+    setState(() {
+      _currentCategories = cats;
+    });
   }
 
-  void _enterLevel(Category cat) {
-    if (cat.level < 2) {
-      setState(() {
-        _currentParentId = cat.id;
-      });
-      _loadCategories();
-    }
+  Future<void> _addCategory() async {
+    final name = _addController.text.trim();
+    if (name.isEmpty) return;
+
+    final newCat = Category(
+      name: name,
+      level: _parentCategory == null ? 0 : (_parentCategory!.level + 1),
+      parentId: _parentCategory?.id,
+    );
+
+    await isarInstance.writeTxn(() async {
+      await isarInstance.categorys.put(newCat);
+    });
+
+    _addController.clear();
+    _loadCategories();
   }
 
-  void _goBack() async {
-    if (_currentParentCategory != null) {
-      setState(() {
-        _currentParentId = _currentParentCategory!.parentId;
-      });
-      _loadCategories();
-    }
-  }
-
-  void _addCategory() {
-    final controller = TextEditingController();
-    final l10n = AppLocalizations.of(context)!;
+  // --- 【新增】重命名逻辑 ---
+  void _editCategory(Category cat) {
+    final controller = TextEditingController(text: cat.name);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n.category), // 这里用 category 也可以，或者 "Add Category"
+        title: const Text('Edit Category'),
         content: TextField(
           controller: controller, 
-          decoration: const InputDecoration(hintText: "Category Name"),
           autofocus: true,
+          decoration: const InputDecoration(labelText: "New Name"),
         ),
         actions: [
           TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
             onPressed: () async {
-              if (controller.text.isNotEmpty) {
-                final newCat = Category(
-                  name: controller.text,
-                  parentId: _currentParentId,
-                  level: (_currentParentCategory?.level ?? -1) + 1,
-                );
-                await isarInstance.writeTxn(() async => await isarInstance.categorys.put(newCat));
-                _loadCategories();
-                if (ctx.mounted) Navigator.pop(ctx);
+              if (controller.text.isNotEmpty && controller.text != cat.name) {
+                // 执行更新
+                await _updateCategoryName(cat, controller.text);
+                if (mounted) Navigator.pop(ctx);
               }
             },
-            child: Text(l10n.save),
-          )
+            child: const Text('Save'),
+          ),
         ],
       ),
     );
   }
 
-  void _deleteCategory(Category cat) async {
-     final hasChildren = await isarInstance.categorys.filter().parentIdEqualTo(cat.id).count() > 0;
-     final hasItems = await isarInstance.items.filter().categoryLink((q) => q.idEqualTo(cat.id)).count() > 0;
+  // 同步更新 Item 表中的 categoryName
+  Future<void> _updateCategoryName(Category cat, String newName) async {
+    await isarInstance.writeTxn(() async {
+      // 1. 更新分类本身
+      cat.name = newName;
+      await isarInstance.categorys.put(cat);
 
-    if (hasChildren || hasItems) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("This category contains items or sub-categories."), backgroundColor: Colors.red)
-        );
+      // 2. 找到所有关联了这个分类的物品
+      final items = await isarInstance.items
+          .filter()
+          .categoryLink((q) => q.idEqualTo(cat.id))
+          .findAll();
+      
+      for (var item in items) {
+        item.categoryName = newName;
+        await isarInstance.items.put(item);
       }
+    });
+    
+    _loadCategories(); // 刷新列表
+    if (mounted) {
+       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Updated!')));
+    }
+  }
+
+  Future<void> _deleteCategory(Category cat) async {
+    // 检查是否有子分类
+    final subCount = await isarInstance.categorys.filter().parentIdEqualTo(cat.id).count();
+    if (subCount > 0) {
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Cannot delete: Has sub-categories.")));
       return;
     }
-    await isarInstance.writeTxn(() async => await isarInstance.categorys.delete(cat.id));
+    
+    // 检查是否被使用 (Item)
+    final itemCount = await isarInstance.items.filter().categoryLink((q) => q.idEqualTo(cat.id)).count();
+    if (itemCount > 0) {
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Cannot delete: Items are using this category.")));
+      return;
+    }
+
+    await isarInstance.writeTxn(() async {
+      await isarInstance.categorys.delete(cat.id);
+    });
+    _loadCategories();
+  }
+
+  void _enterLevel(Category cat) {
+    setState(() {
+      _parentCategory = cat;
+    });
+    _loadCategories();
+  }
+
+  void _goBackLevel() {
+    if (_parentCategory == null) return;
+    
+    // 如果现在的 parent 是顶层，回退后 parent 为 null
+    // 如果现在的 parent 是二级，回退后 parent 为它爹
+    // 简单起见，这里只支持 2 层，所以直接回退到 null (顶层)
+    // 如果未来支持多层，这里需要查库找 parent
+    
+    setState(() {
+      _parentCategory = null; 
+    });
     _loadCategories();
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     return Container(
-      height: 500,
+      height: MediaQuery.of(context).size.height * 0.7,
+      padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Container(
-              width: 40, 
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-
+          // Header
           Row(
             children: [
-              if (_currentParentId != null)
+              if (_parentCategory != null)
                 IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, size: 20),
-                  onPressed: _goBack,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: _goBackLevel,
                 ),
-              if (_currentParentId != null) const SizedBox(width: 12),
-              
               Text(
-                _currentParentCategory?.name ?? l10n.category,
+                _parentCategory == null ? "Select Category" : _parentCategory!.name,
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
+              if (widget.isManageMode)
+                 const Chip(label: Text("Manage Mode"), backgroundColor: AppTheme.alertOrange)
+            ],
+          ),
+          const Divider(),
+
+          // Add New
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _addController,
+                  decoration: const InputDecoration(
+                    hintText: "New Category Name",
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
               IconButton(
                 onPressed: _addCategory,
                 icon: const Icon(Icons.add_circle, color: AppTheme.primaryGreen, size: 32),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          const Divider(height: 1),
-          
+          const SizedBox(height: 16),
+
+          // List
           Expanded(
-            child: _categories.isEmpty
-                ? Center(child: Text('No categories yet', style: TextStyle(color: Colors.grey[400])))
-                : ListView.separated(
-                    itemCount: _categories.length,
-                    separatorBuilder: (ctx, i) => Divider(height: 1, color: Colors.grey[100]),
-                    itemBuilder: (context, index) {
-                      final cat = _categories[index];
-                      return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                        title: Text(
-                          cat.name,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.check_circle, color: AppTheme.primaryGreen, size: 30),
-                              onPressed: () {
-                                widget.onSelected(cat);
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete_outline, size: 22, color: Colors.red[200]),
-                              onPressed: () => _deleteCategory(cat),
-                            ),
-                            if (cat.level < 2) 
-                              IconButton(
-                                icon: const Icon(Icons.chevron_right, color: Colors.grey),
-                                onPressed: () {
-                                  _enterLevel(cat);
-                                },
-                              ),
-                          ],
-                        ),
-                        onTap: () {
-                          if (cat.level < 2) {
+            child: _currentCategories.isEmpty 
+              ? const Center(child: Text("No categories here."))
+              : ListView.separated(
+                  itemCount: _currentCategories.length,
+                  separatorBuilder: (ctx, i) => const Divider(height: 1),
+                  itemBuilder: (ctx, i) {
+                    final cat = _currentCategories[i];
+                    
+                    // Future: 检查是否有子类，如果有显示箭头
+                    // 这里简单处理：如果 parentId 为 null，则允许点击进入下一级
+                    final canGoDeeper = (cat.parentId == null); 
+
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      onTap: () {
+                        if (widget.isManageMode) {
+                          // 管理模式：如果没有子层级，或者是子层级，直接编辑
+                          // 逻辑：点击总是编辑，还是点击如果有子类进子类？
+                          // 更好的体验：管理模式下，还是允许导航，只有点特定的 Edit 按钮才编辑？
+                          // 或者：点击名字导航，点击 trailing 的 edit 按钮编辑。
+                          
+                          if (canGoDeeper) {
                             _enterLevel(cat);
                           } else {
-                            widget.onSelected(cat);
+                            _editCategory(cat);
                           }
-                        },
-                      );
-                    },
-                  ),
+                        } else {
+                          // 选择模式
+                          if (canGoDeeper) {
+                            _enterLevel(cat);
+                          } else {
+                            if (widget.onSelected != null) {
+                               widget.onSelected!(cat);
+                            }
+                          }
+                        }
+                      },
+                      leading: Icon(
+                        canGoDeeper ? Icons.folder_open : Icons.label_outline,
+                        color: Colors.grey,
+                      ),
+                      title: Text(cat.name, style: const TextStyle(fontSize: 16)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (widget.isManageMode)
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
+                              onPressed: () => _editCategory(cat),
+                            ),
+                          
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                            onPressed: () => _deleteCategory(cat),
+                          ),
+                          
+                          if (canGoDeeper)
+                            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey)
+                          else if (!widget.isManageMode)
+                            // 选择模式下的选中状态逻辑略显复杂，这里简化
+                            const Icon(Icons.radio_button_unchecked, size: 20, color: Colors.grey),
+                        ],
+                      ),
+                    );
+                  },
+                ),
           ),
         ],
       ),

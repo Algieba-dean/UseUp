@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
-import '../../localization/app_localizations.dart';
-import '../../models/location.dart';
-import '../../models/item.dart';
-import '../../../main.dart'; 
+import 'package:use_up/src/models/location.dart';
+import 'package:use_up/main.dart';
 import '../../config/theme.dart';
+import '../../models/item.dart';
 
 class LocationSelector extends StatefulWidget {
-  final Function(Location) onSelected;
+  final Function(Location)? onSelected;
+  final bool isManageMode;
 
-  const LocationSelector({super.key, required this.onSelected});
+  const LocationSelector({
+    super.key, 
+    this.onSelected,
+    this.isManageMode = false,
+  });
 
   @override
   State<LocationSelector> createState() => _LocationSelectorState();
 }
 
 class _LocationSelectorState extends State<LocationSelector> {
-  int? _currentParentId;
-  List<Location> _locations = [];
-  Location? _currentParentLocation;
+  List<Location> _currentLocations = [];
+  Location? _parentLocation; 
+  final TextEditingController _addController = TextEditingController();
 
   @override
   void initState() {
@@ -27,189 +31,236 @@ class _LocationSelectorState extends State<LocationSelector> {
   }
 
   Future<void> _loadLocations() async {
-    final locs = await isarInstance.locations
-        .filter()
-        .parentIdEqualTo(_currentParentId)
-        .findAll();
-    
-    if (_currentParentId != null) {
-      _currentParentLocation = await isarInstance.locations.get(_currentParentId!);
+    final parentId = _parentLocation?.id;
+    List<Location> locs;
+    if (parentId == null) {
+      locs = await isarInstance.locations.filter().levelEqualTo(0).findAll();
     } else {
-      _currentParentLocation = null;
+      locs = await isarInstance.locations.filter().parentIdEqualTo(parentId).findAll();
     }
-
-    if (mounted) {
-      setState(() {
-        _locations = locs;
-      });
-    }
+    setState(() {
+      _currentLocations = locs;
+    });
   }
 
-  void _enterLevel(Location loc) {
-    if (loc.level < 2) {
-      setState(() {
-        _currentParentId = loc.id;
-      });
-      _loadLocations();
-    }
+  Future<void> _addLocation() async {
+    final name = _addController.text.trim();
+    if (name.isEmpty) return;
+
+    final newLoc = Location(
+      name: name,
+      level: _parentLocation == null ? 0 : (_parentLocation!.level + 1),
+      parentId: _parentLocation?.id,
+    );
+
+    await isarInstance.writeTxn(() async {
+      await isarInstance.locations.put(newLoc);
+    });
+
+    _addController.clear();
+    _loadLocations();
   }
 
-  void _goBack() async {
-    if (_currentParentLocation != null) {
-      setState(() {
-        _currentParentId = _currentParentLocation!.parentId;
-      });
-      _loadLocations();
-    }
-  }
-
-  void _addLocation() {
-    final controller = TextEditingController();
-    final l10n = AppLocalizations.of(context)!;
+  // --- 【新增】重命名逻辑 ---
+  void _editLocation(Location loc) {
+    final controller = TextEditingController(text: loc.name);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n.locationAdd),
+        title: const Text('Edit Location'),
         content: TextField(
           controller: controller, 
-          decoration: InputDecoration(hintText: l10n.locationName),
           autofocus: true,
+          decoration: const InputDecoration(labelText: "New Name"),
         ),
         actions: [
           TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
             onPressed: () async {
-              if (controller.text.isNotEmpty) {
-                final newLoc = Location(
-                  name: controller.text,
-                  parentId: _currentParentId,
-                  level: (_currentParentLocation?.level ?? -1) + 1,
-                );
-                await isarInstance.writeTxn(() async => await isarInstance.locations.put(newLoc));
-                _loadLocations();
-                if (ctx.mounted) Navigator.pop(ctx);
+              if (controller.text.isNotEmpty && controller.text != loc.name) {
+                await _updateLocationName(loc, controller.text);
+                if (mounted) Navigator.pop(ctx);
               }
             },
-            child: Text(l10n.save),
-          )
+            child: const Text('Save'),
+          ),
         ],
       ),
     );
   }
 
-  void _deleteLocation(Location loc) async {
-     final l10n = AppLocalizations.of(context)!;
-     final hasChildren = await isarInstance.locations.filter().parentIdEqualTo(loc.id).count() > 0;
-     final hasItems = await isarInstance.items.filter().locationLink((q) => q.idEqualTo(loc.id)).count() > 0;
+  // 同步更新 Item 表中的 locationName
+  Future<void> _updateLocationName(Location loc, String newName) async {
+    await isarInstance.writeTxn(() async {
+      loc.name = newName;
+      await isarInstance.locations.put(loc);
 
-    if (hasChildren || hasItems) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.deleteConfirm), backgroundColor: Colors.red));
+      final items = await isarInstance.items
+          .filter()
+          .locationLink((q) => q.idEqualTo(loc.id))
+          .findAll();
+      
+      for (var item in items) {
+        item.locationName = newName;
+        await isarInstance.items.put(item);
       }
+    });
+    
+    _loadLocations(); 
+    if (mounted) {
+       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Updated!')));
+    }
+  }
+
+  Future<void> _deleteLocation(Location loc) async {
+    // Check sub-locations
+    final subCount = await isarInstance.locations.filter().parentIdEqualTo(loc.id).count();
+    if (subCount > 0) {
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Cannot delete: Has sub-locations.")));
       return;
     }
-    await isarInstance.writeTxn(() async => await isarInstance.locations.delete(loc.id));
+    
+    // Check usage
+    final itemCount = await isarInstance.items.filter().locationLink((q) => q.idEqualTo(loc.id)).count();
+    if (itemCount > 0) {
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Cannot delete: Items are stored here.")));
+      return;
+    }
+
+    await isarInstance.writeTxn(() async {
+      await isarInstance.locations.delete(loc.id);
+    });
+    _loadLocations();
+  }
+
+  void _enterLevel(Location loc) {
+    setState(() {
+      _parentLocation = loc;
+    });
+    _loadLocations();
+  }
+
+  void _goBackLevel() {
+    if (_parentLocation == null) return;
+    setState(() {
+      _parentLocation = null; 
+    });
     _loadLocations();
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     return Container(
-      height: 500,
+      height: MediaQuery.of(context).size.height * 0.7,
+      padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 顶部灰色小横条 (Drag Handle)
-          Center(
-            child: Container(
-              width: 40, 
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-
-          // 顶部导航栏
+          // Header
           Row(
             children: [
-              if (_currentParentId != null)
+              if (_parentLocation != null)
                 IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, size: 20),
-                  onPressed: _goBack,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: _goBackLevel,
                 ),
-              if (_currentParentId != null) const SizedBox(width: 12),
-              
               Text(
-                _currentParentLocation?.name ?? l10n.locationSelect,
+                _parentLocation == null ? "Select Location" : _parentLocation!.name,
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
+              if (widget.isManageMode)
+                 const Chip(label: Text("Manage Mode"), backgroundColor: AppTheme.alertOrange)
+            ],
+          ),
+          const Divider(),
+
+          // Add New
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _addController,
+                  decoration: const InputDecoration(
+                    hintText: "New Location Name",
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
               IconButton(
                 onPressed: _addLocation,
                 icon: const Icon(Icons.add_circle, color: AppTheme.primaryGreen, size: 32),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          const Divider(height: 1),
-          
+          const SizedBox(height: 16),
+
+          // List
           Expanded(
-            child: _locations.isEmpty
-                ? Center(child: Text('No locations yet', style: TextStyle(color: Colors.grey[400])))
-                : ListView.separated(
-                    itemCount: _locations.length,
-                    separatorBuilder: (ctx, i) => Divider(height: 1, color: Colors.grey[100]),
-                    itemBuilder: (context, index) {
-                      final loc = _locations[index];
-                      return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                        title: Text(
-                          loc.name,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.check_circle, color: AppTheme.primaryGreen, size: 30),
-                              onPressed: () {
-                                widget.onSelected(loc);
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete_outline, size: 22, color: Colors.red[200]),
-                              onPressed: () => _deleteLocation(loc),
-                            ),
-                            if (loc.level < 2) 
-                              IconButton(
-                                icon: const Icon(Icons.chevron_right, color: Colors.grey),
-                                onPressed: () {
-                                  _enterLevel(loc);
-                                },
-                              ),
-                          ],
-                        ),
-                        onTap: () {
-                          if (loc.level < 2) {
+            child: _currentLocations.isEmpty 
+              ? const Center(child: Text("No locations here."))
+              : ListView.separated(
+                  itemCount: _currentLocations.length,
+                  separatorBuilder: (ctx, i) => const Divider(height: 1),
+                  itemBuilder: (ctx, i) {
+                    final loc = _currentLocations[i];
+                    final canGoDeeper = (loc.parentId == null); 
+
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      onTap: () {
+                        if (widget.isManageMode) {
+                          if (canGoDeeper) {
                             _enterLevel(loc);
                           } else {
-                            widget.onSelected(loc);
+                            _editLocation(loc);
                           }
-                        },
-                      );
-                    },
-                  ),
+                        } else {
+                          if (canGoDeeper) {
+                            _enterLevel(loc);
+                          } else {
+                            if (widget.onSelected != null) {
+                               widget.onSelected!(loc);
+                            }
+                          }
+                        }
+                      },
+                      leading: Icon(
+                        canGoDeeper ? Icons.folder_open : Icons.place_outlined,
+                        color: Colors.grey,
+                      ),
+                      title: Text(loc.name, style: const TextStyle(fontSize: 16)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (widget.isManageMode)
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
+                              onPressed: () => _editLocation(loc),
+                            ),
+                          
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                            onPressed: () => _deleteLocation(loc),
+                          ),
+                          
+                          if (canGoDeeper)
+                            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey)
+                          else if (!widget.isManageMode)
+                            const Icon(Icons.radio_button_unchecked, size: 20, color: Colors.grey),
+                        ],
+                      ),
+                    );
+                  },
+                ),
           ),
         ],
       ),
