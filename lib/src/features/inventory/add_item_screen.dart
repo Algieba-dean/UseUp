@@ -57,13 +57,17 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               : item.quantity.toString());
       _selectedUnit = item.unit;
       
-      _categoryNameDisplay = item.categoryName;
-      _locationNameDisplay = item.locationName;
-      // Note: Direct object assignment might need fresh fetch if object not loaded, 
-      // but assuming item comes from ISAR watch, links should be available or we rely on names.
-      // Ideally we check if link is loaded.
+      // --- 核心修复开始 ---
+      // IsarLink 有时候需要手动 load，虽然 watch 会自动 load，但为了保险起见：
+      item.categoryLink.loadSync(); 
+      item.locationLink.loadSync();
+
       _selectedCategoryObj = item.categoryLink.value;
+      _categoryNameDisplay = item.categoryLink.value?.name ?? item.categoryName;
+      
       _selectedLocationObj = item.locationLink.value;
+      _locationNameDisplay = item.locationLink.value?.name ?? item.locationName;
+      // --- 核心修复结束 ---
       
       _expiryDate = item.expiryDate;
       _imagePath = item.imagePath;
@@ -185,9 +189,23 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
 
           // 2. Save to DB (INSIDE the transaction)
           await isarInstance.writeTxn(() async {
+            // 1. 先把 Item 存入数据库 (为了生成 ID)
             await isarInstance.items.put(itemToSave);
+
+            // 2. 更新 Link 的值
+            itemToSave.categoryLink.value = _selectedCategoryObj;
+            itemToSave.locationLink.value = _selectedLocationObj;
+            
+            // 3. 更新缓存的字符串名字 (用于 UI 快速显示)
+            itemToSave.categoryName = _categoryNameDisplay;
+            itemToSave.locationName = _locationNameDisplay;
+
+            // 4. 【关键】再次保存 Links
             await itemToSave.categoryLink.save();
             await itemToSave.locationLink.save();
+            
+            // 5. 如果是编辑模式，为了保险，再次保存 Item 确保 string 字段也更新了
+            await isarInstance.items.put(itemToSave); 
           });
           
           // 3. Schedule Notification (OUTSIDE the transaction)
