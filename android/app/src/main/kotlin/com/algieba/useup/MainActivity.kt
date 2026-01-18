@@ -1,4 +1,4 @@
-package com.example.use_up
+package com.algieba.useup
 
 import io.flutter.embedding.android.FlutterActivity
 
