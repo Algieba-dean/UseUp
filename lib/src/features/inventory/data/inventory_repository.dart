@@ -6,6 +6,7 @@ import '../../../models/category.dart';
 import '../../../models/location.dart';
 import '../../../data/providers/database_provider.dart';
 import '../../../config/constants.dart';
+import '../../../services/notification_service.dart';
 
 class InventoryRepository {
   final Isar _isar;
@@ -42,6 +43,9 @@ class InventoryRepository {
     await _isar.writeTxn(() async {
       await _isar.items.delete(id);
     });
+    
+    // Ensure notifications are cancelled
+    await NotificationService().cancelNotification(id);
   }
 
   // 3. 消耗物品
@@ -51,6 +55,9 @@ class InventoryRepository {
       item.consumedDate = DateTime.now();
       await _isar.items.put(item);
     });
+    
+    // Consumed items shouldn't trigger expiry notifications
+    await NotificationService().cancelNotification(item.id);
   }
 
   // 4. 获取默认位置和分类

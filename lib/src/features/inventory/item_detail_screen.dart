@@ -121,9 +121,9 @@ class ItemDetailScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final confirm = await _showConfirmDialog(context, l10n.deleteItemTitle, l10n.deleteItemContent);
     if (confirm == true) {
+      if (context.mounted) context.pop(); // 先退出页面，避免 StreamBuilder 收到 null 导致转圈
       await ref.read(inventoryRepositoryProvider).deleteItem(id);
       await NotificationService().cancelNotification(id);
-      if (context.mounted) context.pop();
     }
   }
 

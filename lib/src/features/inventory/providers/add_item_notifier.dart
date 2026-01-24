@@ -268,46 +268,60 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
   Future<bool> save({Item? itemToEdit, bool addNext = false}) async {
     if (state.expiryDate == null) return false;
 
-    Item item;
-    if (itemToEdit != null && !addNext) {
-      item = itemToEdit;
-      item.name = state.name;
-      item.quantity = state.quantity;
-      item.unit = state.unit;
-      item.price = state.price;
-      item.purchaseDate = state.purchaseDate;
-      item.expiryDate = state.expiryDate;
-      item.productionDate = state.isProductionMode ? state.productionDate : null;
-      item.shelfLifeDays = state.isProductionMode ? state.shelfLifeDays : null;
-      item.notifyDaysList = state.notifyDaysList;
-      item.imagePath = state.imagePath;
-    } else {
-      item = Item(
-        name: state.name,
-        quantity: state.quantity,
-        unit: state.unit,
-        price: state.price,
-        purchaseDate: state.purchaseDate,
-        expiryDate: state.expiryDate,
-        productionDate: state.isProductionMode ? state.productionDate : null,
-        shelfLifeDays: state.isProductionMode ? state.shelfLifeDays : null,
-        notifyDaysList: state.notifyDaysList,
-        imagePath: state.imagePath,
-      );
-    }
+    state = state.copyWith(isLoading: true);
+    try {
+      Item item;
+      if (itemToEdit != null && !addNext) {
+        item = itemToEdit;
+        item.name = state.name;
+        item.quantity = state.quantity;
+        item.unit = state.unit;
+        item.price = state.price;
+        item.purchaseDate = state.purchaseDate;
+        item.expiryDate = state.expiryDate;
+        item.productionDate = state.isProductionMode ? state.productionDate : null;
+        item.shelfLifeDays = state.isProductionMode ? state.shelfLifeDays : null;
+        item.notifyDaysList = state.notifyDaysList;
+        item.imagePath = state.imagePath;
+      } else {
+        item = Item(
+          name: state.name,
+          quantity: state.quantity,
+          unit: state.unit,
+          price: state.price,
+          purchaseDate: state.purchaseDate,
+          expiryDate: state.expiryDate,
+          productionDate: state.isProductionMode ? state.productionDate : null,
+          shelfLifeDays: state.isProductionMode ? state.shelfLifeDays : null,
+          notifyDaysList: state.notifyDaysList,
+          imagePath: state.imagePath,
+        );
+      }
 
-    await _repository.saveItem(item, state.selectedCategory, state.selectedLocation);
-    await NotificationService().scheduleExpiryNotification(item);
+      await _repository.saveItem(item, state.selectedCategory, state.selectedLocation);
+      await NotificationService().scheduleExpiryNotification(item);
 
-    if (addNext) {
-      final defLoc = await _repository.getDefaultLocation();
-      final defCat = await _repository.getDefaultCategory();
-      state = AddItemState(
-        selectedLocation: state.selectedLocation ?? defLoc,
-        selectedCategory: state.selectedCategory ?? defCat,
-      );
+      if (addNext) {
+        final defLoc = await _repository.getDefaultLocation();
+        final defCat = await _repository.getDefaultCategory();
+        // 重置状态但保留一些偏好
+        state = AddItemState(
+          selectedLocation: state.selectedLocation ?? defLoc,
+          selectedCategory: state.selectedCategory ?? defCat,
+          // 保留当前选择的单位，方便连续录入
+          shelfLifeUnit: state.shelfLifeUnit,
+        );
+      } else {
+        // 如果是关闭页面，不需要重置 state，但要关闭 loading
+        state = state.copyWith(isLoading: false);
+      }
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false);
+      // 可以考虑这里 rethrow 或者返回 false 并在 UI 处理
+      // print('Save error: $e'); 
+      return false;
     }
-    return true;
   }
 }
 

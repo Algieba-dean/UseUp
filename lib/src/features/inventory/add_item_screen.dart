@@ -457,7 +457,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   Widget _buildBottomButtons(AddItemState state, AddItemNotifier notifier, AppLocalizations l10n) {
     final isEditing = widget.itemToEdit != null && !widget.isRestock;
     return Container(padding: const EdgeInsets.all(16), decoration: const BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))]), child: SafeArea(child: Row(children: [
-      if (!isEditing && !widget.isRestock) Expanded(child: OutlinedButton(onPressed: () async {
+      if (!isEditing && !widget.isRestock) Expanded(child: OutlinedButton(onPressed: state.isLoading ? null : () async {
         notifier.updateName(_nameController.text);
         notifier.updateQuantity(_quantityController.text);
         notifier.updatePrice(_priceController.text);
@@ -484,19 +484,18 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
              }
            }
         }
-      }, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), side: const BorderSide(color: AppTheme.primaryGreen), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text(l10n.saveAndNext, style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)))),
-      if (!isEditing) const SizedBox(width: 12),
-      Expanded(child: FilledButton(onPressed: () async {
+      }, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), side: const BorderSide(color: AppTheme.primaryGreen), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: state.isLoading 
+          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryGreen))
+          : Text(l10n.saveAndNext, style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)))),
+      if (!isEditing && !widget.isRestock) const SizedBox(width: 12),
+      Expanded(child: FilledButton(onPressed: state.isLoading ? null : () async {
         notifier.updateName(_nameController.text);
         notifier.updateQuantity(_quantityController.text);
         notifier.updatePrice(_priceController.text);
         notifier.updateShelfLife(_shelfLifeController.text);
 
         if (_formKey.currentState!.validate()) {
-           // 如果是补货 (isRestock)，则视为新添加 (itemToEdit: null)
-           final success = await notifier.save(
-             itemToEdit: widget.isRestock ? null : widget.itemToEdit
-           );
+           final success = await notifier.save(itemToEdit: widget.isRestock ? null : widget.itemToEdit);
            if (success) {
              if (context.mounted) context.pop();
            } else {
@@ -508,7 +507,9 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
              }
            }
         }
-      }, style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: AppTheme.primaryGreen, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text(isEditing ? l10n.updateItem : l10n.save, style: const TextStyle(fontWeight: FontWeight.bold)))),
+      }, style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: AppTheme.primaryGreen, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: state.isLoading 
+          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+          : Text(isEditing ? l10n.updateItem : l10n.save, style: const TextStyle(fontWeight: FontWeight.bold)))),
     ])));
   }
 }
