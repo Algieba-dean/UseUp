@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+enum FilterStatus { all, expired, expiringSoon }
+
 class DashboardFilter {
   final String searchQuery;
   
@@ -9,6 +11,8 @@ class DashboardFilter {
 
   final int? locationId;
   final String? locationName; // 用于 UI 显示 "已选: 冰箱"
+  
+  final FilterStatus status;
 
   DashboardFilter({
     this.searchQuery = '',
@@ -16,6 +20,7 @@ class DashboardFilter {
     this.categoryName,
     this.locationId,
     this.locationName,
+    this.status = FilterStatus.all,
   });
 
   DashboardFilter copyWith({
@@ -24,6 +29,7 @@ class DashboardFilter {
     String? categoryName,
     int? locationId,
     String? locationName,
+    FilterStatus? status,
   }) {
     return DashboardFilter(
       searchQuery: searchQuery ?? this.searchQuery,
@@ -34,6 +40,7 @@ class DashboardFilter {
       categoryName: categoryName ?? this.categoryName,
       locationId: locationId ?? this.locationId,
       locationName: locationName ?? this.locationName,
+      status: status ?? this.status,
     );
   }
 
@@ -43,6 +50,8 @@ class DashboardFilter {
       searchQuery: this.searchQuery,
       locationId: this.locationId,
       locationName: this.locationName,
+      // Keep status
+      status: this.status,
       categoryId: null,
       categoryName: null,
     );
@@ -54,6 +63,8 @@ class DashboardFilter {
       searchQuery: this.searchQuery,
       categoryId: this.categoryId,
       categoryName: this.categoryName,
+      // Keep status
+      status: this.status,
       locationId: null,
       locationName: null,
     );

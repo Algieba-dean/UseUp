@@ -130,5 +130,7 @@
   "privacyPolicy": "Privacy Policy",
   "errorExpiryRequired": "Expiry date is required",
   "deleteItemTitle": "Delete Item?",
-  "deleteItemContent": "This cannot be undone."
+  "deleteItemContent": "This cannot be undone.",
+  "filterExpired": "Expired",
+  "filterExpiringSoon": "Expiring Soon"
 }

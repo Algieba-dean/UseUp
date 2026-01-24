@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:use_up/src/localization/app_localizations.dart'; 
 import '../inventory/providers/inventory_provider.dart'; 
+import '../inventory/data/inventory_repository.dart';
 import 'providers/dashboard_filter_provider.dart';
 import 'widgets/expiring_card.dart';
 import '../../config/theme.dart';
@@ -25,9 +27,11 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   bool _isSearching = false; 
   final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -201,8 +205,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 style: const TextStyle(color: Colors.black, fontSize: 18),
                 onChanged: (value) {
-                  ref.read(dashboardFilterProvider.notifier).state = 
-                      filterState.copyWith(searchQuery: value);
+                  if (_debounce?.isActive ?? false) _debounce?.cancel();
+                  _debounce = Timer(const Duration(milliseconds: 300), () {
+                    ref.read(dashboardFilterProvider.notifier).state = 
+                        filterState.copyWith(searchQuery: value);
+                  });
                 },
               )
             : Row(
@@ -372,12 +379,59 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                 ),
 
-              // All Items Header
+              // All Items Header with Chips
               if (!isFiltered)
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Text(l10n.sectionAllItems, style: Theme.of(context).textTheme.titleLarge),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(l10n.sectionAllItems, style: Theme.of(context).textTheme.titleLarge),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          children: [
+                            ChoiceChip(
+                              label: Text(l10n.sectionAllItems),
+                              selected: filterState.status == FilterStatus.all,
+                              onSelected: (selected) {
+                                if (selected) {
+                                  ref.read(dashboardFilterProvider.notifier).state = 
+                                      filterState.copyWith(status: FilterStatus.all);
+                                }
+                              },
+                            ),
+                            ChoiceChip(
+                              label: Text(l10n.filterExpiringSoon),
+                              selected: filterState.status == FilterStatus.expiringSoon,
+                              onSelected: (selected) {
+                                ref.read(dashboardFilterProvider.notifier).state = 
+                                    filterState.copyWith(status: selected ? FilterStatus.expiringSoon : FilterStatus.all);
+                              },
+                              selectedColor: AppTheme.alertOrange.withOpacity(0.2),
+                              labelStyle: TextStyle(
+                                color: filterState.status == FilterStatus.expiringSoon ? AppTheme.alertOrange : Colors.black,
+                                fontWeight: filterState.status == FilterStatus.expiringSoon ? FontWeight.bold : FontWeight.normal,
+                              ),
+                            ),
+                            ChoiceChip(
+                              label: Text(l10n.filterExpired),
+                              selected: filterState.status == FilterStatus.expired,
+                              onSelected: (selected) {
+                                ref.read(dashboardFilterProvider.notifier).state = 
+                                    filterState.copyWith(status: selected ? FilterStatus.expired : FilterStatus.all);
+                              },
+                              selectedColor: Colors.red.withOpacity(0.1),
+                              labelStyle: TextStyle(
+                                color: filterState.status == FilterStatus.expired ? Colors.red : Colors.black,
+                                fontWeight: filterState.status == FilterStatus.expired ? FontWeight.bold : FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -390,7 +444,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       if (index < items.length) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 8.0),
-                          child: _buildItemTile(context, items[index]),
+                          child: _buildItemTile(context, items[index], ref),
                         );
                       }
                       return null;
@@ -413,44 +467,104 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildItemTile(BuildContext context, Item item) {
+  Widget _buildItemTile(BuildContext context, Item item, WidgetRef ref) {
     final days = item.expiryDate != null 
         ? ExpiryUtils.daysRemaining(item.expiryDate!) 
         : 999;
     
-    return Card(
-      child: ListTile(
-        onTap: () => context.push('/item/${item.id}'),
-        leading: Container(
-          width: 50, 
-          height: 50,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: AppTheme.softSage.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(8),
+    return Dismissible(
+      key: ValueKey(item.id),
+      direction: DismissDirection.horizontal,
+      background: Container(
+        color: AppTheme.primaryGreen,
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.only(left: 20),
+        child: const Icon(Icons.check, color: Colors.white),
+      ),
+      secondaryBackground: Container(
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      confirmDismiss: (direction) async {
+        final l10n = AppLocalizations.of(context)!;
+        if (direction == DismissDirection.endToStart) {
+          // Delete
+          return await showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text(l10n.deleteItemTitle),
+              content: Text(l10n.deleteItemContent),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, true), 
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  child: Text(l10n.delete),
+                ),
+              ],
+            ),
+          );
+        } else {
+          // Consume (Start to End)
+          // Optionally confirm or just do it
+          return true; 
+        }
+      },
+      onDismissed: (direction) async {
+        final l10n = AppLocalizations.of(context)!;
+        final repo = ref.read(inventoryRepositoryProvider);
+        if (direction == DismissDirection.endToStart) {
+          // Delete
+          await repo.deleteItem(item.id);
+          // NotificationService cancel is handled in repo
+        } else {
+          // Consume
+          await repo.consumeItem(item);
+          // NotificationService cancel is handled in repo
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.itemConsumed)),
+            );
+          }
+        }
+      },
+      child: Card(
+        margin: EdgeInsets.zero, // Dismissible handles margin via padding
+        child: ListTile(
+          onTap: () => context.push('/item/${item.id}'),
+          leading: Container(
+            width: 50, 
+            height: 50,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: AppTheme.softSage.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: item.imagePath != null
+                ? Image.file(
+                    File(item.imagePath!),
+                    fit: BoxFit.cover,
+                    errorBuilder: (ctx, err, stack) => Icon(LocalizedUtils.getCategoryIcon(item.categoryName), color: AppTheme.primaryGreen),
+                  )
+                : Icon(LocalizedUtils.getCategoryIcon(item.categoryName), color: AppTheme.primaryGreen),
           ),
-          child: item.imagePath != null
-              ? Image.file(
-                  File(item.imagePath!),
-                  fit: BoxFit.cover,
-                  errorBuilder: (ctx, err, stack) => Icon(LocalizedUtils.getCategoryIcon(item.categoryName), color: AppTheme.primaryGreen),
-                )
-              : Icon(LocalizedUtils.getCategoryIcon(item.categoryName), color: AppTheme.primaryGreen),
-        ),
-        title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text('${item.quantity} ${LocalizedUtils.getLocalizedUnit(context, item.unit)} • ${LocalizedUtils.getLocalizedName(context, item.locationName)}'),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: ExpiryUtils.getColorForExpiry(days).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            ExpiryUtils.getExpiryString(context, days),
-            style: TextStyle(
-              color: ExpiryUtils.getColorForExpiry(days),
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
+          title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+          subtitle: Text('${item.quantity} ${LocalizedUtils.getLocalizedUnit(context, item.unit)} • ${LocalizedUtils.getLocalizedName(context, item.locationName)}'),
+          trailing: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: ExpiryUtils.getColorForExpiry(days).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              ExpiryUtils.getExpiryString(context, days),
+              style: TextStyle(
+                color: ExpiryUtils.getColorForExpiry(days),
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
             ),
           ),
         ),

@@ -48,6 +48,30 @@ final inventoryProvider = StreamProvider<List<Item>>((ref) async* {
     }
   }
 
-  // 6. 输出流
-  yield* query.sortByExpiryDate().watch(fireImmediately: true);
+  // 6. 状态筛选 (已过期/临期)
+  // 注意：需要 import 'package:isar/isar.dart'; 确保扩展方法可用
+  final now = DateTime.now();
+  // 清除时分秒，只比较日期
+  final today = DateTime(now.year, now.month, now.day);
+  
+  if (filter.status == FilterStatus.expired) {
+    query = query.expiryDateLessThan(today);
+  } else if (filter.status == FilterStatus.expiringSoon) {
+    // 临期：今天 <= 到期日 <= 5天后
+    final fiveDaysLater = today.add(const Duration(days: 5));
+    query = query.expiryDateBetween(today, fiveDaysLater, includeLower: true, includeUpper: true);
+  }
+
+  // 7. 输出流 (根据状态调整排序)
+  // 已过期物品通常按“过期时间倒序”（越早过期的越上面？或者刚刚过期的在上面？）
+  // 这里的需求是“按过期时间倒序排列” (Desc)，即 2022年 在 2023年 上面（Isar sortDesc 是大到小，所以 2023 在 2022 上面）。
+  // 通常“已过期”列表，我们希望看到“过期最久”的还是“刚刚过期”的？需求说是“倒序”。
+  // 假设 2020年(A) 和 2024年(B)。倒序 -> B, A。
+  // 如果是默认排序 (sortByExpiryDate) 是升序 -> 2020, 2024。
+  
+  if (filter.status == FilterStatus.expired) {
+    yield* query.sortByExpiryDateDesc().watch(fireImmediately: true);
+  } else {
+    yield* query.sortByExpiryDate().watch(fireImmediately: true);
+  }
 });

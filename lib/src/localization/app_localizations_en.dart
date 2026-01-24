@@ -388,4 +388,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteItemContent => 'This cannot be undone.';
+
+  @override
+  String get filterExpired => 'Expired';
+
+  @override
+  String get filterExpiringSoon => 'Expiring Soon';
 }

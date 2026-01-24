@@ -83,8 +83,13 @@ void main() async {
   // 预读取语言设置
   final savedSettings = await isar.appSettings.get(AppConstants.settingRecordId);
   Locale? initialLocale;
-  if (savedSettings?.languageCode != null) {
-    initialLocale = Locale(savedSettings!.languageCode!);
+  if (savedSettings?.languageCode != null && savedSettings!.languageCode!.isNotEmpty) {
+    try {
+      initialLocale = Locale(savedSettings.languageCode!);
+    } catch (_) {
+      // 如果解析失败，回退到默认（null 表示跟随系统）
+      initialLocale = null;
+    }
   }
 
   runApp(

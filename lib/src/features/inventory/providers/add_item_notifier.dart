@@ -242,7 +242,7 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
     if (pickedFile == null) return;
     
     final directory = await getApplicationDocumentsDirectory();
-    final String fileName = p.basename(pickedFile.path);
+    final String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
     final String savedPath = '${directory.path}/$fileName';
     await File(pickedFile.path).copy(savedPath);
     state = state.copyWith(imagePath: savedPath);

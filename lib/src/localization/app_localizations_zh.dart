@@ -386,4 +386,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deleteItemContent => '此操作无法撤销。';
+
+  @override
+  String get filterExpired => '已过期';
+
+  @override
+  String get filterExpiringSoon => '临期';
 }

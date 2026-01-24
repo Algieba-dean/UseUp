@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:isar/isar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,7 +39,7 @@ class InventoryRepository {
           await file.delete();
         }
       } catch (e) {
-        // Log error
+        debugPrint('Error deleting image: $e');
       }
     }
     await _isar.writeTxn(() async {
