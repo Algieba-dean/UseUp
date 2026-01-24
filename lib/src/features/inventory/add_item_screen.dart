@@ -26,6 +26,7 @@ class AddItemScreen extends ConsumerStatefulWidget {
 
 class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   final _formKey = GlobalKey<FormState>();
+  final ScrollController _scrollController = ScrollController();
   
   late TextEditingController _nameController;
   late TextEditingController _priceController;
@@ -54,6 +55,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _nameController.dispose();
     _priceController.dispose();
     _shelfLifeController.dispose();
@@ -96,6 +98,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
+          controller: _scrollController,
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 100), 
           children: [
             _buildImagePicker(state, notifier),
@@ -354,6 +357,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
              _priceController.clear();
              _shelfLifeController.clear();
              _quantityController.text = '1';
+             _scrollController.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
            }
         }
       }, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), side: const BorderSide(color: AppTheme.primaryGreen), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text(l10n.saveAndNext, style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)))),
