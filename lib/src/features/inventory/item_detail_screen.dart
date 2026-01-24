@@ -118,7 +118,8 @@ class ItemDetailScreen extends ConsumerWidget {
   }
 
   Future<void> _deleteItem(BuildContext context, WidgetRef ref, int id) async {
-    final confirm = await _showConfirmDialog(context, "Delete Item?", "This cannot be undone.");
+    final l10n = AppLocalizations.of(context)!;
+    final confirm = await _showConfirmDialog(context, l10n.deleteItemTitle, l10n.deleteItemContent);
     if (confirm == true) {
       await ref.read(inventoryRepositoryProvider).deleteItem(id);
       await NotificationService().cancelNotification(id);
@@ -136,11 +137,12 @@ class ItemDetailScreen extends ConsumerWidget {
   }
 
   Future<bool?> _showConfirmDialog(BuildContext context, String title, String content) {
+    final l10n = AppLocalizations.of(context)!;
     return showDialog<bool>(context: context, builder: (ctx) => AlertDialog(
       title: Text(title), content: Text(content),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-        TextButton(onPressed: () => Navigator.pop(ctx, true), style: TextButton.styleFrom(foregroundColor: Colors.red), child: const Text('Delete')),
+        TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+        TextButton(onPressed: () => Navigator.pop(ctx, true), style: TextButton.styleFrom(foregroundColor: Colors.red), child: Text(l10n.delete)),
       ],
     ));
   }

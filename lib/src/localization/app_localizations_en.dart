@@ -379,4 +379,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get errorExpiryRequired => 'Expiry date is required';
+
+  @override
+  String get deleteItemTitle => 'Delete Item?';
+
+  @override
+  String get deleteItemContent => 'This cannot be undone.';
 }

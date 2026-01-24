@@ -458,14 +458,24 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         notifier.updateShelfLife(_shelfLifeController.text);
         
         if (_formKey.currentState!.validate()) {
-           if (await notifier.save(addNext: true)) {
+           final success = await notifier.save(addNext: true);
+           if (success) {
              HapticFeedback.mediumImpact();
-             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.saveAndNext)));
+             if (context.mounted) {
+               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.saveAndNext)));
+             }
              _nameController.clear();
              _priceController.clear();
              _shelfLifeController.clear();
              _quantityController.text = '1';
              _scrollController.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+           } else {
+             if (context.mounted) {
+               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                 content: Text(l10n.errorExpiryRequired),
+                 backgroundColor: Colors.red,
+               ));
+             }
            }
         }
       }, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), side: const BorderSide(color: AppTheme.primaryGreen), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text(l10n.saveAndNext, style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)))),
@@ -477,7 +487,17 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         notifier.updateShelfLife(_shelfLifeController.text);
 
         if (_formKey.currentState!.validate()) {
-           if (await notifier.save(itemToEdit: widget.itemToEdit)) context.pop();
+           final success = await notifier.save(itemToEdit: widget.itemToEdit);
+           if (success) {
+             if (context.mounted) context.pop();
+           } else {
+             if (context.mounted) {
+               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                 content: Text(l10n.errorExpiryRequired),
+                 backgroundColor: Colors.red,
+               ));
+             }
+           }
         }
       }, style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: AppTheme.primaryGreen, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text(isEditing ? l10n.updateItem : l10n.save, style: const TextStyle(fontWeight: FontWeight.bold)))),
     ])));

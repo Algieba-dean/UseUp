@@ -127,5 +127,8 @@
   "addReminder": "Add Reminder",
   "customReminderTitle": "Custom Reminder",
   "enterValue": "Enter value",
-  "privacyPolicy": "Privacy Policy"
+  "privacyPolicy": "Privacy Policy",
+  "errorExpiryRequired": "Expiry date is required",
+  "deleteItemTitle": "Delete Item?",
+  "deleteItemContent": "This cannot be undone."
 }

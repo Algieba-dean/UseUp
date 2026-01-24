@@ -127,5 +127,8 @@
   "addReminder": "添加提醒",
   "customReminderTitle": "自定义提醒",
   "enterValue": "输入数值",
-  "privacyPolicy": "隐私政策"
+  "privacyPolicy": "隐私政策",
+  "errorExpiryRequired": "必须设置过期日期",
+  "deleteItemTitle": "删除物品？",
+  "deleteItemContent": "此操作无法撤销。"
 }

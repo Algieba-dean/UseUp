@@ -377,4 +377,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get privacyPolicy => '隐私政策';
+
+  @override
+  String get errorExpiryRequired => '必须设置过期日期';
+
+  @override
+  String get deleteItemTitle => '删除物品？';
+
+  @override
+  String get deleteItemContent => '此操作无法撤销。';
 }

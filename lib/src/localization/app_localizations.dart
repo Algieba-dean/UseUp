@@ -799,6 +799,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy Policy'**
   String get privacyPolicy;
+
+  /// No description provided for @errorExpiryRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry date is required'**
+  String get errorExpiryRequired;
+
+  /// No description provided for @deleteItemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Item?'**
+  String get deleteItemTitle;
+
+  /// No description provided for @deleteItemContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This cannot be undone.'**
+  String get deleteItemContent;
 }
 
 class _AppLocalizationsDelegate
