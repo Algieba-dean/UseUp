@@ -77,6 +77,8 @@
   "confirmDelete": "Are you sure you want to delete?",
   "deleteEmptyConfirm": "This item is empty and will be deleted directly.",
   "deleteMoveConfirm": "Contains {count} items. Items will be moved to {target}.",
+  "deleteMigrateTitle": "Delete & Migrate?",
+  "deleteMigrateContent": "This item contains {items} items and {subs} sub-items.\nThey will be moved to '{target}'.",
   "confirmAndMove": "Confirm & Move",
   "cannotDeleteDefault": "Cannot delete the default item!",
   "containsSubItems": "Contains sub-items. Delete them first.",
@@ -104,6 +106,8 @@
   "unitMl": "ml",
   "unitPack": "pack",
   "unitBox": "box",
+  "unitBag": "bag",
+  "unitBottle": "bottle",
 
   "valOther": "Other",
   "valMisc": "Misc",

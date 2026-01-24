@@ -6,7 +6,6 @@ import 'package:use_up/src/localization/app_localizations.dart';
 import '../../config/theme.dart';
 import '../../models/item.dart';
 import '../../data/providers/database_provider.dart';
-import '../../utils/localized_utils.dart';
 
 final historyProvider = StreamProvider<List<Item>>((ref) {
   final isar = ref.watch(databaseProvider);

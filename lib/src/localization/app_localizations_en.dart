@@ -231,6 +231,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get deleteMigrateTitle => 'Delete & Migrate?';
+
+  @override
+  String deleteMigrateContent(Object items, Object subs, Object target) {
+    return 'This item contains $items items and $subs sub-items.\nThey will be moved to \'$target\'.';
+  }
+
+  @override
   String get confirmAndMove => 'Confirm & Move';
 
   @override
@@ -308,6 +316,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unitBox => 'box';
+
+  @override
+  String get unitBag => 'bag';
+
+  @override
+  String get unitBottle => 'bottle';
 
   @override
   String get valOther => 'Other';

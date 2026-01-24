@@ -229,6 +229,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get deleteMigrateTitle => '删除并迁移？';
+
+  @override
+  String deleteMigrateContent(Object items, Object subs, Object target) {
+    return '包含 $items 个物品和 $subs 个子项。\n它们将被移动到“$target”。';
+  }
+
+  @override
   String get confirmAndMove => '确认并移动';
 
   @override
@@ -306,6 +314,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get unitBox => '盒';
+
+  @override
+  String get unitBag => '袋';
+
+  @override
+  String get unitBottle => '瓶';
 
   @override
   String get valOther => '其他';

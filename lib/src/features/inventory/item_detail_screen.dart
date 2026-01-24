@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
-import 'package:isar/isar.dart';
 import 'package:use_up/src/localization/app_localizations.dart';
 import '../../config/theme.dart';
 import '../../models/item.dart';
@@ -22,7 +21,6 @@ class ItemDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isar = ref.watch(databaseProvider);
-    final repository = ref.watch(inventoryRepositoryProvider);
 
     return StreamBuilder<Item?>(
       stream: isar.items.watchObject(itemId, fireImmediately: true),

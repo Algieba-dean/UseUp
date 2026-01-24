@@ -77,6 +77,8 @@
   "confirmDelete": "确认要删除吗？",
   "deleteEmptyConfirm": "此项为空，将直接删除。",
   "deleteMoveConfirm": "包含 {count} 个物品。物品将被移动到 {target}。",
+  "deleteMigrateTitle": "删除并迁移？",
+  "deleteMigrateContent": "包含 {items} 个物品和 {subs} 个子项。\n它们将被移动到“{target}”。",
   "confirmAndMove": "确认并移动",
   "cannotDeleteDefault": "无法删除默认项！",
   "containsSubItems": "包含子项，请先删除子项。",
@@ -104,6 +106,8 @@
   "unitMl": "毫升",
   "unitPack": "包",
   "unitBox": "盒",
+  "unitBag": "袋",
+  "unitBottle": "瓶",
 
   "valOther": "其他",
   "valMisc": "未分类",

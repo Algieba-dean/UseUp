@@ -4,16 +4,64 @@ import 'dart:io';
 import 'package:use_up/src/config/theme.dart';
 import 'package:use_up/src/models/item.dart';
 import 'package:use_up/src/utils/expiry_utils.dart';
+import 'package:use_up/src/localization/app_localizations.dart';
 
 class ExpiringCard extends StatelessWidget {
   final Item item;
 
   const ExpiringCard({super.key, required this.item});
 
+  String _getLocalizedUnit(BuildContext context, String unitKey) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (unitKey.toLowerCase()) {
+      case 'pcs': return l10n.unitPcs;
+      case 'kg': return l10n.unitKg;
+      case 'g': return l10n.unitG;
+      case 'l': return l10n.unitL;
+      case 'ml': return l10n.unitMl;
+      case 'pack': return l10n.unitPack;
+      case 'box': return l10n.unitBox;
+      case 'bag': return l10n.unitBag;
+      case 'bottle': return l10n.unitBottle;
+      default: return unitKey;
+    }
+  }
+
+  void _showImagePreview(BuildContext context, ImageProvider imageProvider) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Dismiss',
+      barrierColor: Colors.black.withOpacity(0.9),
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, anim1, anim2) {
+        return Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 600, maxHeight: 600),
+            padding: const EdgeInsets.all(20),
+            child: InteractiveViewer(
+              child: Image(image: imageProvider, fit: BoxFit.contain),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+          child: FadeTransition(opacity: anim1, child: child),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final days = ExpiryUtils.daysRemaining(item.expiryDate!);
     final color = ExpiryUtils.getColorForExpiry(days);
+    
+    final ImageProvider? imageProvider = item.imagePath != null
+        ? FileImage(File(item.imagePath!))
+        : null;
 
     return GestureDetector(
       onTap: () {
@@ -38,17 +86,36 @@ class ExpiringCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 这里的 Icon 换成图片
-            CircleAvatar(
-              backgroundColor: color.withOpacity(0.1),
-              foregroundColor: color,
-              backgroundImage: item.imagePath != null 
-                  ? FileImage(File(item.imagePath!)) 
-                  : null,
-              child: item.imagePath == null 
-                  ? const Icon(Icons.fastfood) // 默认图标
-                  : null, 
+            GestureDetector(
+              onLongPress: () {
+                if (imageProvider != null) {
+                  _showImagePreview(context, imageProvider);
+                }
+              },
+              child: Center(
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: color.withOpacity(0.1),
+                    image: imageProvider != null 
+                        ? DecorationImage(image: imageProvider, fit: BoxFit.cover)
+                        : null,
+                  ),
+                  child: imageProvider == null
+                      ? Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Opacity(
+                            opacity: 0.5,
+                            child: Image.asset('assets/AppIcons/playstore.png'),
+                          ),
+                        )
+                      : null,
+                ),
+              ),
             ),
+            
             const Spacer(),
             Text(
               item.name,
@@ -58,12 +125,17 @@ class ExpiringCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
+            
+            Text(
+              '${item.quantity} ${_getLocalizedUnit(context, item.unit)}',
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            ),
+            
             const SizedBox(height: 4),
             Row(
               children: [
                 Icon(Icons.access_time, size: 12, color: color),
                 const SizedBox(width: 4),
-                // Updated to use localized string
                 Text(
                   ExpiryUtils.getExpiryString(context, days),
                   style: TextStyle(

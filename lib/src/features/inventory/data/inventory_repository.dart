@@ -76,6 +76,90 @@ class InventoryRepository {
     await item.locationLink.load();
   }
 
+  // --- Category Safety Operations ---
+
+  Future<int> countItemsByCategory(int id) {
+    return _isar.items.filter().categoryLink((q) => q.idEqualTo(id)).count();
+  }
+
+  Future<int> countSubCategories(int id) {
+    return _isar.categorys.filter().parentIdEqualTo(id).count();
+  }
+
+  Future<void> deleteCategorySafe(int id) async {
+    // 1. Find Default
+    var defaultCat = await _isar.categorys.filter().nameEqualTo(AppConstants.defaultCategoryMisc).findFirst();
+    // Fallback for legacy data
+    if (defaultCat == null) {
+       defaultCat = await _isar.categorys.filter().nameEqualTo('杂物').findFirst();
+    }
+    
+    if (defaultCat == null) throw Exception("Default category not found.");
+    if (defaultCat.id == id) throw Exception("Cannot delete the system default category.");
+
+    await _isar.writeTxn(() async {
+      // 2. Migrate Sub-categories
+      final subs = await _isar.categorys.filter().parentIdEqualTo(id).findAll();
+      for (var sub in subs) {
+        sub.parentId = defaultCat!.id;
+        await _isar.categorys.put(sub);
+      }
+
+      // 3. Migrate Items
+      final items = await _isar.items.filter().categoryLink((q) => q.idEqualTo(id)).findAll();
+      for (var item in items) {
+        item.categoryLink.value = defaultCat;
+        item.categoryName = defaultCat!.name;
+        await item.categoryLink.save();
+        await _isar.items.put(item);
+      }
+
+      // 4. Delete
+      await _isar.categorys.delete(id);
+    });
+  }
+
+  // --- Location Safety Operations ---
+
+  Future<int> countItemsByLocation(int id) {
+    return _isar.items.filter().locationLink((q) => q.idEqualTo(id)).count();
+  }
+
+  Future<int> countSubLocations(int id) {
+    return _isar.locations.filter().parentIdEqualTo(id).count();
+  }
+
+  Future<void> deleteLocationSafe(int id) async {
+    var defaultLoc = await _isar.locations.filter().nameEqualTo(AppConstants.defaultLocationOther).findFirst();
+    if (defaultLoc == null) {
+       defaultLoc = await _isar.locations.filter().nameEqualTo('其他').findFirst();
+    }
+
+    if (defaultLoc == null) throw Exception("Default location not found.");
+    if (defaultLoc.id == id) throw Exception("Cannot delete the system default location.");
+
+    await _isar.writeTxn(() async {
+      // Migrate Sub-locations
+      final subs = await _isar.locations.filter().parentIdEqualTo(id).findAll();
+      for (var sub in subs) {
+        sub.parentId = defaultLoc!.id;
+        await _isar.locations.put(sub);
+      }
+
+      // Migrate Items
+      final items = await _isar.items.filter().locationLink((q) => q.idEqualTo(id)).findAll();
+      for (var item in items) {
+        item.locationLink.value = defaultLoc;
+        item.locationName = defaultLoc!.name;
+        await item.locationLink.save();
+        await _isar.items.put(item);
+      }
+
+      // Delete
+      await _isar.locations.delete(id);
+    });
+  }
+
   // 6. 递归获取子分类 ID
   Future<List<int>> getCategoryIdsWithDescendants(int parentId) async {
     final ids = {parentId};

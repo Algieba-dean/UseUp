@@ -512,6 +512,18 @@ abstract class AppLocalizations {
   /// **'Contains {count} items. Items will be moved to {target}.'**
   String deleteMoveConfirm(Object count, Object target);
 
+  /// No description provided for @deleteMigrateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete & Migrate?'**
+  String get deleteMigrateTitle;
+
+  /// No description provided for @deleteMigrateContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This item contains {items} items and {subs} sub-items.\nThey will be moved to \'{target}\'.'**
+  String deleteMigrateContent(Object items, Object subs, Object target);
+
   /// No description provided for @confirmAndMove.
   ///
   /// In en, this message translates to:
@@ -661,6 +673,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'box'**
   String get unitBox;
+
+  /// No description provided for @unitBag.
+  ///
+  /// In en, this message translates to:
+  /// **'bag'**
+  String get unitBag;
+
+  /// No description provided for @unitBottle.
+  ///
+  /// In en, this message translates to:
+  /// **'bottle'**
+  String get unitBottle;
 
   /// No description provided for @valOther.
   ///
