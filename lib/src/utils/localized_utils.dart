@@ -92,4 +92,24 @@ class LocalizedUtils {
       default: return originalUnit;
     }
   }
+
+  static IconData getCategoryIcon(String categoryName) {
+    if (categoryName.contains('Vegetable') || categoryName.contains('蔬菜')) {
+      return Icons.grass;
+    } else if (categoryName.contains('Fruit') || categoryName.contains('水果')) {
+      return Icons.apple;
+    } else if (categoryName.contains('Meat') || categoryName.contains('肉')) {
+      return Icons.kebab_dining;
+    } else if (categoryName.contains('Dairy') || categoryName.contains('奶')) {
+      return Icons.water_drop;
+    } else if (categoryName.contains('Health') || categoryName.contains('药') || categoryName.contains('健康')) {
+      return Icons.medical_services;
+    } else if (categoryName.contains('Utility') || categoryName.contains('工具') || categoryName.contains('日用')) {
+      return Icons.build;
+    } else if (categoryName.contains('Food') || categoryName.contains('食品')) {
+      return Icons.restaurant; 
+    } else {
+      return Icons.inventory_2_outlined;
+    }
+  }
 }

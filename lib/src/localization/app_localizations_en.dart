@@ -355,4 +355,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorNameRequired => 'Name is required';
+
+  @override
+  String get timeUnitDay => 'Day';
+
+  @override
+  String get timeUnitWeek => 'Week';
+
+  @override
+  String get timeUnitMonth => 'Month';
+
+  @override
+  String get timeUnitYear => 'Year';
+
+  @override
+  String get addReminder => 'Add Reminder';
+
+  @override
+  String get customReminderTitle => 'Custom Reminder';
+
+  @override
+  String get enterValue => 'Enter value';
 }

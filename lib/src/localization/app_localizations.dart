@@ -751,6 +751,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Name is required'**
   String get errorNameRequired;
+
+  /// No description provided for @timeUnitDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get timeUnitDay;
+
+  /// No description provided for @timeUnitWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get timeUnitWeek;
+
+  /// No description provided for @timeUnitMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get timeUnitMonth;
+
+  /// No description provided for @timeUnitYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get timeUnitYear;
+
+  /// No description provided for @addReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Reminder'**
+  String get addReminder;
+
+  /// No description provided for @customReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Reminder'**
+  String get customReminderTitle;
+
+  /// No description provided for @enterValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter value'**
+  String get enterValue;
 }
 
 class _AppLocalizationsDelegate

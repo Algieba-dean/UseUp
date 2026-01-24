@@ -353,4 +353,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get errorNameRequired => '请输入名称';
+
+  @override
+  String get timeUnitDay => '天';
+
+  @override
+  String get timeUnitWeek => '周';
+
+  @override
+  String get timeUnitMonth => '月';
+
+  @override
+  String get timeUnitYear => '年';
+
+  @override
+  String get addReminder => '添加提醒';
+
+  @override
+  String get customReminderTitle => '自定义提醒';
+
+  @override
+  String get enterValue => '输入数值';
 }

@@ -119,5 +119,12 @@
   "valBattery": "Battery",
   "imageGallery": "Gallery",
   "imageCamera": "Camera",
-  "errorNameRequired": "Name is required"
+  "errorNameRequired": "Name is required",
+  "timeUnitDay": "Day",
+  "timeUnitWeek": "Week",
+  "timeUnitMonth": "Month",
+  "timeUnitYear": "Year",
+  "addReminder": "Add Reminder",
+  "customReminderTitle": "Custom Reminder",
+  "enterValue": "Enter value"
 }

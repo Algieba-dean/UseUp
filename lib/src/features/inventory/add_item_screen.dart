@@ -36,21 +36,33 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController();
+    _priceController = TextEditingController();
+    _shelfLifeController = TextEditingController();
+    _quantityController = TextEditingController(text: '1');
+
     Future.microtask(() async {
       await ref.read(addItemProvider.notifier).init(widget.itemToEdit);
       final state = ref.read(addItemProvider);
       _nameController.text = state.name;
       _priceController.text = state.price?.toString() ?? '';
-      _shelfLifeController.text = state.shelfLifeDays?.toString() ?? '';
+      
+      // 根据单位初始化显示值
+      if (state.shelfLifeDays != null) {
+        int displayVal = state.shelfLifeDays!;
+        switch (state.shelfLifeUnit) {
+          case TimeUnit.week: displayVal = (state.shelfLifeDays! / 7).round(); break;
+          case TimeUnit.month: displayVal = (state.shelfLifeDays! / 30).round(); break;
+          case TimeUnit.year: displayVal = (state.shelfLifeDays! / 365).round(); break;
+          case TimeUnit.day: default: break;
+        }
+        _shelfLifeController.text = displayVal.toString();
+      }
+
       _quantityController.text = state.quantity % 1 == 0 
           ? state.quantity.toInt().toString() 
           : state.quantity.toString();
     });
-    
-    _nameController = TextEditingController();
-    _priceController = TextEditingController();
-    _shelfLifeController = TextEditingController();
-    _quantityController = TextEditingController(text: '1');
   }
 
   @override
@@ -75,6 +87,24 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       case 'box': return l10n.unitBox;
       default: return key;
     }
+  }
+  
+  String _getTimeUnitName(TimeUnit unit) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (unit) {
+      case TimeUnit.day: return l10n.timeUnitDay;
+      case TimeUnit.week: return l10n.timeUnitWeek;
+      case TimeUnit.month: return l10n.timeUnitMonth;
+      case TimeUnit.year: return l10n.timeUnitYear;
+    }
+  }
+
+  String _formatReminderDays(int days) {
+    final l10n = AppLocalizations.of(context)!;
+    if (days % 365 == 0) return "${days ~/ 365} ${l10n.timeUnitYear}";
+    if (days % 30 == 0) return "${days ~/ 30} ${l10n.timeUnitMonth}";
+    if (days % 7 == 0) return "${days ~/ 7} ${l10n.timeUnitWeek}";
+    return "$days ${l10n.timeUnitDay}";
   }
 
   @override
@@ -198,11 +228,34 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             if (d != null) notifier.updateProductionDate(d);
           },
         ),
-        TextFormField(
-          controller: _shelfLifeController,
-          onChanged: notifier.updateShelfLife,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(labelText: l10n.shelfLife, border: InputBorder.none, prefixIcon: const Icon(Icons.timer_outlined)),
+        Row(
+          children: [
+            const Icon(Icons.timer_outlined, color: Colors.grey), 
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextFormField(
+                controller: _shelfLifeController,
+                onChanged: (val) => notifier.updateShelfLife(val),
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: l10n.shelfLife, border: InputBorder.none),
+              ),
+            ),
+            DropdownButton<TimeUnit>(
+              value: state.shelfLifeUnit,
+              underline: const SizedBox(),
+              items: TimeUnit.values.map((u) {
+                 // 暂时不在UI显示周作为保质期单位，因为不太常见且占位置，或者为了统一也可以加上。
+                 // 这里只显示 天、月、年，去掉周，或者保留全部。
+                 if (u == TimeUnit.week) return null; 
+                 return DropdownMenuItem(value: u, child: Text(_getTimeUnitName(u)));
+              }).whereType<DropdownMenuItem<TimeUnit>>().toList(),
+              onChanged: (v) {
+                if (v != null) {
+                  notifier.updateShelfLifeAndUnit(_shelfLifeController.text, v);
+                }
+              },
+            ),
+          ],
         ),
         if (state.expiryDate != null)
           Padding(
@@ -218,24 +271,79 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.reminderLabel, style: const TextStyle(color: Colors.black87)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(l10n.reminderLabel, style: const TextStyle(color: Colors.black87)),
+            GestureDetector(
+               onTap: () => _showCustomReminderDialog(notifier, l10n),
+               child: Container(
+                 padding: const EdgeInsets.all(4),
+                 decoration: BoxDecoration(color: AppTheme.primaryGreen.withOpacity(0.1), shape: BoxShape.circle),
+                 child: const Icon(Icons.add, size: 16, color: AppTheme.primaryGreen),
+               ),
+            )
+          ],
+        ),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
-          children: [1, 3, 7].map((d) => FilterChip(
-            label: Text(d == 1 ? l10n.reminder1Day : d == 3 ? l10n.reminder3Days : l10n.reminder7Days),
-            selected: state.notifyDaysList.contains(d),
-            onSelected: (_) => notifier.toggleNotifyDay(d),
-            selectedColor: AppTheme.primaryGreen.withOpacity(0.2),
-            checkmarkColor: AppTheme.primaryGreen,
-            labelStyle: TextStyle(
-              color: state.notifyDaysList.contains(d) ? AppTheme.primaryGreen : Colors.black87,
-              fontWeight: state.notifyDaysList.contains(d) ? FontWeight.bold : FontWeight.normal,
-            ),
-          )).toList(),
+          children: state.notifyDaysList.map((days) {
+            return FilterChip(
+              label: Text(_formatReminderDays(days)),
+              selected: true,
+              onSelected: (_) => notifier.toggleNotifyDay(days),
+              selectedColor: AppTheme.primaryGreen.withOpacity(0.2),
+              checkmarkColor: AppTheme.primaryGreen,
+              labelStyle: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold),
+            );
+          }).toList(),
         ),
       ],
     );
+  }
+  
+  void _showCustomReminderDialog(AddItemNotifier notifier, AppLocalizations l10n) {
+    int val = 1;
+    TimeUnit unit = TimeUnit.day;
+    
+    showDialog(context: context, builder: (ctx) {
+      return StatefulBuilder(builder: (context, setState) {
+        return AlertDialog(
+          title: Text(l10n.customReminderTitle),
+          content: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  keyboardType: TextInputType.number,
+                  autofocus: true,
+                  decoration: InputDecoration(labelText: l10n.enterValue),
+                  onChanged: (v) => val = int.tryParse(v) ?? 1,
+                ),
+              ),
+              const SizedBox(width: 16),
+              DropdownButton<TimeUnit>(
+                value: unit,
+                items: TimeUnit.values.map((u) => DropdownMenuItem(value: u, child: Text(_getTimeUnitName(u)))).toList(),
+                onChanged: (v) {
+                   if (v != null) setState(() => unit = v);
+                },
+              )
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
+            TextButton(
+              onPressed: () {
+                notifier.addCustomNotifyDay(val, unit);
+                Navigator.pop(ctx);
+              }, 
+              child: Text(l10n.confirm)
+            ),
+          ],
+        );
+      });
+    });
   }
 
   void _showImageSourceSheet(AddItemNotifier notifier) {

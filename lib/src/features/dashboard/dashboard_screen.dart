@@ -427,9 +427,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ? Image.file(
                   File(item.imagePath!),
                   fit: BoxFit.cover,
-                  errorBuilder: (ctx, err, stack) => _getCategoryIcon(context, item.categoryName),
+                  errorBuilder: (ctx, err, stack) => Icon(LocalizedUtils.getCategoryIcon(item.categoryName), color: AppTheme.primaryGreen),
                 )
-              : _getCategoryIcon(context, item.categoryName),
+              : Icon(LocalizedUtils.getCategoryIcon(item.categoryName), color: AppTheme.primaryGreen),
         ),
         title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: Text('${item.quantity} ${LocalizedUtils.getLocalizedUnit(context, item.unit)} • ${LocalizedUtils.getLocalizedName(context, item.locationName)}'),
@@ -450,31 +450,5 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
       ),
     );
-  }
-
-  Widget _getCategoryIcon(BuildContext context, String categoryName) {
-    // 简单映射，也可以放进 LocalizedUtils 但这里是图标逻辑
-    IconData icon;
-    // 使用英文关键字匹配 (因为数据库存的是英文，但如果存的是中文，也可以匹配)
-    // 更好的做法是依赖 LocalizedUtils 的英文回退或 ID，但这里暂时用字符串匹配
-    
-    if (categoryName.contains('Vegetable') || categoryName.contains('蔬菜')) {
-      icon = Icons.grass;
-    } else if (categoryName.contains('Fruit') || categoryName.contains('水果')) {
-      icon = Icons.apple;
-    } else if (categoryName.contains('Meat') || categoryName.contains('肉')) {
-      icon = Icons.kebab_dining;
-    } else if (categoryName.contains('Dairy') || categoryName.contains('奶')) {
-      icon = Icons.water_drop;
-    } else if (categoryName.contains('Health') || categoryName.contains('药') || categoryName.contains('健康')) {
-      icon = Icons.medical_services;
-    } else if (categoryName.contains('Utility') || categoryName.contains('工具') || categoryName.contains('日用')) {
-      icon = Icons.build;
-    } else if (categoryName.contains('Food') || categoryName.contains('食品')) {
-      icon = Icons.restaurant; 
-    } else {
-      icon = Icons.inventory_2_outlined;
-    }
-    return Icon(icon, color: AppTheme.primaryGreen);
   }
 }

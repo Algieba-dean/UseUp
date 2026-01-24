@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:io';
 import 'package:use_up/src/config/theme.dart';
@@ -6,26 +7,12 @@ import 'package:use_up/src/models/item.dart';
 import 'package:use_up/src/utils/expiry_utils.dart';
 import 'package:use_up/src/localization/app_localizations.dart';
 
+import 'package:use_up/src/utils/localized_utils.dart';
+
 class ExpiringCard extends StatelessWidget {
   final Item item;
 
   const ExpiringCard({super.key, required this.item});
-
-  String _getLocalizedUnit(BuildContext context, String unitKey) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (unitKey.toLowerCase()) {
-      case 'pcs': return l10n.unitPcs;
-      case 'kg': return l10n.unitKg;
-      case 'g': return l10n.unitG;
-      case 'l': return l10n.unitL;
-      case 'ml': return l10n.unitMl;
-      case 'pack': return l10n.unitPack;
-      case 'box': return l10n.unitBox;
-      case 'bag': return l10n.unitBag;
-      case 'bottle': return l10n.unitBottle;
-      default: return unitKey;
-    }
-  }
 
   void _showImagePreview(BuildContext context, ImageProvider imageProvider) {
     showGeneralDialog(
@@ -104,13 +91,7 @@ class ExpiringCard extends StatelessWidget {
                         : null,
                   ),
                   child: imageProvider == null
-                      ? Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Opacity(
-                            opacity: 0.5,
-                            child: Image.asset('assets/AppIcons/playstore.png'),
-                          ),
-                        )
+                      ? Icon(LocalizedUtils.getCategoryIcon(item.categoryName), color: AppTheme.primaryGreen)
                       : null,
                 ),
               ),
@@ -127,7 +108,7 @@ class ExpiringCard extends StatelessWidget {
             ),
             
             Text(
-              '${item.quantity} ${_getLocalizedUnit(context, item.unit)}',
+              '${item.quantity} ${LocalizedUtils.getLocalizedUnit(context, item.unit)}',
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
             

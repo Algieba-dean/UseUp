@@ -18,12 +18,7 @@ class SettingsScreen extends ConsumerWidget {
     // 如果 provider 为空（跟随系统），则获取当前上下文的 locale
     final effectiveLocale = providerLocale ?? Localizations.localeOf(context);
     
-    String currentLanguageText;
-    if (effectiveLocale.languageCode == 'zh') {
-      currentLanguageText = '简体中文';
-    } else {
-      currentLanguageText = 'English';
-    }
+    final currentLanguageText = _getLanguageName(effectiveLocale);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5), // 保持背景灰白
@@ -115,6 +110,15 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                     );
                   }
+  String _getLanguageName(Locale locale) {
+    switch (locale.languageCode) {
+      case 'en': return 'English';
+      case 'zh': return '简体中文';
+      // Future languages can be added here, or fall back to languageCode
+      default: return locale.languageCode;
+    }
+  }
+
   void _showLanguagePicker(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
@@ -125,28 +129,18 @@ class SettingsScreen extends ConsumerWidget {
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: const Text('English'),
-                trailing: ref.read(localeProvider)?.languageCode == 'en' 
-                    ? const Icon(Icons.check, color: AppTheme.primaryGreen) 
+            children: AppLocalizations.supportedLocales.map((locale) {
+              return ListTile(
+                title: Text(_getLanguageName(locale)),
+                trailing: ref.read(localeProvider)?.languageCode == locale.languageCode
+                    ? const Icon(Icons.check, color: AppTheme.primaryGreen)
                     : null,
                 onTap: () {
-                  ref.read(localeProvider.notifier).setLocale(const Locale('en'));
-                  context.pop(); 
-                },
-              ),
-              ListTile(
-                title: const Text('简体中文'),
-                trailing: ref.read(localeProvider)?.languageCode == 'zh' 
-                    ? const Icon(Icons.check, color: AppTheme.primaryGreen) 
-                    : null,
-                onTap: () {
-                  ref.read(localeProvider.notifier).setLocale(const Locale('zh'));
+                  ref.read(localeProvider.notifier).setLocale(locale);
                   context.pop();
                 },
-              ),
-            ],
+              );
+            }).toList(),
           ),
         );
       },

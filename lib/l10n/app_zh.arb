@@ -119,5 +119,12 @@
   "valBattery": "电池",
   "imageGallery": "相册",
   "imageCamera": "相机",
-  "errorNameRequired": "请输入名称"
+  "errorNameRequired": "请输入名称",
+  "timeUnitDay": "天",
+  "timeUnitWeek": "周",
+  "timeUnitMonth": "月",
+  "timeUnitYear": "年",
+  "addReminder": "添加提醒",
+  "customReminderTitle": "自定义提醒",
+  "enterValue": "输入数值"
 }
