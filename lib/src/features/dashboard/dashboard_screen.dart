@@ -9,6 +9,8 @@ import 'widgets/expiring_card.dart';
 import '../../config/theme.dart';
 import '../../utils/expiry_utils.dart';
 import '../../models/item.dart';
+import '../../models/category.dart';
+import '../../models/location.dart';
 import '../../utils/localized_utils.dart';
 import '../inventory/category_selector.dart';
 import '../inventory/location_selector.dart';
@@ -80,26 +82,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   Text(l10n.category, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
                   const SizedBox(height: 8),
                   InkWell(
-                    onTap: () {
-                      showModalBottomSheet(
+                    onTap: () async {
+                      final Category? cat = await showModalBottomSheet<Category>(
                         context: context,
                         isScrollControlled: true,
                         useSafeArea: true,
-                        builder: (c) => CategorySelector(
-                          onSelected: (cat) {
-                            final old = ref.read(dashboardFilterProvider);
-                            ref.read(dashboardFilterProvider.notifier).state = DashboardFilter(
-                              searchQuery: old.searchQuery,
-                              locationId: old.locationId,
-                              locationName: old.locationName,
-                              categoryId: cat.id,
-                              categoryName: cat.name,
-                            );
-                            Navigator.pop(c);
-                            Navigator.pop(ctx);
-                          },
-                        ),
+                        builder: (c) => const CategorySelector(),
                       );
+                      
+                      if (cat != null) {
+                        final old = ref.read(dashboardFilterProvider);
+                        ref.read(dashboardFilterProvider.notifier).state = DashboardFilter(
+                          searchQuery: old.searchQuery,
+                          locationId: old.locationId,
+                          locationName: old.locationName,
+                          categoryId: cat.id,
+                          categoryName: cat.name,
+                        );
+                        Navigator.pop(ctx);
+                      }
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -127,26 +128,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   Text(l10n.location, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
                   const SizedBox(height: 8),
                   InkWell(
-                    onTap: () {
-                       showModalBottomSheet(
+                    onTap: () async {
+                       final Location? loc = await showModalBottomSheet<Location>(
                         context: context,
                         isScrollControlled: true,
                         useSafeArea: true,
-                        builder: (c) => LocationSelector(
-                          onSelected: (loc) {
-                            final old = ref.read(dashboardFilterProvider);
-                            ref.read(dashboardFilterProvider.notifier).state = DashboardFilter(
-                              searchQuery: old.searchQuery,
-                              categoryId: old.categoryId,
-                              categoryName: old.categoryName,
-                              locationId: loc.id,
-                              locationName: loc.name,
-                            );
-                            Navigator.pop(c);
-                            Navigator.pop(ctx);
-                          },
-                        ),
+                        builder: (c) => const LocationSelector(),
                       );
+                      
+                      if (loc != null) {
+                        final old = ref.read(dashboardFilterProvider);
+                        ref.read(dashboardFilterProvider.notifier).state = DashboardFilter(
+                          searchQuery: old.searchQuery,
+                          categoryId: old.categoryId,
+                          categoryName: old.categoryName,
+                          locationId: loc.id,
+                          locationName: loc.name,
+                        );
+                        Navigator.pop(ctx);
+                      }
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),

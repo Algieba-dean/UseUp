@@ -10,13 +10,15 @@ import '../../data/providers/database_provider.dart';
 import '../../utils/localized_utils.dart';
 
 class CategorySelector extends ConsumerStatefulWidget {
-  final Function(Category)? onSelected;
   final bool isManageMode; 
+  final Id? parentId; 
+  final String? breadcrumbs;
 
   const CategorySelector({
     super.key, 
-    this.onSelected,
     this.isManageMode = false,
+    this.parentId,
+    this.breadcrumbs,
   });
 
   @override
@@ -24,7 +26,6 @@ class CategorySelector extends ConsumerStatefulWidget {
 }
 
 class _CategorySelectorState extends ConsumerState<CategorySelector> {
-  Id? _currentParentId;
   List<Category> _categories = [];
   Category? _currentParentCategory;
 
@@ -36,11 +37,9 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
 
   Future<void> _loadCategories() async {
     final isar = ref.read(databaseProvider);
-    final cats = await isar.categorys.filter().parentIdEqualTo(_currentParentId).findAll();
-    if (_currentParentId != null) {
-      _currentParentCategory = await isar.categorys.get(_currentParentId!);
-    } else {
-      _currentParentCategory = null;
+    final cats = await isar.categorys.filter().parentIdEqualTo(widget.parentId).findAll();
+    if (widget.parentId != null) {
+      _currentParentCategory = await isar.categorys.get(widget.parentId!);
     }
     setState(() => _categories = cats);
   }
@@ -60,27 +59,34 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
     return count > 0;
   }
 
-  void _enterLevel(Category cat) {
+  void _enterLevel(Category cat) async {
     if (cat.level < 2) {
       HapticFeedback.selectionClick();
-      setState(() => _currentParentId = cat.id);
-      _loadCategories();
-    }
-  }
+      final currentName = LocalizedUtils.getLocalizedName(context, cat.name);
+      final newPath = widget.breadcrumbs == null 
+          ? currentName 
+          : '${widget.breadcrumbs} / $currentName';
 
-  void _goBack() {
-    if (_currentParentCategory != null) {
-      HapticFeedback.selectionClick();
-      setState(() => _currentParentId = _currentParentCategory!.parentId);
-      _loadCategories();
+      final result = await Navigator.push<Category>(
+        context,
+        MaterialPageRoute(
+          builder: (ctx) => CategorySelector(
+            isManageMode: widget.isManageMode,
+            parentId: cat.id,
+            breadcrumbs: newPath,
+          ),
+        ),
+      );
+      
+      if (result != null && mounted) {
+        Navigator.pop(context, result);
+      }
     }
   }
 
   void _handleSelection(Category cat) {
-    if (widget.onSelected != null) {
-      HapticFeedback.mediumImpact();
-      widget.onSelected!(cat);
-    }
+    HapticFeedback.mediumImpact();
+    Navigator.pop(context, cat);
   }
 
   void _addCategory() {
@@ -94,16 +100,30 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
         builder: (context, setState) {
           return AlertDialog(
             title: Text(widget.isManageMode ? l10n.categoryAddSub : l10n.categoryAdd),
-            content: TextField(
-              controller: controller, 
-              autofocus: true,
-              decoration: InputDecoration(
-                hintText: l10n.name,
-                errorText: errorText, // 显示错误信息
-              ),
-              onChanged: (_) {
-                if (errorText != null) setState(() => errorText = null);
-              },
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (widget.breadcrumbs != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      "In: ${widget.breadcrumbs}",
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                TextField(
+                  controller: controller, 
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: l10n.name,
+                    errorText: errorText,
+                  ),
+                  onChanged: (_) {
+                    if (errorText != null) setState(() => errorText = null);
+                  },
+                ),
+              ],
             ),
             actions: [
               TextButton(
@@ -114,7 +134,7 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
                 onPressed: () async {
                   final name = controller.text.trim();
                   if (name.isNotEmpty) {
-                    if (await _checkDuplicate(name, _currentParentId)) {
+                    if (await _checkDuplicate(name, widget.parentId)) {
                        HapticFeedback.heavyImpact();
                        setState(() => errorText = l10n.errorNameExists);
                        return;
@@ -122,7 +142,7 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
                     
                     HapticFeedback.lightImpact();
                     final isar = ref.read(databaseProvider);
-                    final newCat = Category(name: name, parentId: _currentParentId, level: (_currentParentCategory?.level ?? -1) + 1);
+                    final newCat = Category(name: name, parentId: widget.parentId, level: (_currentParentCategory?.level ?? -1) + 1);
                     await isar.writeTxn(() async => await isar.categorys.put(newCat));
                     _loadCategories();
                     if(mounted) Navigator.pop(ctx);
@@ -202,7 +222,6 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
      final isar = ref.read(databaseProvider);
      if (await isar.categorys.filter().parentIdEqualTo(cat.id).count() > 0) {
        HapticFeedback.heavyImpact();
-       // 弹窗提示，不使用 SnackBar
        showDialog(context: context, builder: (ctx) => AlertDialog(
          title: Text(l10n.categoryDeleteTitle),
          content: Text(l10n.containsSubItems),
@@ -300,93 +319,64 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final title = _currentParentCategory != null ? LocalizedUtils.getLocalizedName(context, _currentParentCategory!.name) : (widget.isManageMode ? l10n.manageCategories : l10n.categorySelect);
-    return Container(
-      height: 550,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40, height: 4,
-              margin: const EdgeInsets.only(bottom: 20),
-              decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
-            ),
-          ),
-          
-          Row(
-            children: [
-              if (_currentParentId != null)
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-                  onPressed: _goBack,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-              if (_currentParentId != null) const SizedBox(width: 16),
-              
-              Text(
-                title,
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
-              ),
-              const Spacer(),
-              IconButton(
-                onPressed: _addCategory,
-                icon: const Icon(Icons.add_circle, color: AppTheme.primaryGreen, size: 36),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          
-          Expanded(
-            child: _categories.isEmpty
-                ? Center(child: Text(l10n.emptyList, style: TextStyle(color: Colors.grey[400])))
-                : ListView.separated(
-                    itemCount: _categories.length,
-                    separatorBuilder: (ctx, i) => Divider(height: 1, color: Colors.grey[100]),
-                    itemBuilder: (context, index) {
-                      final cat = _categories[index];
-                      final canGoDeeper = cat.level < 2;
-                      final displayName = LocalizedUtils.getLocalizedName(context, cat.name);
+    
+    String title = widget.breadcrumbs ?? (widget.isManageMode ? l10n.manageCategories : l10n.categorySelect);
 
-                      return ListTile(
-                        onTap: () => deepTap(cat, canGoDeeper),
-                        leading: Icon(canGoDeeper ? Icons.grid_view : Icons.label_outline, color: Colors.grey[600], size: 24),
-                        title: Text(displayName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (widget.isManageMode) ...[
-                              IconButton(icon: const Icon(Icons.edit, color: Colors.blueAccent), onPressed: () => _editCategory(cat)),
-                              IconButton(icon: const Icon(Icons.delete_outline, color: Colors.red), onPressed: () => _deleteCategory(cat)),
-                            ] else ...[
-                              IconButton(onPressed: () => _handleSelection(cat), icon: Icon(Icons.radio_button_unchecked, color: Colors.grey[400], size: 28)),
-                            ],
-                            if (canGoDeeper)
-                              Icon(Icons.chevron_right, color: Colors.grey[400]),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(title, style: const TextStyle(fontSize: 16)),
+        centerTitle: false, // 靠左对齐
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        actions: [
+          IconButton(
+            onPressed: _addCategory,
+            icon: const Icon(Icons.add_circle, color: AppTheme.primaryGreen, size: 28),
           ),
+          const SizedBox(width: 12),
         ],
       ),
-    );
-  }
+      body: _categories.isEmpty
+          ? Center(child: Text(l10n.emptyList, style: TextStyle(color: Colors.grey[400])))
+          : ListView.separated(
+              itemCount: _categories.length,
+              separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey[100]),
+              itemBuilder: (ctx, i) {
+                final c = _categories[i];
+                final deep = c.level < 2;
+                final displayName = LocalizedUtils.getLocalizedName(context, c.name);
 
-  void deepTap(Category cat, bool canGoDeeper) {
-    if (canGoDeeper) {
-      _enterLevel(cat);
-    } else {
-      if (!widget.isManageMode) {
-        _handleSelection(cat);
-      }
-    }
+                return ListTile(
+                  onTap: () {
+                    // 如果能深入，点击就深入
+                    if (deep) {
+                      _enterLevel(c);
+                    } else {
+                      // 否则，如果是管理模式，点击编辑；如果是选择模式，选中并返回
+                      if (widget.isManageMode) {
+                        _editCategory(c);
+                      } else {
+                        _handleSelection(c);
+                      }
+                    }
+                  },
+                  leading: Icon(deep ? Icons.grid_view : Icons.label_outline, color: Colors.grey[600], size: 24),
+                  title: Text(displayName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
+                  trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                    if (widget.isManageMode) ...[
+                      IconButton(icon: const Icon(Icons.edit, color: Colors.blueAccent), onPressed: () => _editCategory(c)),
+                      IconButton(icon: const Icon(Icons.delete_outline, color: Colors.red), onPressed: () => _deleteCategory(c)),
+                    ] else ...[
+                      // 选中按钮
+                      IconButton(onPressed: () => _handleSelection(c), icon: const Icon(Icons.radio_button_unchecked, color: Colors.grey)),
+                    ],
+                    if (deep) Icon(Icons.chevron_right, color: Colors.grey[400]),
+                  ]),
+                );
+              },
+            ),
+    );
   }
 }

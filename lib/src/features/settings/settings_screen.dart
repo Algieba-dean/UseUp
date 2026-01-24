@@ -80,40 +80,37 @@ class SettingsScreen extends ConsumerWidget {
                   context,
                   MaterialPageRoute(
                     builder: (ctx) => Scaffold(
-                      appBar: AppBar(title: Text(l10n.manageCategories)),
-                      body: CategorySelector(
-                        isManageMode: true,
-                        onSelected: (_) {},
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // 4. 位置管理
-          Container(
-            color: Colors.white,
-            child: ListTile(
-              leading: const Icon(Icons.kitchen, color: AppTheme.primaryGreen),
-              title: Text(l10n.manageLocations),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-              onTap: () {
-                 Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (ctx) => Scaffold(
-                      appBar: AppBar(title: Text(l10n.manageLocations)),
-                      body: LocationSelector(
-                        isManageMode: true,
-                        onSelected: (_) {},
-                      ),
-                    ),
-                  ),
-                                 );
-                              },
-                            ),
+                                            appBar: AppBar(title: Text(l10n.manageCategories)),
+                                            body: const CategorySelector(
+                                              isManageMode: true,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                      
+                                // 4. 位置管理
+                                Container(
+                                  color: Colors.white,
+                                  child: ListTile(
+                                    leading: const Icon(Icons.kitchen, color: AppTheme.primaryGreen),
+                                    title: Text(l10n.manageLocations),
+                                    trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                                    onTap: () {
+                                       Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (ctx) => Scaffold(
+                                            appBar: AppBar(title: Text(l10n.manageLocations)),
+                                            body: const LocationSelector(
+                                              isManageMode: true,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },                            ),
                           ),
                         ],
                       ),

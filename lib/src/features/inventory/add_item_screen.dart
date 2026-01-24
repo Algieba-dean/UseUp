@@ -9,6 +9,8 @@ import 'package:use_up/src/localization/app_localizations.dart';
 
 import '../../config/theme.dart';
 import '../../models/item.dart';
+import '../../models/category.dart';
+import '../../models/location.dart';
 import '../../utils/localized_utils.dart';
 import 'category_selector.dart';
 import 'location_selector.dart';
@@ -101,7 +103,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             _buildSection(children: [
               TextFormField(
                 controller: _nameController,
-                // onChanged removed
+                onChanged: notifier.updateName,
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(labelText: "${l10n.name} *", border: InputBorder.none, prefixIcon: const Icon(Icons.edit_outlined)),
                 validator: (v) => v == null || v.isEmpty ? 'Name is required' : null,
@@ -195,7 +197,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         ),
         TextFormField(
           controller: _shelfLifeController,
-          onChanged: notifier.updateShelfLife, // Keep for calculation
+          onChanged: notifier.updateShelfLife,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(labelText: l10n.shelfLife, border: InputBorder.none, prefixIcon: const Icon(Icons.timer_outlined)),
         ),
@@ -240,18 +242,28 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     ])));
   }
 
-  void _showCategoryPicker(BuildContext context, AddItemNotifier notifier) {
-    showModalBottomSheet(context: context, isScrollControlled: true, useSafeArea: true, builder: (_) => CategorySelector(onSelected: (c) {
+  Future<void> _showCategoryPicker(BuildContext context, AddItemNotifier notifier) async {
+    final Category? c = await showModalBottomSheet<Category>(
+      context: context, 
+      isScrollControlled: true, 
+      useSafeArea: true, 
+      builder: (_) => const CategorySelector()
+    );
+    if (c != null) {
       notifier.updateCategory(c);
-      Navigator.pop(context);
-    }));
+    }
   }
 
-  void _showLocationPicker(BuildContext context, AddItemNotifier notifier) {
-    showModalBottomSheet(context: context, isScrollControlled: true, useSafeArea: true, builder: (_) => LocationSelector(onSelected: (l) {
+  Future<void> _showLocationPicker(BuildContext context, AddItemNotifier notifier) async {
+    final Location? l = await showModalBottomSheet<Location>(
+      context: context, 
+      isScrollControlled: true, 
+      useSafeArea: true, 
+      builder: (_) => const LocationSelector()
+    );
+    if (l != null) {
       notifier.updateLocation(l);
-      Navigator.pop(context);
-    }));
+    }
   }
 
   Widget _buildSection({required List<Widget> children, bool isAdvanced = false}) {
@@ -305,7 +317,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   Widget _buildQuantityRow(AddItemState state, AddItemNotifier notifier, AppLocalizations l10n) {
     return Row(children: [
       const Icon(Icons.shopping_bag_outlined, color: Colors.grey), const SizedBox(width: 12),
-      Expanded(child: TextFormField(controller: _quantityController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: InputDecoration(labelText: l10n.quantity, border: InputBorder.none))),
+      Expanded(child: TextFormField(controller: _quantityController, onChanged: notifier.updateQuantity, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: InputDecoration(labelText: l10n.quantity, border: InputBorder.none))),
       DropdownButton<String>(value: state.unit, underline: const SizedBox(), items: ['pcs', 'kg', 'g', 'L', 'ml', 'pack', 'box'].map((u) => DropdownMenuItem(value: u, child: Text(_getUnitDisplayName(u)))).toList(), onChanged: (v) => notifier.updateUnit(v!)),
     ]);
   }
@@ -320,7 +332,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   Widget _buildPriceInput(AddItemState state, AddItemNotifier notifier, AppLocalizations l10n, String currency) {
     return Row(children: [
       const Icon(Icons.attach_money, color: Colors.grey), const SizedBox(width: 12),
-      Expanded(child: TextFormField(controller: _priceController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: InputDecoration(labelText: l10n.price, border: InputBorder.none, prefixText: currency))),
+      Expanded(child: TextFormField(controller: _priceController, onChanged: notifier.updatePrice, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: InputDecoration(labelText: l10n.price, border: InputBorder.none, prefixText: currency))),
     ]);
   }
 
