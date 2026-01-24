@@ -18,14 +18,6 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(":app")
 
-    plugins.withType<com.android.build.gradle.api.AndroidBasePlugin> {
-        val android = extensions.getByType<com.android.build.gradle.BaseExtension>()
-        android.compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
-        }
-    }
-
     plugins.withId("com.android.library") {
         val android = extensions.getByName("android") as com.android.build.gradle.LibraryExtension
         if (android.namespace == null) {
