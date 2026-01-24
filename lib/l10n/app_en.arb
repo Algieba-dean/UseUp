@@ -81,6 +81,7 @@
   "cannotDeleteDefault": "Cannot delete the default item!",
   "containsSubItems": "Contains sub-items. Delete them first.",
   "errorDefaultNotFound": "Error: Default {name} not found.",
+  "errorNameExists": "Name already exists in this level.",
 
   "searchHint": "Search items...",
   "noItemsFound": "No items found",

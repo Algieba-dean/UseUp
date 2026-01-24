@@ -81,6 +81,7 @@
   "cannotDeleteDefault": "无法删除默认项！",
   "containsSubItems": "包含子项，请先删除子项。",
   "errorDefaultNotFound": "错误：未找到默认项 {name}。",
+  "errorNameExists": "该名称已存在。",
 
   "searchHint": "搜索物品...",
   "noItemsFound": "未找到物品",
@@ -95,7 +96,7 @@
   "catPantry": "储藏室",
   "catSnack": "零食",
   "catHealth": "药品/保健",
-  "catUtility": "杂物",
+  "catUtility": "日用品",
   "unitPcs": "个",
   "unitKg": "千克",
   "unitG": "克",
@@ -105,7 +106,7 @@
   "unitBox": "盒",
 
   "valOther": "其他",
-  "valMisc": "杂物",
+  "valMisc": "未分类",
   "valKitchen": "厨房",
   "valFridge": "冰箱",
   "valPantry": "储藏室",

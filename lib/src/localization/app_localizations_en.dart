@@ -245,6 +245,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get errorNameExists => 'Name already exists in this level.';
+
+  @override
   String get searchHint => 'Search items...';
 
   @override

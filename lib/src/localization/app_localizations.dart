@@ -536,6 +536,12 @@ abstract class AppLocalizations {
   /// **'Error: Default {name} not found.'**
   String errorDefaultNotFound(Object name);
 
+  /// No description provided for @errorNameExists.
+  ///
+  /// In en, this message translates to:
+  /// **'Name already exists in this level.'**
+  String get errorNameExists;
+
   /// No description provided for @searchHint.
   ///
   /// In en, this message translates to:

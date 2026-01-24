@@ -26,6 +26,46 @@ void main() async {
   await _seedDefaultLocations(isar);
   await _seedDefaultCategories(isar);
 
+  // --- Merge duplicate "Misc" categories ---
+  // Only merge if we have multiple system defaults (key = 'Misc')
+  final miscCats = await isar.categorys
+      .filter()
+      .nameEqualTo(AppConstants.defaultCategoryMisc)
+      .findAll();
+
+  if (miscCats.length > 1) {
+    final targetCat = miscCats.first;
+    final sourceCats = miscCats.sublist(1);
+
+    await isar.writeTxn(() async {
+      for (var source in sourceCats) {
+        // Move Items
+        final items = await isar.items
+            .filter()
+            .categoryLink((q) => q.idEqualTo(source.id))
+            .findAll();
+        for (var item in items) {
+          item.categoryLink.value = targetCat;
+          item.categoryName = targetCat.name;
+          await item.categoryLink.save();
+          await isar.items.put(item);
+        }
+        // Move Sub-categories
+        final subCats = await isar.categorys
+            .filter()
+            .parentIdEqualTo(source.id)
+            .findAll();
+        for (var sub in subCats) {
+           sub.parentId = targetCat.id;
+           await isar.categorys.put(sub);
+        }
+        // Delete Duplicate
+        await isar.categorys.delete(source.id);
+      }
+    });
+  }
+  // ----------------------------------------
+
   // 初始化通知
   final notificationService = NotificationService();
   await notificationService.init();

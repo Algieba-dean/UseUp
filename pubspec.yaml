@@ -1,8 +1,13 @@
 name: use_up
-description: "A new Flutter project."
-publish_to: 'none'
-version: 0.1.0+1
+# 1. 修改描述：不要用默认的 "A new Flutter project."
+description: "Your personal expiry date tracker and inventory manager." 
 
+publish_to: 'none'
+
+# 2. 修改版本号：正式上架建议从 1.0.0 开始
+# 格式为：主版本.次版本.补丁版本+构建号(versionCode)
+# 注意：每次上架 Google Play，'+' 后面的数字必须比上一次大（例如下次是 +2）
+version: 1.0.0+1
 environment:
   sdk: ^3.10.4
 
@@ -27,7 +32,7 @@ dependencies:
   path_provider: ^2.1.2
 
   # Features
-  mobile_scanner: ^7.1.4
+  # mobile_scanner: ^7.1.4
   image_picker: ^1.0.7
   uuid: ^4.3.3
   flutter_local_notifications: ^17.0.0

@@ -243,6 +243,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get errorNameExists => '该名称已存在。';
+
+  @override
   String get searchHint => '搜索物品...';
 
   @override
@@ -281,7 +284,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get catHealth => '药品/保健';
 
   @override
-  String get catUtility => '杂物';
+  String get catUtility => '日用品';
 
   @override
   String get unitPcs => '个';
@@ -308,7 +311,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get valOther => '其他';
 
   @override
-  String get valMisc => '杂物';
+  String get valMisc => '未分类';
 
   @override
   String get valKitchen => '厨房';

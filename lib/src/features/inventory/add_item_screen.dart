@@ -101,6 +101,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             _buildSection(children: [
               TextFormField(
                 controller: _nameController,
+                // onChanged removed
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(labelText: "${l10n.name} *", border: InputBorder.none, prefixIcon: const Icon(Icons.edit_outlined)),
                 validator: (v) => v == null || v.isEmpty ? 'Name is required' : null,
@@ -194,7 +195,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         ),
         TextFormField(
           controller: _shelfLifeController,
-          onChanged: notifier.updateShelfLife,
+          onChanged: notifier.updateShelfLife, // Keep for calculation
           keyboardType: TextInputType.number,
           decoration: InputDecoration(labelText: l10n.shelfLife, border: InputBorder.none, prefixIcon: const Icon(Icons.timer_outlined)),
         ),
@@ -222,6 +223,10 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             onSelected: (_) => notifier.toggleNotifyDay(d),
             selectedColor: AppTheme.primaryGreen.withOpacity(0.2),
             checkmarkColor: AppTheme.primaryGreen,
+            labelStyle: TextStyle(
+              color: state.notifyDaysList.contains(d) ? AppTheme.primaryGreen : Colors.black87,
+              fontWeight: state.notifyDaysList.contains(d) ? FontWeight.bold : FontWeight.normal,
+            ),
           )).toList(),
         ),
       ],
@@ -323,7 +328,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     final isEditing = widget.itemToEdit != null;
     return Container(padding: const EdgeInsets.all(16), decoration: const BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))]), child: SafeArea(child: Row(children: [
       if (!isEditing) Expanded(child: OutlinedButton(onPressed: () async {
-        // Sync before save
         notifier.updateName(_nameController.text);
         notifier.updateQuantity(_quantityController.text);
         notifier.updatePrice(_priceController.text);
@@ -333,7 +337,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
            if (await notifier.save(addNext: true)) {
              HapticFeedback.mediumImpact();
              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.saveAndNext)));
-             // Clear controllers
              _nameController.clear();
              _priceController.clear();
              _shelfLifeController.clear();
@@ -343,7 +346,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       }, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), side: const BorderSide(color: AppTheme.primaryGreen), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text(l10n.saveAndNext, style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)))),
       if (!isEditing) const SizedBox(width: 12),
       Expanded(child: FilledButton(onPressed: () async {
-        // Sync before save
         notifier.updateName(_nameController.text);
         notifier.updateQuantity(_quantityController.text);
         notifier.updatePrice(_priceController.text);
