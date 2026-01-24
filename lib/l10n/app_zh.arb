@@ -116,5 +116,7 @@
   "valPantry": "储藏室",
   "valBathroom": "浴室",
   "valFood": "食品",
-  "valBattery": "电池"
+  "valBattery": "电池",
+  "imageGallery": "相册",
+  "imageCamera": "相机"
 }

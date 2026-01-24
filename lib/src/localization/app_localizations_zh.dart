@@ -344,4 +344,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get valBattery => '电池';
+
+  @override
+  String get imageGallery => '相册';
+
+  @override
+  String get imageCamera => '相机';
 }

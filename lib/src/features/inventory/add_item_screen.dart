@@ -236,9 +236,10 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   }
 
   void _showImageSourceSheet(AddItemNotifier notifier) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(context: context, builder: (_) => SafeArea(child: Wrap(children: [
-      ListTile(leading: const Icon(Icons.photo_library), title: const Text('Gallery'), onTap: () { Navigator.pop(context); notifier.pickImage(ImageSource.gallery); }),
-      ListTile(leading: const Icon(Icons.photo_camera), title: const Text('Camera'), onTap: () { Navigator.pop(context); notifier.pickImage(ImageSource.camera); }),
+      ListTile(leading: const Icon(Icons.photo_library), title: Text(l10n.imageGallery), onTap: () { Navigator.pop(context); notifier.pickImage(ImageSource.gallery); }),
+      ListTile(leading: const Icon(Icons.photo_camera), title: Text(l10n.imageCamera), onTap: () { Navigator.pop(context); notifier.pickImage(ImageSource.camera); }),
     ])));
   }
 

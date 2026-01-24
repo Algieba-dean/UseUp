@@ -346,4 +346,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get valBattery => 'Battery';
+
+  @override
+  String get imageGallery => 'Gallery';
+
+  @override
+  String get imageCamera => 'Camera';
 }

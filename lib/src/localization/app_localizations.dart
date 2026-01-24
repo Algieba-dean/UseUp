@@ -733,6 +733,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Battery'**
   String get valBattery;
+
+  /// No description provided for @imageGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get imageGallery;
+
+  /// No description provided for @imageCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get imageCamera;
 }
 
 class _AppLocalizationsDelegate

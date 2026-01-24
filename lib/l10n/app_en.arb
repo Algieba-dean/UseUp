@@ -116,5 +116,7 @@
   "valPantry": "Pantry",
   "valBathroom": "Bathroom",
   "valFood": "Food",
-  "valBattery": "Battery"
+  "valBattery": "Battery",
+  "imageGallery": "Gallery",
+  "imageCamera": "Camera"
 }
