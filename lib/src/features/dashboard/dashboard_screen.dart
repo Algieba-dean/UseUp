@@ -270,132 +270,138 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ],
       ),
       
-      body: Column(
-        children: [
-          if (hasActiveFilters)
-            Container(
-              width: double.infinity,
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    Text(l10n.filtersHeader, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-                    const SizedBox(width: 8),
-                    if (filterState.categoryName != null)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: InputChip(
-                          label: Text(LocalizedUtils.getLocalizedName(context, filterState.categoryName!)),
-                          backgroundColor: AppTheme.primaryGreen.withOpacity(0.1),
-                          labelStyle: const TextStyle(color: AppTheme.primaryGreen),
-                          onDeleted: () {
-                            ref.read(dashboardFilterProvider.notifier).state = 
-                                ref.read(dashboardFilterProvider).clearCategory();
-                          },
-                        ),
-                      ),
-                    if (filterState.locationName != null)
-                      InputChip(
-                        label: Text(LocalizedUtils.getLocalizedName(context, filterState.locationName!)),
-                        backgroundColor: AppTheme.softSage.withOpacity(0.3),
-                        labelStyle: const TextStyle(color: Colors.black87),
-                        onDeleted: () {
-                          ref.read(dashboardFilterProvider.notifier).state = 
-                              ref.read(dashboardFilterProvider).clearLocation();
-                        },
-                      ),
-                  ],
-                ),
+      body: inventoryAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
+        data: (items) {
+          final isFiltered = currentQuery.isNotEmpty || hasActiveFilters;
+          final expiringItems = items.where((i) {
+            if (i.expiryDate == null) return false;
+            final days = ExpiryUtils.daysRemaining(i.expiryDate!);
+            return days <= 5; 
+          }).toList();
+
+          if (isFiltered && items.isEmpty) {
+             return Center(child: Text(
+               currentQuery.isNotEmpty 
+                 ? l10n.noItemsFoundFor(currentQuery) 
+                 : l10n.noItemsFound
+             ));
+          }
+
+          if (!isFiltered && items.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  Text(l10n.noItemsFound, style: TextStyle(color: Colors.grey[600])),
+                ],
               ),
-            ),
+            );
+          }
 
-          Expanded(
-            child: inventoryAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Error: $err')),
-              data: (items) {
-                final isFiltered = currentQuery.isNotEmpty || hasActiveFilters;
-
-                if (isFiltered) {
-                   if (items.isEmpty) {
-                      return Center(child: Text(
-                        currentQuery.isNotEmpty 
-                          ? l10n.noItemsFoundFor(currentQuery) 
-                          : l10n.noItemsFound
-                      ));
-                   }
-                   return ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: items.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 8),
-                      itemBuilder: (context, index) => _buildItemTile(context, items[index]),
-                   );
-                }
-
-                if (items.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[400]),
-                        const SizedBox(height: 16),
-                        Text(l10n.noItemsFound, style: TextStyle(color: Colors.grey[600])),
-                      ],
+          return CustomScrollView(
+            slivers: [
+              // Filters Section
+              if (hasActiveFilters)
+                SliverToBoxAdapter(
+                  child: Container(
+                    width: double.infinity,
+                    color: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          Text(l10n.filtersHeader, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+                          const SizedBox(width: 8),
+                          if (filterState.categoryName != null)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: InputChip(
+                                label: Text(LocalizedUtils.getLocalizedName(context, filterState.categoryName!)),
+                                backgroundColor: AppTheme.primaryGreen.withOpacity(0.1),
+                                labelStyle: const TextStyle(color: AppTheme.primaryGreen),
+                                onDeleted: () {
+                                  ref.read(dashboardFilterProvider.notifier).state = 
+                                      ref.read(dashboardFilterProvider).clearCategory();
+                                },
+                              ),
+                            ),
+                          if (filterState.locationName != null)
+                            InputChip(
+                              label: Text(LocalizedUtils.getLocalizedName(context, filterState.locationName!)),
+                              backgroundColor: AppTheme.softSage.withOpacity(0.3),
+                              labelStyle: const TextStyle(color: Colors.black87),
+                              onDeleted: () {
+                                ref.read(dashboardFilterProvider.notifier).state = 
+                                    ref.read(dashboardFilterProvider).clearLocation();
+                              },
+                            ),
+                        ],
+                      ),
                     ),
-                  );
-                }
+                  ),
+                ),
 
-                final expiringItems = items.where((i) {
-                  if (i.expiryDate == null) return false;
-                  final days = ExpiryUtils.daysRemaining(i.expiryDate!);
-                  return days <= 5; 
-                }).toList();
-
-                return SingleChildScrollView(
+              // Expiring Soon Section
+              if (!isFiltered && expiringItems.isNotEmpty)
+                SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (expiringItems.isNotEmpty) ...[
-                          Text(l10n.sectionExpiringSoon, style: Theme.of(context).textTheme.titleLarge),
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            height: 160,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: expiringItems.length,
-                              itemBuilder: (context, index) {
-                                return ExpiringCard(item: expiringItems[index]);
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-
-                        Text(l10n.sectionAllItems, style: Theme.of(context).textTheme.titleLarge),
+                        Text(l10n.sectionExpiringSoon, style: Theme.of(context).textTheme.titleLarge),
                         const SizedBox(height: 12),
-                        
-                        ListView.separated(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: items.length,
-                          separatorBuilder: (context, index) => const SizedBox(height: 8),
-                          itemBuilder: (context, index) {
-                            return _buildItemTile(context, items[index]);
-                          },
+                        SizedBox(
+                          height: 160,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: expiringItems.length,
+                            itemBuilder: (context, index) {
+                              return ExpiringCard(item: expiringItems[index]);
+                            },
+                          ),
                         ),
-                        const SizedBox(height: 80), 
+                        const SizedBox(height: 24),
                       ],
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-        ],
+                ),
+
+              // All Items Header
+              if (!isFiltered)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Text(l10n.sectionAllItems, style: Theme.of(context).textTheme.titleLarge),
+                  ),
+                ),
+
+              // All Items List
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index < items.length) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: _buildItemTile(context, items[index]),
+                        );
+                      }
+                      return null;
+                    },
+                    childCount: items.length,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
       
       floatingActionButton: FloatingActionButton.extended(

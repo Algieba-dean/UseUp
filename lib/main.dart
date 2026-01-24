@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'src/app.dart';
 import 'src/models/item.dart';
 import 'src/models/location.dart';
@@ -22,49 +23,57 @@ void main() async {
     directory: dir.path,
   );
 
-  // 初始化数据
-  await _seedDefaultLocations(isar);
-  await _seedDefaultCategories(isar);
+  final prefs = await SharedPreferences.getInstance();
+  const kIsDataSeededV1 = 'is_data_seeded_v1';
+  final isSeeded = prefs.getBool(kIsDataSeededV1) ?? false;
 
-  // --- Merge duplicate "Misc" categories ---
-  // Only merge if we have multiple system defaults (key = 'Misc')
-  final miscCats = await isar.categorys
-      .filter()
-      .nameEqualTo(AppConstants.defaultCategoryMisc)
-      .findAll();
+  if (!isSeeded) {
+    // 初始化数据
+    await _seedDefaultLocations(isar);
+    await _seedDefaultCategories(isar);
 
-  if (miscCats.length > 1) {
-    final targetCat = miscCats.first;
-    final sourceCats = miscCats.sublist(1);
+    // --- Merge duplicate "Misc" categories ---
+    // Only merge if we have multiple system defaults (key = 'Misc')
+    final miscCats = await isar.categorys
+        .filter()
+        .nameEqualTo(AppConstants.defaultCategoryMisc)
+        .findAll();
 
-    await isar.writeTxn(() async {
-      for (var source in sourceCats) {
-        // Move Items
-        final items = await isar.items
-            .filter()
-            .categoryLink((q) => q.idEqualTo(source.id))
-            .findAll();
-        for (var item in items) {
-          item.categoryLink.value = targetCat;
-          item.categoryName = targetCat.name;
-          await item.categoryLink.save();
-          await isar.items.put(item);
+    if (miscCats.length > 1) {
+      final targetCat = miscCats.first;
+      final sourceCats = miscCats.sublist(1);
+
+      await isar.writeTxn(() async {
+        for (var source in sourceCats) {
+          // Move Items
+          final items = await isar.items
+              .filter()
+              .categoryLink((q) => q.idEqualTo(source.id))
+              .findAll();
+          for (var item in items) {
+            item.categoryLink.value = targetCat;
+            item.categoryName = targetCat.name;
+            await item.categoryLink.save();
+            await isar.items.put(item);
+          }
+          // Move Sub-categories
+          final subCats = await isar.categorys
+              .filter()
+              .parentIdEqualTo(source.id)
+              .findAll();
+          for (var sub in subCats) {
+             sub.parentId = targetCat.id;
+             await isar.categorys.put(sub);
+          }
+          // Delete Duplicate
+          await isar.categorys.delete(source.id);
         }
-        // Move Sub-categories
-        final subCats = await isar.categorys
-            .filter()
-            .parentIdEqualTo(source.id)
-            .findAll();
-        for (var sub in subCats) {
-           sub.parentId = targetCat.id;
-           await isar.categorys.put(sub);
-        }
-        // Delete Duplicate
-        await isar.categorys.delete(source.id);
-      }
-    });
+      });
+    }
+    // ----------------------------------------
+    
+    await prefs.setBool(kIsDataSeededV1, true);
   }
-  // ----------------------------------------
 
   // 初始化通知
   final notificationService = NotificationService();
