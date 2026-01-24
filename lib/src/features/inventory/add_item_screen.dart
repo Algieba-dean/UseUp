@@ -109,7 +109,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                 onChanged: notifier.updateName,
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(labelText: "${l10n.name} *", border: InputBorder.none, prefixIcon: const Icon(Icons.edit_outlined)),
-                validator: (v) => v == null || v.isEmpty ? 'Name is required' : null,
+                validator: (v) => v == null || v.isEmpty ? l10n.errorNameRequired : null,
               ),
               const Divider(),
               _buildDateModeTabs(state, notifier, l10n),

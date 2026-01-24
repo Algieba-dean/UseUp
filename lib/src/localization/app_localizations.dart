@@ -745,6 +745,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Camera'**
   String get imageCamera;
+
+  /// No description provided for @errorNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get errorNameRequired;
 }
 
 class _AppLocalizationsDelegate

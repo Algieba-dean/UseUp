@@ -350,4 +350,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get imageCamera => '相机';
+
+  @override
+  String get errorNameRequired => '请输入名称';
 }

@@ -118,5 +118,6 @@
   "valFood": "Food",
   "valBattery": "Battery",
   "imageGallery": "Gallery",
-  "imageCamera": "Camera"
+  "imageCamera": "Camera",
+  "errorNameRequired": "Name is required"
 }

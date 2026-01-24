@@ -352,4 +352,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get imageCamera => 'Camera';
+
+  @override
+  String get errorNameRequired => 'Name is required';
 }

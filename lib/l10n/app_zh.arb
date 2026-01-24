@@ -118,5 +118,6 @@
   "valFood": "食品",
   "valBattery": "电池",
   "imageGallery": "相册",
-  "imageCamera": "相机"
+  "imageCamera": "相机",
+  "errorNameRequired": "请输入名称"
 }
