@@ -22,6 +22,7 @@ class AddItemState {
   final DateTime? productionDate;
   final int? shelfLifeDays;
   final TimeUnit shelfLifeUnit; // 新增：当前保质期单位
+  final String shelfLifeInputValue; // 新增：输入框的值，作为 Single Source of Truth
   final List<int> notifyDaysList;
   final String? imagePath;
   final Category? selectedCategory;
@@ -39,6 +40,7 @@ class AddItemState {
     this.productionDate,
     this.shelfLifeDays,
     this.shelfLifeUnit = TimeUnit.day,
+    this.shelfLifeInputValue = '',
     this.notifyDaysList = const [1, 3],
     this.imagePath,
     this.selectedCategory,
@@ -57,6 +59,7 @@ class AddItemState {
     DateTime? productionDate,
     int? shelfLifeDays,
     TimeUnit? shelfLifeUnit,
+    String? shelfLifeInputValue,
     List<int>? notifyDaysList,
     String? imagePath,
     Category? selectedCategory,
@@ -74,6 +77,7 @@ class AddItemState {
       productionDate: productionDate ?? this.productionDate,
       shelfLifeDays: shelfLifeDays ?? this.shelfLifeDays,
       shelfLifeUnit: shelfLifeUnit ?? this.shelfLifeUnit,
+      shelfLifeInputValue: shelfLifeInputValue ?? this.shelfLifeInputValue,
       notifyDaysList: notifyDaysList ?? this.notifyDaysList,
       imagePath: imagePath ?? this.imagePath,
       selectedCategory: selectedCategory ?? this.selectedCategory,
@@ -111,15 +115,22 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
       await _repository.loadLinks(item);
     }
     
-    // 智能推断保质期单位
+    // 智能推断保质期单位和初始输入值
     TimeUnit bestUnit = TimeUnit.day;
-    int displayShelfLife = item.shelfLifeDays ?? 0;
+    String initialInput = '';
     
     if (item.shelfLifeDays != null && item.shelfLifeDays! > 0) {
       if (item.shelfLifeDays! % 365 == 0) {
         bestUnit = TimeUnit.year;
+        initialInput = (item.shelfLifeDays! ~/ 365).toString();
       } else if (item.shelfLifeDays! % 30 == 0) {
         bestUnit = TimeUnit.month;
+        initialInput = (item.shelfLifeDays! ~/ 30).toString();
+      } else if (item.shelfLifeDays! % 7 == 0) {
+        bestUnit = TimeUnit.week;
+        initialInput = (item.shelfLifeDays! ~/ 7).toString();
+      } else {
+        initialInput = item.shelfLifeDays!.toString();
       }
     }
 
@@ -133,6 +144,7 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
       productionDate: item.productionDate,
       shelfLifeDays: item.shelfLifeDays,
       shelfLifeUnit: bestUnit,
+      shelfLifeInputValue: initialInput, // 初始化输入值
       notifyDaysList: List.from(item.notifyDaysList),
       imagePath: item.imagePath,
       selectedCategory: item.categoryLink.value,
@@ -155,61 +167,33 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
     _calculateExpiry();
   }
   
-  // 更新保质期数值
+  // 更新保质期数值 (Input changed)
   void updateShelfLife(String val) {
-    final valInt = int.tryParse(val);
-    if (valInt == null) {
-      state = state.copyWith(shelfLifeDays: null);
-      return; 
-    }
-    _updateShelfLifeWithUnit(valInt, state.shelfLifeUnit);
+    state = state.copyWith(shelfLifeInputValue: val);
+    _recalculateShelfLifeDays();
   }
 
-  // 更新保质期单位
+  // 更新保质期单位 (Unit changed)
   void updateShelfLifeUnit(TimeUnit unit) {
-    // 获取当前显示的值（需要反向计算出当前输入框里的值，或者在 State 里存 input value，
-    // 但为了简单，我们假设调用此方法前，UI 会把当前的 converted days 重新根据新 unit 计算并不太对。
-    // 更好的方式是：UI 层的 Controller 保持数字不变，只改变单位，然后重新计算总天数。
-    
-    // 这里我们假设当前的 shelfLifeDays 已经是最新的总天数
-    // 但这个逻辑有点绕，因为 shelfLifeDays 存的是总天数。
-    // 如果用户输入 "1" 选 "年"，总天数是 365。
-    // 然后用户改为 "月"，由于 Controller 里的字还是 "1"，所以逻辑应该是：
-    // 保持输入的数字不变，改变单位乘数。
-    
-    // 所以我们需要 UI 传过来当前的输入值，或者我们存一个 inputValue。
-    // 鉴于目前架构，我们在 updateShelfLifeUnit 时，并不改变 shelfLifeDays，
-    // 而是等待 updateShelfLife 被再次调用（通常 UI 会联动），
-    // 或者我们在此处重新计算：
-    // 但这里拿不到 Input 的值。
-    
-    // 修正策略：State 里存 unit，计算逻辑在 helper。
     state = state.copyWith(shelfLifeUnit: unit);
-    // 注意：这里没有重新计算 expiry，因为必须配合具体的数值。
-    // 我们依赖 UI 在改变 Unit 后，手动触发一次 updateShelfLife (带上当前的 text) 或者在 UI 上触发 _calculateExpiry。
-    // 为了简化，我们在下面提供一个 helper 给 UI 调用。
+    _recalculateShelfLifeDays();
   }
   
-  // 供 UI 调用：同时更新数值和单位
-  void updateShelfLifeAndUnit(String val, TimeUnit unit) {
-     final valInt = int.tryParse(val);
-     state = state.copyWith(shelfLifeUnit: unit); // 先更新单位
-     if (valInt != null) {
-       _updateShelfLifeWithUnit(valInt, unit);
-     } else {
-        state = state.copyWith(shelfLifeDays: null);
-     }
-  }
-
-  void _updateShelfLifeWithUnit(int val, TimeUnit unit) {
-    int totalDays = val;
-    switch (unit) {
-      case TimeUnit.week: totalDays = val * 7; break;
-      case TimeUnit.month: totalDays = val * 30; break;
-      case TimeUnit.year: totalDays = val * 365; break;
-      case TimeUnit.day: default: totalDays = val; break;
+  // 统一计算逻辑：根据 inputValue 和 unit 计算 days
+  void _recalculateShelfLifeDays() {
+    final valInt = int.tryParse(state.shelfLifeInputValue);
+    if (valInt == null) {
+      state = state.copyWith(shelfLifeDays: null);
+    } else {
+      int totalDays = valInt;
+      switch (state.shelfLifeUnit) {
+        case TimeUnit.week: totalDays = valInt * 7; break;
+        case TimeUnit.month: totalDays = valInt * 30; break;
+        case TimeUnit.year: totalDays = valInt * 365; break;
+        case TimeUnit.day: default: totalDays = valInt; break;
+      }
+      state = state.copyWith(shelfLifeDays: totalDays);
     }
-    state = state.copyWith(shelfLifeDays: totalDays);
     _calculateExpiry();
   }
 

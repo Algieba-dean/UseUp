@@ -257,7 +257,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               }).whereType<DropdownMenuItem<TimeUnit>>().toList(),
               onChanged: (v) {
                 if (v != null) {
-                  notifier.updateShelfLifeAndUnit(_shelfLifeController.text, v);
+                  notifier.updateShelfLifeUnit(v);
                 }
               },
             ),
