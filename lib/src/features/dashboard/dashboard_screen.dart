@@ -207,13 +207,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               )
             : Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      'assets/AppIcons/playstore.png',
+                      width: 40,
+                      height: 40,
                     ),
-                    child: const Icon(Icons.eco, color: AppTheme.primaryGreen),
                   ),
                   const SizedBox(width: 12),
                   Text(

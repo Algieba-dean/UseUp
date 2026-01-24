@@ -57,6 +57,8 @@ flutter_launcher_icons:
   image_path: "assets/AppIcons/playstore.png"
 
 flutter:
+  assets:
+    - assets/AppIcons/
 
   generate: true
 
