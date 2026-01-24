@@ -16,4 +16,6 @@ class AppConstants {
   static const String locFridge = 'Fridge';
   static const String locPantry = 'Pantry';
   static const String locBathroom = 'Bathroom';
+
+  static const String privacyPolicyUrl = 'https://sites.google.com/view/useup-privacy-policy';
 }

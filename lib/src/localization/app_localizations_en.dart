@@ -376,4 +376,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enterValue => 'Enter value';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
 }

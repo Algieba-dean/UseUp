@@ -126,5 +126,6 @@
   "timeUnitYear": "Year",
   "addReminder": "Add Reminder",
   "customReminderTitle": "Custom Reminder",
-  "enterValue": "Enter value"
+  "enterValue": "Enter value",
+  "privacyPolicy": "Privacy Policy"
 }

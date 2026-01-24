@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:use_up/src/localization/app_localizations.dart'; 
 import '../../config/theme.dart';
+import '../../config/constants.dart';
 import '../../providers/locale_provider.dart';
 import '../inventory/category_selector.dart';
 import '../inventory/location_selector.dart';
@@ -106,6 +108,38 @@ class SettingsScreen extends ConsumerWidget {
                                       );
                                     },                            ),
                           ),
+                        
+                        const SizedBox(height: 24),
+
+                        // 5. 隐私政策
+                        Container(
+                          color: Colors.white,
+                          child: ListTile(
+                            leading: const Icon(Icons.privacy_tip_outlined, color: AppTheme.primaryGreen),
+                            title: Text(l10n.privacyPolicy),
+                            trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                            onTap: () async {
+                              final Uri url = Uri.parse(AppConstants.privacyPolicyUrl);
+                              try {
+                                if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Could not launch ${AppConstants.privacyPolicyUrl}')),
+                                    );
+                                  }
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Error launching URL: $e')),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(height: 40),
                         ],
                       ),
                     );

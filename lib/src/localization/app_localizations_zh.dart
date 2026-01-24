@@ -374,4 +374,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enterValue => '输入数值';
+
+  @override
+  String get privacyPolicy => '隐私政策';
 }

@@ -126,5 +126,6 @@
   "timeUnitYear": "年",
   "addReminder": "添加提醒",
   "customReminderTitle": "自定义提醒",
-  "enterValue": "输入数值"
+  "enterValue": "输入数值",
+  "privacyPolicy": "隐私政策"
 }
