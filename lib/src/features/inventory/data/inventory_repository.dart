@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:isar/isar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../models/item.dart';
 import '../../../models/category.dart';
 import '../../../models/location.dart';
@@ -60,17 +61,48 @@ class InventoryRepository {
     await NotificationService().cancelNotification(item.id);
   }
 
+  static const String _kDefaultLocationId = 'default_location_id_v1';
+  static const String _kDefaultCategoryId = 'default_category_id_v1';
+
   // 4. 获取默认位置和分类
   Future<Location?> getDefaultLocation() async {
-    return await _isar.locations.filter()
+    final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getInt(_kDefaultLocationId);
+    
+    if (id != null) {
+      final loc = await _isar.locations.get(id);
+      if (loc != null) return loc;
+    }
+
+    // Fallback to name search
+    final loc = await _isar.locations.filter()
         .nameEqualTo('其他').or().nameEqualTo(AppConstants.defaultLocationOther)
         .findFirst();
+        
+    if (loc != null) {
+      await prefs.setInt(_kDefaultLocationId, loc.id);
+    }
+    return loc;
   }
 
   Future<Category?> getDefaultCategory() async {
-    return await _isar.categorys.filter()
+    final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getInt(_kDefaultCategoryId);
+    
+    if (id != null) {
+      final cat = await _isar.categorys.get(id);
+      if (cat != null) return cat;
+    }
+
+    // Fallback to name search
+    final cat = await _isar.categorys.filter()
         .nameEqualTo('杂物').or().nameEqualTo(AppConstants.defaultCategoryMisc)
         .findFirst();
+        
+    if (cat != null) {
+      await prefs.setInt(_kDefaultCategoryId, cat.id);
+    }
+    return cat;
   }
 
   QueryBuilder<Item, Item, QWhere> getItemsQuery() {
@@ -95,11 +127,7 @@ class InventoryRepository {
 
   Future<void> deleteCategorySafe(int id) async {
     // 1. Find Default
-    var defaultCat = await _isar.categorys.filter().nameEqualTo(AppConstants.defaultCategoryMisc).findFirst();
-    // Fallback for legacy data
-    if (defaultCat == null) {
-       defaultCat = await _isar.categorys.filter().nameEqualTo('杂物').findFirst();
-    }
+    final defaultCat = await getDefaultCategory();
     
     if (defaultCat == null) throw Exception("Default category not found.");
     if (defaultCat.id == id) throw Exception("Cannot delete the system default category.");
@@ -108,7 +136,7 @@ class InventoryRepository {
       // 2. Migrate Sub-categories
       final subs = await _isar.categorys.filter().parentIdEqualTo(id).findAll();
       for (var sub in subs) {
-        sub.parentId = defaultCat!.id;
+        sub.parentId = defaultCat.id;
         await _isar.categorys.put(sub);
       }
 
@@ -116,7 +144,7 @@ class InventoryRepository {
       final items = await _isar.items.filter().categoryLink((q) => q.idEqualTo(id)).findAll();
       for (var item in items) {
         item.categoryLink.value = defaultCat;
-        item.categoryName = defaultCat!.name;
+        item.categoryName = defaultCat.name;
         await item.categoryLink.save();
         await _isar.items.put(item);
       }
@@ -137,10 +165,7 @@ class InventoryRepository {
   }
 
   Future<void> deleteLocationSafe(int id) async {
-    var defaultLoc = await _isar.locations.filter().nameEqualTo(AppConstants.defaultLocationOther).findFirst();
-    if (defaultLoc == null) {
-       defaultLoc = await _isar.locations.filter().nameEqualTo('其他').findFirst();
-    }
+    final defaultLoc = await getDefaultLocation();
 
     if (defaultLoc == null) throw Exception("Default location not found.");
     if (defaultLoc.id == id) throw Exception("Cannot delete the system default location.");
@@ -149,7 +174,7 @@ class InventoryRepository {
       // Migrate Sub-locations
       final subs = await _isar.locations.filter().parentIdEqualTo(id).findAll();
       for (var sub in subs) {
-        sub.parentId = defaultLoc!.id;
+        sub.parentId = defaultLoc.id;
         await _isar.locations.put(sub);
       }
 
@@ -157,7 +182,7 @@ class InventoryRepository {
       final items = await _isar.items.filter().locationLink((q) => q.idEqualTo(id)).findAll();
       for (var item in items) {
         item.locationLink.value = defaultLoc;
-        item.locationName = defaultLoc!.name;
+        item.locationName = defaultLoc.name;
         await item.locationLink.save();
         await _isar.items.put(item);
       }
