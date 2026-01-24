@@ -432,7 +432,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               : _getCategoryIcon(context, item.categoryName),
         ),
         title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text('${item.quantity} ${item.unit} • ${LocalizedUtils.getLocalizedName(context, item.locationName)}'),
+        subtitle: Text('${item.quantity} ${LocalizedUtils.getLocalizedUnit(context, item.unit)} • ${LocalizedUtils.getLocalizedName(context, item.locationName)}'),
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(

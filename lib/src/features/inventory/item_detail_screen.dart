@@ -66,7 +66,7 @@ class ItemDetailScreen extends ConsumerWidget {
                   ),
                 Text(item.name, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                Text('${item.quantity} ${item.unit}', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
+                Text('${item.quantity} ${LocalizedUtils.getLocalizedUnit(context, item.unit)}', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
                 const SizedBox(height: 32),
                 _buildExpiryCard(color, expiryString, item),
                 const SizedBox(height: 24),

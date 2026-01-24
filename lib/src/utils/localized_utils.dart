@@ -57,4 +57,39 @@ class LocalizedUtils {
       default: return originalName; // 没命中则显示原名
     }
   }
+
+  static String getLocalizedUnit(BuildContext context, String originalUnit) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    switch (originalUnit.toLowerCase()) {
+      case 'pcs': return l10n.unitPcs;
+      case '个': return l10n.unitPcs;
+      
+      case 'kg': return l10n.unitKg;
+      case '千克': return l10n.unitKg;
+      
+      case 'g': return l10n.unitG;
+      case '克': return l10n.unitG;
+      
+      case 'l': return l10n.unitL;
+      case '升': return l10n.unitL;
+      
+      case 'ml': return l10n.unitMl;
+      case '毫升': return l10n.unitMl;
+      
+      case 'pack': return l10n.unitPack;
+      case '包': return l10n.unitPack;
+      
+      case 'box': return l10n.unitBox;
+      case '盒': return l10n.unitBox;
+      
+      case 'bag': return l10n.unitBag;
+      case '袋': return l10n.unitBag;
+      
+      case 'bottle': return l10n.unitBottle;
+      case '瓶': return l10n.unitBottle;
+      
+      default: return originalUnit;
+    }
+  }
 }

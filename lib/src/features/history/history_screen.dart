@@ -6,6 +6,7 @@ import 'package:use_up/src/localization/app_localizations.dart';
 import '../../config/theme.dart';
 import '../../models/item.dart';
 import '../../data/providers/database_provider.dart';
+import '../../utils/localized_utils.dart';
 
 final historyProvider = StreamProvider<List<Item>>((ref) {
   final isar = ref.watch(databaseProvider);
@@ -90,7 +91,7 @@ class HistoryScreen extends ConsumerWidget {
           children: [
             const SizedBox(height: 4),
             Text(
-              '${item.quantity} ${item.unit}',
+              '${item.quantity} ${LocalizedUtils.getLocalizedUnit(context, item.unit)}',
               style: TextStyle(color: Colors.grey[600], fontSize: 12),
             ),
             Text(
