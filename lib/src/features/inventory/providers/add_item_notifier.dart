@@ -91,7 +91,7 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
   AddItemNotifier(this._repository) : super(AddItemState());
 
   // 1. 初始化（编辑模式）
-  Future<void> init(Item? item) async {
+  Future<void> init(Item? item, {bool isRestock = false}) async {
     if (item == null) {
       state = state.copyWith(isLoading: true);
       final defLoc = await _repository.getDefaultLocation();
@@ -105,7 +105,11 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
     }
 
     state = state.copyWith(isLoading: true);
-    await _repository.loadLinks(item);
+    // 如果是补货（临时对象），不要从数据库加载 Link，因为它们还没存进去，
+    // 而是直接使用 item 中已经赋值的 value。
+    if (!isRestock) {
+      await _repository.loadLinks(item);
+    }
     
     // 智能推断保质期单位
     TimeUnit bestUnit = TimeUnit.day;

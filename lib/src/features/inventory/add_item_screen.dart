@@ -18,7 +18,8 @@ import 'providers/add_item_notifier.dart';
 
 class AddItemScreen extends ConsumerStatefulWidget {
   final Item? itemToEdit;
-  const AddItemScreen({super.key, this.itemToEdit});
+  final bool isRestock;
+  const AddItemScreen({super.key, this.itemToEdit, this.isRestock = false});
 
   @override
   ConsumerState<AddItemScreen> createState() => _AddItemScreenState();
@@ -42,7 +43,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     _quantityController = TextEditingController(text: '1');
 
     Future.microtask(() async {
-      await ref.read(addItemProvider.notifier).init(widget.itemToEdit);
+      await ref.read(addItemProvider.notifier).init(widget.itemToEdit, isRestock: widget.isRestock);
       final state = ref.read(addItemProvider);
       _nameController.text = state.name;
       _priceController.text = state.price?.toString() ?? '';
@@ -121,7 +122,12 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       appBar: AppBar(
-        title: Text(widget.itemToEdit != null ? l10n.editItem : l10n.addItem, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          widget.isRestock 
+              ? l10n.restock 
+              : (widget.itemToEdit != null ? l10n.editItem : l10n.addItem),
+          style: const TextStyle(fontWeight: FontWeight.bold)
+        ),
         backgroundColor: Colors.transparent,
         centerTitle: true,
       ),
@@ -449,9 +455,9 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   }
 
   Widget _buildBottomButtons(AddItemState state, AddItemNotifier notifier, AppLocalizations l10n) {
-    final isEditing = widget.itemToEdit != null;
+    final isEditing = widget.itemToEdit != null && !widget.isRestock;
     return Container(padding: const EdgeInsets.all(16), decoration: const BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))]), child: SafeArea(child: Row(children: [
-      if (!isEditing) Expanded(child: OutlinedButton(onPressed: () async {
+      if (!isEditing && !widget.isRestock) Expanded(child: OutlinedButton(onPressed: () async {
         notifier.updateName(_nameController.text);
         notifier.updateQuantity(_quantityController.text);
         notifier.updatePrice(_priceController.text);
@@ -487,7 +493,10 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         notifier.updateShelfLife(_shelfLifeController.text);
 
         if (_formKey.currentState!.validate()) {
-           final success = await notifier.save(itemToEdit: widget.itemToEdit);
+           // 如果是补货 (isRestock)，则视为新添加 (itemToEdit: null)
+           final success = await notifier.save(
+             itemToEdit: widget.isRestock ? null : widget.itemToEdit
+           );
            if (success) {
              if (context.mounted) context.pop();
            } else {

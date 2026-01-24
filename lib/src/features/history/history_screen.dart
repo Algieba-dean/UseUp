@@ -7,6 +7,7 @@ import '../../config/theme.dart';
 import '../../models/item.dart';
 import '../../data/providers/database_provider.dart';
 import '../../utils/localized_utils.dart';
+import '../inventory/add_item_screen.dart';
 
 final historyProvider = StreamProvider<List<Item>>((ref) {
   final isar = ref.watch(databaseProvider);
@@ -113,31 +114,33 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _restockItem(WidgetRef ref, Item oldItem, BuildContext context) async {
-    final isar = ref.read(databaseProvider);
-    final newItem = Item(
+  void _restockItem(WidgetRef ref, Item oldItem, BuildContext context) {
+    // 创建一个基于旧物品的新对象，但重置日期
+    final templateItem = Item(
       name: oldItem.name,
       quantity: oldItem.quantity,
       unit: oldItem.unit,
+      price: oldItem.price,
       purchaseDate: DateTime.now(),
-      expiryDate: null,
+      // expiryDate 留空，让用户在添加页面填写
+      expiryDate: null, 
       categoryName: oldItem.categoryName,
       locationName: oldItem.locationName,
+      shelfLifeDays: oldItem.shelfLifeDays, // 保留保质期偏好
+      notifyDaysList: oldItem.notifyDaysList,
+      imagePath: oldItem.imagePath,
       isConsumed: false,
     );
     
-    await isar.writeTxn(() async {
-      await isar.items.put(newItem);
-      newItem.categoryLink.value = oldItem.categoryLink.value;
-      newItem.locationLink.value = oldItem.locationLink.value;
-      await newItem.categoryLink.save();
-      await newItem.locationLink.save();
-    });
-
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${newItem.name} restocked!')),
-      );
-    }
+    // 关键：手动赋值关联对象，以便 AddItemNotifier 读取
+    templateItem.categoryLink.value = oldItem.categoryLink.value;
+    templateItem.locationLink.value = oldItem.locationLink.value;
+    
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AddItemScreen(itemToEdit: templateItem, isRestock: true),
+      ),
+    );
   }
 }
