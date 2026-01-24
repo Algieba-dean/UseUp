@@ -10,14 +10,15 @@ class Location {
   late String name;
 
   // 父级ID，如果为 null 则表示是一级目录（如“厨房”）
-  int? parentId; 
+  int? parentId;
+  short level;
 
-  // 层级深度 (0=Room, 1=Furniture, 2=Section)
-  int level; 
+  double sortOrder;
 
   Location({
     required this.name,
     this.parentId,
     this.level = 0,
+    this.sortOrder = 0.0,
   });
 }

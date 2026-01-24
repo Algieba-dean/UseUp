@@ -10,14 +10,12 @@ import '../../data/providers/database_provider.dart';
 import '../../utils/localized_utils.dart';
 
 class LocationSelector extends ConsumerStatefulWidget {
-  final Function(Location)? onSelected;
   final bool isManageMode;
   final Id? parentId;
   final String? breadcrumbs;
 
   const LocationSelector({
     super.key, 
-    this.onSelected,
     this.isManageMode = false,
     this.parentId,
     this.breadcrumbs,
@@ -39,7 +37,11 @@ class _LocationSelectorState extends ConsumerState<LocationSelector> {
 
   Future<void> _loadLocations() async {
     final isar = ref.read(databaseProvider);
-    final locs = await isar.locations.filter().parentIdEqualTo(widget.parentId).findAll();
+    final locs = await isar.locations
+        .filter()
+        .parentIdEqualTo(widget.parentId)
+        .sortBySortOrder()
+        .findAll();
     if (widget.parentId != null) {
       _currentParentLocation = await isar.locations.get(widget.parentId!);
     }
@@ -132,10 +134,19 @@ class _LocationSelectorState extends ConsumerState<LocationSelector> {
                   }
                   HapticFeedback.lightImpact();
                   final isar = ref.read(databaseProvider);
+                  
+                  final lastLocation = await isar.locations
+                      .filter()
+                      .parentIdEqualTo(widget.parentId)
+                      .sortBySortOrderDesc()
+                      .findFirst();
+                  final newOrder = (lastLocation?.sortOrder ?? 0.0) + 1.0;
+
                   final newLoc = Location(
                     name: name, 
                     parentId: widget.parentId, 
                     level: (_currentParentLocation?.level ?? -1) + 1,
+                    sortOrder: newOrder,
                   );
                   await isar.writeTxn(() async => await isar.locations.put(newLoc));
                   _loadLocations();
@@ -276,6 +287,24 @@ class _LocationSelectorState extends ConsumerState<LocationSelector> {
     _loadLocations();
   }
 
+  void _onReorder(int oldIndex, int newIndex) async {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final item = _locations.removeAt(oldIndex);
+    _locations.insert(newIndex, item);
+    setState(() {});
+
+    final isar = ref.read(databaseProvider);
+    await isar.writeTxn(() async {
+      for (var i = 0; i < _locations.length; i++) {
+        final loc = _locations[i];
+        loc.sortOrder = i.toDouble();
+        await isar.locations.put(loc);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -299,33 +328,25 @@ class _LocationSelectorState extends ConsumerState<LocationSelector> {
       ),
       body: _locations.isEmpty
           ? Center(child: Text(l10n.emptyList, style: TextStyle(color: Colors.grey[400])))
-          : ListView.separated(
+          : ReorderableListView.builder(
               itemCount: _locations.length,
-              separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey[100]),
+              onReorder: _onReorder,
               itemBuilder: (ctx, i) {
                 final l = _locations[i];
                 final deep = l.level < 2;
                 final displayName = LocalizedUtils.getLocalizedName(context, l.name);
 
                 return ListTile(
-                  onTap: () {
-                    // 逻辑优化：有下一级就进入，否则根据模式决定动作
-                    if (deep) {
-                      _enterLevel(l);
-                    } else {
-                      if (widget.isManageMode) {
-                        _editLocation(l);
-                      } else {
-                        _handleSelection(l);
-                      }
-                    }
-                  },
+                  key: ValueKey(l.id),
+                  onTap: () => deepTap(l, deep),
                   leading: Icon(deep ? Icons.grid_view : Icons.place_outlined, color: Colors.grey[600], size: 24),
                   title: Text(displayName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
                   trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                     if (widget.isManageMode) ...[
                       IconButton(icon: const Icon(Icons.edit, color: Colors.blueAccent), onPressed: () => _editLocation(l)),
                       IconButton(icon: const Icon(Icons.delete_outline, color: Colors.red), onPressed: () => _deleteLocation(l)),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.drag_handle, color: Colors.grey),
                     ] else ...[
                       IconButton(onPressed: () => _handleSelection(l), icon: const Icon(Icons.radio_button_unchecked, color: Colors.grey)),
                     ],
@@ -335,5 +356,15 @@ class _LocationSelectorState extends ConsumerState<LocationSelector> {
               },
             ),
     );
+  }
+
+  void deepTap(Location loc, bool canGoDeeper) {
+    if (canGoDeeper) {
+      _enterLevel(loc);
+    } else {
+      if (!widget.isManageMode) {
+        _handleSelection(loc);
+      }
+    }
   }
 }

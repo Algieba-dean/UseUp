@@ -20,7 +20,7 @@ const LocationSchema = CollectionSchema(
     r'level': PropertySchema(
       id: 0,
       name: r'level',
-      type: IsarType.long,
+      type: IsarType.int,
     ),
     r'name': PropertySchema(
       id: 1,
@@ -31,6 +31,11 @@ const LocationSchema = CollectionSchema(
       id: 2,
       name: r'parentId',
       type: IsarType.long,
+    ),
+    r'sortOrder': PropertySchema(
+      id: 3,
+      name: r'sortOrder',
+      type: IsarType.double,
     )
   },
   estimateSize: _locationEstimateSize,
@@ -77,9 +82,10 @@ void _locationSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeLong(offsets[0], object.level);
+  writer.writeInt(offsets[0], object.level);
   writer.writeString(offsets[1], object.name);
   writer.writeLong(offsets[2], object.parentId);
+  writer.writeDouble(offsets[3], object.sortOrder);
 }
 
 Location _locationDeserialize(
@@ -89,9 +95,10 @@ Location _locationDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Location(
-    level: reader.readLongOrNull(offsets[0]) ?? 0,
+    level: reader.readIntOrNull(offsets[0]) ?? 0,
     name: reader.readString(offsets[1]),
     parentId: reader.readLongOrNull(offsets[2]),
+    sortOrder: reader.readDoubleOrNull(offsets[3]) ?? 0.0,
   );
   object.id = id;
   return object;
@@ -105,11 +112,13 @@ P _locationDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readLongOrNull(offset) ?? 0) as P;
+      return (reader.readIntOrNull(offset) ?? 0) as P;
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
       return (reader.readLongOrNull(offset)) as P;
+    case 3:
+      return (reader.readDoubleOrNull(offset) ?? 0.0) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -650,6 +659,68 @@ extension LocationQueryFilter
       ));
     });
   }
+
+  QueryBuilder<Location, Location, QAfterFilterCondition> sortOrderEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'sortOrder',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Location, Location, QAfterFilterCondition> sortOrderGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'sortOrder',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Location, Location, QAfterFilterCondition> sortOrderLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'sortOrder',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Location, Location, QAfterFilterCondition> sortOrderBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'sortOrder',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
 }
 
 extension LocationQueryObject
@@ -692,6 +763,18 @@ extension LocationQuerySortBy on QueryBuilder<Location, Location, QSortBy> {
   QueryBuilder<Location, Location, QAfterSortBy> sortByParentIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'parentId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Location, Location, QAfterSortBy> sortBySortOrder() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sortOrder', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Location, Location, QAfterSortBy> sortBySortOrderDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sortOrder', Sort.desc);
     });
   }
 }
@@ -745,6 +828,18 @@ extension LocationQuerySortThenBy
       return query.addSortBy(r'parentId', Sort.desc);
     });
   }
+
+  QueryBuilder<Location, Location, QAfterSortBy> thenBySortOrder() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sortOrder', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Location, Location, QAfterSortBy> thenBySortOrderDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sortOrder', Sort.desc);
+    });
+  }
 }
 
 extension LocationQueryWhereDistinct
@@ -765,6 +860,12 @@ extension LocationQueryWhereDistinct
   QueryBuilder<Location, Location, QDistinct> distinctByParentId() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'parentId');
+    });
+  }
+
+  QueryBuilder<Location, Location, QDistinct> distinctBySortOrder() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'sortOrder');
     });
   }
 }
@@ -792,6 +893,12 @@ extension LocationQueryProperty
   QueryBuilder<Location, int?, QQueryOperations> parentIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'parentId');
+    });
+  }
+
+  QueryBuilder<Location, double, QQueryOperations> sortOrderProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'sortOrder');
     });
   }
 }

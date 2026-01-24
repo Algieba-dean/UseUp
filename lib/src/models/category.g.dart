@@ -31,6 +31,11 @@ const CategorySchema = CollectionSchema(
       id: 2,
       name: r'parentId',
       type: IsarType.long,
+    ),
+    r'sortOrder': PropertySchema(
+      id: 3,
+      name: r'sortOrder',
+      type: IsarType.double,
     )
   },
   estimateSize: _categoryEstimateSize,
@@ -80,6 +85,7 @@ void _categorySerialize(
   writer.writeInt(offsets[0], object.level);
   writer.writeString(offsets[1], object.name);
   writer.writeLong(offsets[2], object.parentId);
+  writer.writeDouble(offsets[3], object.sortOrder);
 }
 
 Category _categoryDeserialize(
@@ -92,6 +98,7 @@ Category _categoryDeserialize(
     level: reader.readIntOrNull(offsets[0]) ?? 0,
     name: reader.readString(offsets[1]),
     parentId: reader.readLongOrNull(offsets[2]),
+    sortOrder: reader.readDoubleOrNull(offsets[3]) ?? 0.0,
   );
   object.id = id;
   return object;
@@ -110,6 +117,8 @@ P _categoryDeserializeProp<P>(
       return (reader.readString(offset)) as P;
     case 2:
       return (reader.readLongOrNull(offset)) as P;
+    case 3:
+      return (reader.readDoubleOrNull(offset) ?? 0.0) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -650,6 +659,68 @@ extension CategoryQueryFilter
       ));
     });
   }
+
+  QueryBuilder<Category, Category, QAfterFilterCondition> sortOrderEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'sortOrder',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Category, Category, QAfterFilterCondition> sortOrderGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'sortOrder',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Category, Category, QAfterFilterCondition> sortOrderLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'sortOrder',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Category, Category, QAfterFilterCondition> sortOrderBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'sortOrder',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
 }
 
 extension CategoryQueryObject
@@ -692,6 +763,18 @@ extension CategoryQuerySortBy on QueryBuilder<Category, Category, QSortBy> {
   QueryBuilder<Category, Category, QAfterSortBy> sortByParentIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'parentId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Category, Category, QAfterSortBy> sortBySortOrder() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sortOrder', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Category, Category, QAfterSortBy> sortBySortOrderDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sortOrder', Sort.desc);
     });
   }
 }
@@ -745,6 +828,18 @@ extension CategoryQuerySortThenBy
       return query.addSortBy(r'parentId', Sort.desc);
     });
   }
+
+  QueryBuilder<Category, Category, QAfterSortBy> thenBySortOrder() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sortOrder', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Category, Category, QAfterSortBy> thenBySortOrderDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sortOrder', Sort.desc);
+    });
+  }
 }
 
 extension CategoryQueryWhereDistinct
@@ -765,6 +860,12 @@ extension CategoryQueryWhereDistinct
   QueryBuilder<Category, Category, QDistinct> distinctByParentId() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'parentId');
+    });
+  }
+
+  QueryBuilder<Category, Category, QDistinct> distinctBySortOrder() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'sortOrder');
     });
   }
 }
@@ -792,6 +893,12 @@ extension CategoryQueryProperty
   QueryBuilder<Category, int?, QQueryOperations> parentIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'parentId');
+    });
+  }
+
+  QueryBuilder<Category, double, QQueryOperations> sortOrderProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'sortOrder');
     });
   }
 }

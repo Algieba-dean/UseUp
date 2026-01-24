@@ -37,7 +37,11 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
 
   Future<void> _loadCategories() async {
     final isar = ref.read(databaseProvider);
-    final cats = await isar.categorys.filter().parentIdEqualTo(widget.parentId).findAll();
+    final cats = await isar.categorys
+        .filter()
+        .parentIdEqualTo(widget.parentId)
+        .sortBySortOrder()
+        .findAll();
     if (widget.parentId != null) {
       _currentParentCategory = await isar.categorys.get(widget.parentId!);
     }
@@ -50,11 +54,9 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
         .filter()
         .parentIdEqualTo(parentId)
         .nameEqualTo(name, caseSensitive: false);
-        
     if (excludeId != null) {
       query = query.not().idEqualTo(excludeId);
     }
-    
     final count = await query.count();
     return count > 0;
   }
@@ -115,41 +117,42 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
                 TextField(
                   controller: controller, 
                   autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: l10n.name,
-                    errorText: errorText,
-                  ),
-                  onChanged: (_) {
-                    if (errorText != null) setState(() => errorText = null);
-                  },
+                  decoration: InputDecoration(hintText: l10n.name, errorText: errorText),
+                  onChanged: (_) { if (errorText != null) setState(() => errorText = null); },
                 ),
               ],
             ),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(l10n.cancel),
-              ),
-              TextButton(
-                onPressed: () async {
-                  final name = controller.text.trim();
-                  if (name.isNotEmpty) {
-                    if (await _checkDuplicate(name, widget.parentId)) {
-                       HapticFeedback.heavyImpact();
-                       setState(() => errorText = l10n.errorNameExists);
-                       return;
-                    }
-                    
-                    HapticFeedback.lightImpact();
-                    final isar = ref.read(databaseProvider);
-                    final newCat = Category(name: name, parentId: widget.parentId, level: (_currentParentCategory?.level ?? -1) + 1);
-                    await isar.writeTxn(() async => await isar.categorys.put(newCat));
-                    _loadCategories();
-                    if(mounted) Navigator.pop(ctx);
+              TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
+              TextButton(onPressed: () async {
+                final name = controller.text.trim();
+                if (name.isNotEmpty) {
+                  if (await _checkDuplicate(name, widget.parentId)) {
+                     HapticFeedback.heavyImpact();
+                     setState(() => errorText = l10n.errorNameExists);
+                     return;
                   }
-                },
-                child: Text(l10n.save),
-              )
+                  HapticFeedback.lightImpact();
+                  final isar = ref.read(databaseProvider);
+                  
+                  final lastCategory = await isar.categorys
+                      .filter()
+                      .parentIdEqualTo(widget.parentId)
+                      .sortBySortOrderDesc()
+                      .findFirst();
+                  final newOrder = (lastCategory?.sortOrder ?? 0.0) + 1.0;
+
+                  final newCat = Category(
+                    name: name, 
+                    parentId: widget.parentId, 
+                    level: (_currentParentCategory?.level ?? -1) + 1,
+                    sortOrder: newOrder,
+                  );
+                  await isar.writeTxn(() async => await isar.categorys.put(newCat));
+                  _loadCategories();
+                  if(mounted) Navigator.pop(ctx);
+                }
+              }, child: Text(l10n.save)),
             ],
           );
         }
@@ -171,45 +174,33 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
             content: TextField(
               controller: controller, 
               autofocus: true,
-              decoration: InputDecoration(
-                labelText: l10n.name,
-                errorText: errorText,
-              ),
-              onChanged: (_) {
-                if (errorText != null) setState(() => errorText = null);
-              },
+              decoration: InputDecoration(labelText: l10n.name, errorText: errorText),
+              onChanged: (_) { if (errorText != null) setState(() => errorText = null); },
             ),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(l10n.cancel),
-              ),
-              TextButton(
-                onPressed: () async {
-                  final name = controller.text.trim();
-                  if (name.isNotEmpty && name != cat.name) {
-                    if (await _checkDuplicate(name, cat.parentId, excludeId: cat.id)) {
-                       HapticFeedback.heavyImpact();
-                       setState(() => errorText = l10n.errorNameExists);
-                       return;
-                    }
-
-                    final isar = ref.read(databaseProvider);
-                    await isar.writeTxn(() async {
-                      cat.name = name;
-                      await isar.categorys.put(cat);
-                      final items = await isar.items.filter().categoryLink((q) => q.idEqualTo(cat.id)).findAll();
-                      for (var item in items) {
-                        item.categoryName = name;
-                        await isar.items.put(item);
-                      }
-                    });
-                    _loadCategories();
-                    if(mounted) Navigator.pop(ctx);
+              TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
+              TextButton(onPressed: () async {
+                final name = controller.text.trim();
+                if (name.isNotEmpty && name != cat.name) {
+                  if (await _checkDuplicate(name, cat.parentId, excludeId: cat.id)) {
+                     HapticFeedback.heavyImpact();
+                     setState(() => errorText = l10n.errorNameExists);
+                     return;
                   }
-                },
-                child: Text(l10n.save),
-              ),
+                  final isar = ref.read(databaseProvider);
+                  await isar.writeTxn(() async {
+                    cat.name = name;
+                    await isar.categorys.put(cat);
+                    final items = await isar.items.filter().categoryLink((q) => q.idEqualTo(cat.id)).findAll();
+                    for (var item in items) {
+                      item.categoryName = name;
+                      await isar.items.put(item);
+                    }
+                  });
+                  _loadCategories();
+                  if(mounted) Navigator.pop(ctx);
+                }
+              }, child: Text(l10n.save)),
             ],
           );
         }
@@ -316,17 +307,34 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
     _loadCategories();
   }
 
+  void _onReorder(int oldIndex, int newIndex) async {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final item = _categories.removeAt(oldIndex);
+    _categories.insert(newIndex, item);
+    setState(() {});
+
+    final isar = ref.read(databaseProvider);
+    await isar.writeTxn(() async {
+      for (var i = 0; i < _categories.length; i++) {
+        final cat = _categories[i];
+        cat.sortOrder = i.toDouble();
+        await isar.categorys.put(cat);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
-    String title = widget.breadcrumbs ?? (widget.isManageMode ? l10n.manageCategories : l10n.categorySelect);
+    final title = widget.breadcrumbs ?? (widget.isManageMode ? l10n.manageCategories : l10n.categorySelect);
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(title, style: const TextStyle(fontSize: 16)),
-        centerTitle: false, // 靠左对齐
+        centerTitle: false,
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -340,36 +348,26 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
       ),
       body: _categories.isEmpty
           ? Center(child: Text(l10n.emptyList, style: TextStyle(color: Colors.grey[400])))
-          : ListView.separated(
+          : ReorderableListView.builder(
               itemCount: _categories.length,
-              separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey[100]),
+              onReorder: _onReorder,
               itemBuilder: (ctx, i) {
                 final c = _categories[i];
                 final deep = c.level < 2;
                 final displayName = LocalizedUtils.getLocalizedName(context, c.name);
 
                 return ListTile(
-                  onTap: () {
-                    // 如果能深入，点击就深入
-                    if (deep) {
-                      _enterLevel(c);
-                    } else {
-                      // 否则，如果是管理模式，点击编辑；如果是选择模式，选中并返回
-                      if (widget.isManageMode) {
-                        _editCategory(c);
-                      } else {
-                        _handleSelection(c);
-                      }
-                    }
-                  },
+                  key: ValueKey(c.id),
+                  onTap: () => deepTap(c, deep),
                   leading: Icon(deep ? Icons.grid_view : Icons.label_outline, color: Colors.grey[600], size: 24),
                   title: Text(displayName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
                   trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                     if (widget.isManageMode) ...[
                       IconButton(icon: const Icon(Icons.edit, color: Colors.blueAccent), onPressed: () => _editCategory(c)),
                       IconButton(icon: const Icon(Icons.delete_outline, color: Colors.red), onPressed: () => _deleteCategory(c)),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.drag_handle, color: Colors.grey),
                     ] else ...[
-                      // 选中按钮
                       IconButton(onPressed: () => _handleSelection(c), icon: const Icon(Icons.radio_button_unchecked, color: Colors.grey)),
                     ],
                     if (deep) Icon(Icons.chevron_right, color: Colors.grey[400]),
@@ -378,5 +376,15 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
               },
             ),
     );
+  }
+
+  void deepTap(Category cat, bool canGoDeeper) {
+    if (canGoDeeper) {
+      _enterLevel(cat);
+    } else {
+      if (!widget.isManageMode) {
+        _handleSelection(cat);
+      }
+    }
   }
 }

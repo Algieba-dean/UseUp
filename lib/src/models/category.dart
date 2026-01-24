@@ -9,13 +9,15 @@ class Category {
   @Index(type: IndexType.value)
   late String name;
 
-  int? parentId; // 父级ID
+  int? parentId;
+  short level;
 
-  short level; // 0=大类, 1=子类
+  double sortOrder;
 
   Category({
     required this.name,
     this.parentId,
     this.level = 0,
+    this.sortOrder = 0.0,
   });
 }
