@@ -288,27 +288,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             return days <= 5; 
           }).toList();
 
-          if (isFiltered && items.isEmpty) {
-             return Center(child: Text(
-               currentQuery.isNotEmpty 
-                 ? l10n.noItemsFoundFor(currentQuery) 
-                 : l10n.noItemsFound
-             ));
-          }
-
-          if (!isFiltered && items.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text(l10n.noItemsFound, style: TextStyle(color: Colors.grey[600])),
-                ],
-              ),
-            );
-          }
-
           return CustomScrollView(
             slivers: [
               // Filters Section
@@ -353,8 +332,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                 ),
 
-              // Expiring Soon Section
-              if (!isFiltered && expiringItems.isNotEmpty)
+              // Expiring Soon Section (Horizontal) - Only show if we have expiring items and NOT in filtered modes that conflict
+              // If we are in "Expiring Soon" tab, this horizontal list is redundant if the main list is also expiring items.
+              // But let's keep it simple: Show it if not filtered by Category/Location/Search and we have expiring items.
+              // AND if we are NOT on "Expiring Soon" or "Expired" tabs (because then the main list covers it).
+              if (!isFiltered && 
+                  filterState.status == FilterStatus.all && 
+                  expiringItems.isNotEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -380,6 +364,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
 
               // All Items Header with Chips
+              // Always show unless we are deep in search/category filters?
+              // The user wants tabs to be persistent.
+              // Previous logic was `if (!isFiltered)`.
+              // `isFiltered` is true if Search OR Category OR Location is active.
+              // If I search, I probably don't want "All/Expiring/Expired" tabs confusing things.
+              // So `if (!isFiltered)` is probably still correct for hiding tabs during Search/Category drill-down.
+              // BUT, if `items` is empty, previously we returned early. Now we don't.
               if (!isFiltered)
                 SliverToBoxAdapter(
                   child: Padding(
@@ -435,24 +426,56 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                 ),
 
-              // All Items List
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index < items.length) {
+              // Empty State or List
+              if (items.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[400]),
+                        const SizedBox(height: 16),
+                        Text(
+                          _getEmptyStateMessage(l10n, filterState, isFiltered),
+                          style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (!isFiltered && filterState.status == FilterStatus.all) ...[
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: () => context.push('/add'),
+                            icon: const Icon(Icons.add),
+                            label: Text(l10n.addItem),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.primaryGreen,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                          ),
+                        ]
+                      ],
+                    ),
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 8.0),
                           child: _buildItemTile(context, items[index], ref),
                         );
-                      }
-                      return null;
-                    },
-                    childCount: items.length,
+                      },
+                      childCount: items.length,
+                    ),
                   ),
                 ),
-              ),
             ],
           );
         },
@@ -465,6 +488,34 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         label: Text(l10n.addItem, style: const TextStyle(color: Colors.white)),
       ),
     );
+  }
+
+  String _getEmptyStateMessage(
+    AppLocalizations l10n,
+    DashboardFilter filter,
+    bool isFiltered,
+  ) {
+    if (filter.searchQuery.isNotEmpty) {
+      return l10n.noItemsFoundFor(filter.searchQuery);
+    }
+    // If specific filter categories are active (but no search), generally use "No items found"
+    // But if we are in a tab (Expiring/Expired), we might want to be specific.
+    // The previous logic used 'noItemsFoundFor' for search, and 'noItemsFound' for generic filters.
+    
+    if (isFiltered && filter.searchQuery.isEmpty) {
+      return l10n.noItemsFound;
+    }
+
+    // Tab specific messages
+    if (filter.status == FilterStatus.expiringSoon) {
+      return l10n.noExpiringItems;
+    }
+    if (filter.status == FilterStatus.expired) {
+      return l10n.noExpiredItems;
+    }
+
+    // Default "All Items" empty state
+    return l10n.emptyInventoryPrompt;
   }
 
   Widget _buildItemTile(BuildContext context, Item item, WidgetRef ref) {

@@ -392,4 +392,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get filterExpiringSoon => '临期';
+
+  @override
+  String get emptyInventoryPrompt => '你的冰箱空空如也！试着添加第一件物品吧。';
+
+  @override
+  String get noExpiringItems => '暂无临期物品';
+
+  @override
+  String get noExpiredItems => '暂无过期物品';
 }

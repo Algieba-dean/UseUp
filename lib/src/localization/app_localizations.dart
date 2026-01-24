@@ -829,6 +829,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expiring Soon'**
   String get filterExpiringSoon;
+
+  /// No description provided for @emptyInventoryPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Your fridge is empty! Try adding the first item.'**
+  String get emptyInventoryPrompt;
+
+  /// No description provided for @noExpiringItems.
+  ///
+  /// In en, this message translates to:
+  /// **'No items expiring soon'**
+  String get noExpiringItems;
+
+  /// No description provided for @noExpiredItems.
+  ///
+  /// In en, this message translates to:
+  /// **'No expired items'**
+  String get noExpiredItems;
 }
 
 class _AppLocalizationsDelegate

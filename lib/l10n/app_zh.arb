@@ -132,5 +132,8 @@
   "deleteItemTitle": "删除物品？",
   "deleteItemContent": "此操作无法撤销。",
   "filterExpired": "已过期",
-  "filterExpiringSoon": "临期"
+  "filterExpiringSoon": "临期",
+  "emptyInventoryPrompt": "你的冰箱空空如也！试着添加第一件物品吧。",
+  "noExpiringItems": "暂无临期物品",
+  "noExpiredItems": "暂无过期物品"
 }

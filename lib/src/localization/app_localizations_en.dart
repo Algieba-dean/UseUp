@@ -394,4 +394,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filterExpiringSoon => 'Expiring Soon';
+
+  @override
+  String get emptyInventoryPrompt =>
+      'Your fridge is empty! Try adding the first item.';
+
+  @override
+  String get noExpiringItems => 'No items expiring soon';
+
+  @override
+  String get noExpiredItems => 'No expired items';
 }

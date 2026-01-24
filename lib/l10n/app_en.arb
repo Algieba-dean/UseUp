@@ -132,5 +132,8 @@
   "deleteItemTitle": "Delete Item?",
   "deleteItemContent": "This cannot be undone.",
   "filterExpired": "Expired",
-  "filterExpiringSoon": "Expiring Soon"
+  "filterExpiringSoon": "Expiring Soon",
+  "emptyInventoryPrompt": "Your fridge is empty! Try adding the first item.",
+  "noExpiringItems": "No items expiring soon",
+  "noExpiredItems": "No expired items"
 }
