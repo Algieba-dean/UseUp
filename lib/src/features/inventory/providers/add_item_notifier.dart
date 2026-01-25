@@ -55,6 +55,7 @@ class AddItemState {
     String? unit,
     double? price,
     DateTime? expiryDate,
+    bool clearExpiryDate = false,
     DateTime? purchaseDate,
     DateTime? productionDate,
     int? shelfLifeDays,
@@ -72,7 +73,7 @@ class AddItemState {
       quantity: quantity ?? this.quantity,
       unit: unit ?? this.unit,
       price: price ?? this.price,
-      expiryDate: expiryDate ?? this.expiryDate,
+      expiryDate: clearExpiryDate ? null : (expiryDate ?? this.expiryDate),
       purchaseDate: purchaseDate ?? this.purchaseDate,
       productionDate: productionDate ?? this.productionDate,
       shelfLifeDays: shelfLifeDays ?? this.shelfLifeDays,
@@ -241,7 +242,7 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
         expiryDate: state.productionDate!.add(Duration(days: state.shelfLifeDays!))
       );
     } else {
-      state = state.copyWith(expiryDate: null);
+      state = state.copyWith(clearExpiryDate: true);
     }
   }
 
@@ -292,7 +293,15 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
       }
 
       await _repository.saveItem(item, state.selectedCategory, state.selectedLocation);
-      await NotificationService().scheduleNotifications(item);
+      
+      try {
+        await NotificationService().scheduleNotifications(item);
+      } catch (e) {
+        // Notification scheduling failed, but item is saved. 
+        // We shouldn't fail the entire save operation.
+        // In debug mode, you might want to print this:
+        // print('Notification scheduling failed: $e');
+      }
 
       if (addNext) {
         final defLoc = await _repository.getDefaultLocation();

@@ -458,11 +458,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     final isEditing = widget.itemToEdit != null && !widget.isRestock;
     return Container(padding: const EdgeInsets.all(16), decoration: const BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))]), child: SafeArea(child: Row(children: [
       if (!isEditing && !widget.isRestock) Expanded(child: OutlinedButton(onPressed: state.isLoading ? null : () async {
-        notifier.updateName(_nameController.text);
-        notifier.updateQuantity(_quantityController.text);
-        notifier.updatePrice(_priceController.text);
-        notifier.updateShelfLife(_shelfLifeController.text);
-        
         if (_formKey.currentState!.validate()) {
            final success = await notifier.save(addNext: true);
            if (success) {
@@ -489,11 +484,6 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
           : Text(l10n.saveAndNext, style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)))),
       if (!isEditing && !widget.isRestock) const SizedBox(width: 12),
       Expanded(child: FilledButton(onPressed: state.isLoading ? null : () async {
-        notifier.updateName(_nameController.text);
-        notifier.updateQuantity(_quantityController.text);
-        notifier.updatePrice(_priceController.text);
-        notifier.updateShelfLife(_shelfLifeController.text);
-
         if (_formKey.currentState!.validate()) {
            final success = await notifier.save(itemToEdit: widget.isRestock ? null : widget.itemToEdit);
            if (success) {
