@@ -20,6 +20,7 @@ subprojects {
 
     plugins.withId("com.android.library") {
         val android = extensions.getByName("android") as com.android.build.gradle.LibraryExtension
+        android.compileSdk = 36
         if (android.namespace == null) {
             android.namespace = project.group.toString().replace("-", "_")
         }

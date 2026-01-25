@@ -847,6 +847,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No expired items'**
   String get noExpiredItems;
+
+  /// No description provided for @feedbackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Feedback / Rate Us'**
+  String get feedbackTitle;
+
+  /// No description provided for @feedbackDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enjoying UseUp?'**
+  String get feedbackDialogTitle;
+
+  /// No description provided for @feedbackDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Your feedback helps us improve!'**
+  String get feedbackDialogContent;
+
+  /// No description provided for @feedbackActionLove.
+  ///
+  /// In en, this message translates to:
+  /// **'Love it!'**
+  String get feedbackActionLove;
+
+  /// No description provided for @feedbackActionImprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Could be better'**
+  String get feedbackActionImprove;
 }
 
 class _AppLocalizationsDelegate

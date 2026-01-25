@@ -404,4 +404,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noExpiredItems => 'No expired items';
+
+  @override
+  String get feedbackTitle => 'Send Feedback / Rate Us';
+
+  @override
+  String get feedbackDialogTitle => 'Enjoying UseUp?';
+
+  @override
+  String get feedbackDialogContent => 'Your feedback helps us improve!';
+
+  @override
+  String get feedbackActionLove => 'Love it!';
+
+  @override
+  String get feedbackActionImprove => 'Could be better';
 }

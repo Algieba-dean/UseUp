@@ -401,4 +401,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noExpiredItems => '暂无过期物品';
+
+  @override
+  String get feedbackTitle => '发送反馈 / 给个好评';
+
+  @override
+  String get feedbackDialogTitle => '喜欢 UseUp 吗？';
+
+  @override
+  String get feedbackDialogContent => '您的反馈能帮助我们做得更好！';
+
+  @override
+  String get feedbackActionLove => '非常喜欢！';
+
+  @override
+  String get feedbackActionImprove => '有待改进';
 }
