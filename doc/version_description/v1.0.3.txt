@@ -1,0 +1,95 @@
+<en-US>
+- New: Slide items to quickly delete or mark as used.
+- New: In-app feedback feature.
+- Fixed: Date input logic issue.
+</en-US>
+<de-DE>
+- Neu: Wischen zum Löschen oder Verwenden von Elementen.
+- Neu: Feedback-Funktion in der App.
+- Behoben: Fehler bei der Datumseingabe.
+</de-DE>
+<en-AU>
+- New: Slide items to quickly delete or mark as used.
+- New: In-app feedback feature.
+- Fixed: Date input logic issue.
+</en-AU>
+<en-CA>
+- New: Slide items to quickly delete or mark as used.
+- New: In-app feedback feature.
+- Fixed: Date input logic issue.
+</en-CA>
+<en-GB>
+- New: Slide items to quickly delete or mark as used.
+- New: In-app feedback feature.
+- Fixed: Date input logic issue.
+</en-GB>
+<en-IN>
+- New: Slide items to quickly delete or mark as used.
+- New: In-app feedback feature.
+- Fixed: Date input logic issue.
+</en-IN>
+<en-SG>
+- New: Slide items to quickly delete or mark as used.
+- New: In-app feedback feature.
+- Fixed: Date input logic issue.
+</en-SG>
+<en-ZA>
+- New: Slide items to quickly delete or mark as used.
+- New: In-app feedback feature.
+- Fixed: Date input logic issue.
+</en-ZA>
+<es-419>
+- Nuevo: Deslizar para eliminar o usar artículos.
+- Nuevo: Función de comentarios en la aplicación.
+- Corregido: Error en la lógica de fechas.
+</es-419>
+<es-ES>
+- Nuevo: Deslizar para eliminar o usar artículos.
+- Nuevo: Función de comentarios en la aplicación.
+- Corregido: Error en la lógica de fechas.
+</es-ES>
+<es-US>
+- Nuevo: Deslizar para eliminar o usar artículos.
+- Nuevo: Función de comentarios en la aplicación.
+- Corregido: Error en la lógica de fechas.
+</es-US>
+<fr-CA>
+- Nouveau : Glissez pour supprimer ou utiliser des articles.
+- Nouveau : Fonctionnalité de commentaires.
+- Corrigé : Problème de saisie de date.
+</fr-CA>
+<fr-FR>
+- Nouveau : Glissez pour supprimer ou utiliser des articles.
+- Nouveau : Fonctionnalité de commentaires.
+- Corrigé : Problème de saisie de date.
+</fr-FR>
+<ja-JP>
+- 新機能：スライドしてアイテムを削除または使用済みに。
+- 新機能：フィードバック機能を追加。
+- 修正：日付入力の不具合。
+</ja-JP>
+<pt-BR>
+- Novo: Deslize para excluir ou usar itens.
+- Novo: Recurso de feedback no aplicativo.
+- Corrigido: Problema na lógica de data.
+</pt-BR>
+<pt-PT>
+- Novo: Deslize para excluir ou usar itens.
+- Novo: Recurso de feedback no aplicativo.
+- Corrigido: Problema na lógica de data.
+</pt-PT>
+<zh-CN>
+- 新增：左滑快速删除或标记已用。
+- 新增：应用内反馈功能。
+- 修复：日期录入逻辑问题。
+</zh-CN>
+<zh-HK>
+- 新增：左滑快速刪除或標記已用。
+- 新增：應用內反饋功能。
+- 修復：日期錄入邏輯問題。
+</zh-HK>
+<zh-TW>
+- 新增：左滑快速刪除或標記已用。
+- 新增：應用內反饋功能。
+- 修復：日期錄入邏輯問題。
+</zh-TW>

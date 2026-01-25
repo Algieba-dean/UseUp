@@ -234,6 +234,8 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
   void updateLocation(Location loc) => state = state.copyWith(selectedLocation: loc);
 
   void _calculateExpiry() {
+    if (!state.isProductionMode) return;
+
     if (state.productionDate != null && state.shelfLifeDays != null) {
       state = state.copyWith(
         expiryDate: state.productionDate!.add(Duration(days: state.shelfLifeDays!))

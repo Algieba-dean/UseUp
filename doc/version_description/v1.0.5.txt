@@ -1,0 +1,76 @@
+<en-US>
+- Fixed: Issue saving manual expiry dates.
+- Update: Support for Android 15 (API 35).
+</en-US>
+<de-DE>
+- Behoben: Problem beim Speichern manueller Verfallsdaten.
+- Update: Unterstützung für Android 15 (API 35).
+</de-DE>
+<en-AU>
+- Fixed: Issue saving manual expiry dates.
+- Update: Support for Android 15 (API 35).
+</en-AU>
+<en-CA>
+- Fixed: Issue saving manual expiry dates.
+- Update: Support for Android 15 (API 35).
+</en-CA>
+<en-GB>
+- Fixed: Issue saving manual expiry dates.
+- Update: Support for Android 15 (API 35).
+</en-GB>
+<en-IN>
+- Fixed: Issue saving manual expiry dates.
+- Update: Support for Android 15 (API 35).
+</en-IN>
+<en-SG>
+- Fixed: Issue saving manual expiry dates.
+- Update: Support for Android 15 (API 35).
+</en-SG>
+<en-ZA>
+- Fixed: Issue saving manual expiry dates.
+- Update: Support for Android 15 (API 35).
+</en-ZA>
+<es-419>
+- Solucionado: Problema al guardar fechas de vencimiento manuales.
+- Actualización: Compatibilidad con Android 15 (API 35).
+</es-419>
+<es-ES>
+- Solucionado: Problema al guardar fechas de caducidad manuales.
+- Actualización: Compatibilidad con Android 15 (API 35).
+</es-ES>
+<es-US>
+- Solucionado: Problema al guardar fechas de vencimiento manuales.
+- Actualización: Compatibilidad con Android 15 (API 35).
+</es-US>
+<fr-CA>
+- Corrigé : Problème d'enregistrement des dates d'expiration manuelles.
+- Mise à jour : Prise en charge d'Android 15 (API 35).
+</fr-CA>
+<fr-FR>
+- Corrigé : Problème d'enregistrement des dates d'expiration manuelles.
+- Mise à jour : Prise en charge d'Android 15 (API 35).
+</fr-FR>
+<ja-JP>
+- 修正：手動入力した有効期限が保存されない問題を修正。
+- 更新：Android 15 (API 35) に対応。
+</ja-JP>
+<pt-BR>
+- Corrigido: Problema ao salvar datas de validade manuais.
+- Atualização: Suporte para Android 15 (API 35).
+</pt-BR>
+<pt-PT>
+- Corrigido: Problema ao salvar datas de validade manuais.
+- Atualização: Suporte para Android 15 (API 35).
+</pt-PT>
+<zh-CN>
+- 修复：无法保存直接输入的过期日期的问题。
+- 更新：支持 Android 15 (API 35)。
+</zh-CN>
+<zh-HK>
+- 修復：無法保存直接輸入的過期日期的問題。
+- 更新：支持 Android 15 (API 35)。
+</zh-HK>
+<zh-TW>
+- 修復：無法保存直接輸入的過期日期的問題。
+- 更新：支持 Android 15 (API 35)。
+</zh-TW>
