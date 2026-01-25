@@ -22,4 +22,8 @@ class AppConstants {
   static const String prefDefaultCategoryId = 'default_category_id_v1';
 
   static const String privacyPolicyUrl = 'https://sites.google.com/view/useup-privacy-policy';
+  
+  // Feedback & Support
+  static const String supportEmail = 'algieba.king@gmail.com';
+  static const String appStoreUrl = 'https://play.google.com/store/apps/details?id=com.algieba.useup';
 }

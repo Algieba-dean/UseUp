@@ -135,5 +135,11 @@
   "filterExpiringSoon": "临期",
   "emptyInventoryPrompt": "你的冰箱空空如也！试着添加第一件物品吧。",
   "noExpiringItems": "暂无临期物品",
-  "noExpiredItems": "暂无过期物品"
+  "noExpiredItems": "暂无过期物品",
+
+  "feedbackTitle": "发送反馈 / 给个好评",
+  "feedbackDialogTitle": "喜欢 UseUp 吗？",
+  "feedbackDialogContent": "您的反馈能帮助我们做得更好！",
+  "feedbackActionLove": "非常喜欢！",
+  "feedbackActionImprove": "有待改进"
 }

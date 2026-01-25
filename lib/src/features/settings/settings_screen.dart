@@ -141,6 +141,17 @@ class SettingsScreen extends ConsumerWidget {
                           ),
                         ),
 
+                        // 6. Feedback & Rating
+                        Container(
+                          color: Colors.white,
+                          child: ListTile(
+                            leading: const Icon(Icons.thumb_up_alt_outlined, color: AppTheme.primaryGreen),
+                            title: Text(l10n.feedbackTitle),
+                            trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                            onTap: () => _showFeedbackDialog(context),
+                          ),
+                        ),
+
                         const SizedBox(height: 40),
 
                         // --- Developer Debug Section ---
@@ -215,5 +226,59 @@ class SettingsScreen extends ConsumerWidget {
         );
       },
     );
+  }
+
+  void _showFeedbackDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.feedbackDialogTitle),
+        content: Text(l10n.feedbackDialogContent),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _sendEmailFeedback(context);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.grey),
+            child: Text(l10n.feedbackActionImprove),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _openStoreListing(context);
+            },
+            child: Text(l10n.feedbackActionLove),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _sendEmailFeedback(BuildContext context) async {
+    final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: AppConstants.supportEmail,
+      query: 'subject=UseUp Feedback',
+    );
+    try {
+      if (!await launchUrl(emailLaunchUri)) {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not launch email app')));
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  Future<void> _openStoreListing(BuildContext context) async {
+    final Uri url = Uri.parse(AppConstants.appStoreUrl);
+    try {
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not open store')));
+      }
+    } catch (e) {
+      // ignore
+    }
   }
 }

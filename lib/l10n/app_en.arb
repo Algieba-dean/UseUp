@@ -135,5 +135,11 @@
   "filterExpiringSoon": "Expiring Soon",
   "emptyInventoryPrompt": "Your fridge is empty! Try adding the first item.",
   "noExpiringItems": "No items expiring soon",
-  "noExpiredItems": "No expired items"
+  "noExpiredItems": "No expired items",
+
+  "feedbackTitle": "Send Feedback / Rate Us",
+  "feedbackDialogTitle": "Enjoying UseUp?",
+  "feedbackDialogContent": "Your feedback helps us improve!",
+  "feedbackActionLove": "Love it!",
+  "feedbackActionImprove": "Could be better"
 }
