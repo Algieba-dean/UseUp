@@ -31,7 +31,7 @@ android {
     defaultConfig {
         applicationId = "com.algieba.useup"
         minSdk = flutter.minSdkVersion
-        targetSdk = 36
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

@@ -197,7 +197,12 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
     _calculateExpiry();
   }
 
-  void toggleProductionMode(bool val) => state = state.copyWith(isProductionMode: val);
+  void toggleProductionMode(bool val) {
+    state = state.copyWith(isProductionMode: val);
+    if (val) {
+      _calculateExpiry();
+    }
+  }
   
   void toggleNotifyDay(int day) {
     final list = List<int>.from(state.notifyDaysList);
@@ -233,6 +238,8 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
       state = state.copyWith(
         expiryDate: state.productionDate!.add(Duration(days: state.shelfLifeDays!))
       );
+    } else {
+      state = state.copyWith(expiryDate: null);
     }
   }
 
