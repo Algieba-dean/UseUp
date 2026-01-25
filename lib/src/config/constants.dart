@@ -17,5 +17,9 @@ class AppConstants {
   static const String locPantry = 'Pantry';
   static const String locBathroom = 'Bathroom';
 
+  // SharedPreferences Keys
+  static const String prefDefaultLocationId = 'default_location_id_v1';
+  static const String prefDefaultCategoryId = 'default_category_id_v1';
+
   static const String privacyPolicyUrl = 'https://sites.google.com/view/useup-privacy-policy';
 }

@@ -2,18 +2,19 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:isar/isar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../models/item.dart';
 import '../../../models/category.dart';
 import '../../../models/location.dart';
 import '../../../data/providers/database_provider.dart';
 import '../../../config/constants.dart';
 import '../../../services/notification_service.dart';
+import '../../settings/data/preferences_repository.dart';
 
 class InventoryRepository {
   final Isar _isar;
+  final PreferencesRepository _prefs;
 
-  InventoryRepository(this._isar);
+  InventoryRepository(this._isar, this._prefs);
 
   // 1. 保存/更新物品
   Future<void> saveItem(Item item, Category? category, Location? location) async {
@@ -62,13 +63,9 @@ class InventoryRepository {
     await NotificationService().cancelNotificationsForItem(item.id);
   }
 
-  static const String _kDefaultLocationId = 'default_location_id_v1';
-  static const String _kDefaultCategoryId = 'default_category_id_v1';
-
   // 4. 获取默认位置和分类
   Future<Location?> getDefaultLocation() async {
-    final prefs = await SharedPreferences.getInstance();
-    final id = prefs.getInt(_kDefaultLocationId);
+    final id = await _prefs.getDefaultLocationId();
     
     if (id != null) {
       final loc = await _isar.locations.get(id);
@@ -81,14 +78,13 @@ class InventoryRepository {
         .findFirst();
         
     if (loc != null) {
-      await prefs.setInt(_kDefaultLocationId, loc.id);
+      await _prefs.setDefaultLocationId(loc.id);
     }
     return loc;
   }
 
   Future<Category?> getDefaultCategory() async {
-    final prefs = await SharedPreferences.getInstance();
-    final id = prefs.getInt(_kDefaultCategoryId);
+    final id = await _prefs.getDefaultCategoryId();
     
     if (id != null) {
       final cat = await _isar.categorys.get(id);
@@ -101,7 +97,7 @@ class InventoryRepository {
         .findFirst();
         
     if (cat != null) {
-      await prefs.setInt(_kDefaultCategoryId, cat.id);
+      await _prefs.setDefaultCategoryId(cat.id);
     }
     return cat;
   }
@@ -230,5 +226,6 @@ class InventoryRepository {
 
 final inventoryRepositoryProvider = Provider<InventoryRepository>((ref) {
   final isar = ref.watch(databaseProvider);
-  return InventoryRepository(isar);
+  final prefs = ref.watch(preferencesRepositoryProvider);
+  return InventoryRepository(isar, prefs);
 });

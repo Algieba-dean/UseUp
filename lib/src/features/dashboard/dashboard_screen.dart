@@ -441,22 +441,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           style: TextStyle(color: Colors.grey[600], fontSize: 16),
                           textAlign: TextAlign.center,
                         ),
-                        if (!isFiltered && filterState.status == FilterStatus.all) ...[
-                          const SizedBox(height: 24),
-                          ElevatedButton.icon(
-                            onPressed: () => context.push('/add'),
-                            icon: const Icon(Icons.add),
-                            label: Text(l10n.addItem),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.primaryGreen,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                          ),
-                        ]
                       ],
                     ),
                   ),
@@ -597,6 +581,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ? Image.file(
                     File(item.imagePath!),
                     fit: BoxFit.cover,
+                    cacheWidth: 100, // Optimize: Resize to 100px width during decode
                     errorBuilder: (ctx, err, stack) => Icon(LocalizedUtils.getCategoryIcon(item.categoryName), color: AppTheme.primaryGreen),
                   )
                 : Icon(LocalizedUtils.getCategoryIcon(item.categoryName), color: AppTheme.primaryGreen),
