@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:use_up/src/services/notification_service.dart';
+import 'package:use_up/src/config/app_config.dart';
 import 'package:use_up/src/localization/app_localizations.dart'; 
 import '../../config/theme.dart';
 import '../../config/constants.dart';
@@ -140,6 +142,40 @@ class SettingsScreen extends ConsumerWidget {
                         ),
 
                         const SizedBox(height: 40),
+
+                        // --- Developer Debug Section ---
+                        if (AppConfig.showDeveloperOptions) 
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text("Developer Options", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+                                const SizedBox(height: 8),
+                                OutlinedButton.icon(
+                                  icon: const Icon(Icons.notifications_active),
+                                  label: const Text("Test Group Notifications (Now)"),
+                                  onPressed: () async {
+                                    await NotificationService().debugShowGroupedNotifications();
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Sent 3 notifications! Check status bar.")));
+                                    }
+                                  },
+                                ),
+                                OutlinedButton.icon(
+                                  icon: const Icon(Icons.schedule),
+                                  label: const Text("Check Pending Notifications (Log)"),
+                                  onPressed: () async {
+                                    await NotificationService().debugCheckPendingNotifications();
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Check logs for pending requests.")));
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                         const SizedBox(height: 40),
                         ],
                       ),
                     );

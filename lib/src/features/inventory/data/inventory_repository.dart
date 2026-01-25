@@ -47,7 +47,7 @@ class InventoryRepository {
     });
     
     // Ensure notifications are cancelled
-    await NotificationService().cancelNotification(id);
+    await NotificationService().cancelNotificationsForItem(id);
   }
 
   // 3. 消耗物品
@@ -59,7 +59,7 @@ class InventoryRepository {
     });
     
     // Consumed items shouldn't trigger expiry notifications
-    await NotificationService().cancelNotification(item.id);
+    await NotificationService().cancelNotificationsForItem(item.id);
   }
 
   static const String _kDefaultLocationId = 'default_location_id_v1';

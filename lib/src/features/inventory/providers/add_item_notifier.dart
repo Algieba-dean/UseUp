@@ -283,7 +283,7 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
       }
 
       await _repository.saveItem(item, state.selectedCategory, state.selectedLocation);
-      await NotificationService().scheduleExpiryNotification(item);
+      await NotificationService().scheduleNotifications(item);
 
       if (addNext) {
         final defLoc = await _repository.getDefaultLocation();

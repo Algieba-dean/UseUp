@@ -123,13 +123,11 @@ class ItemDetailScreen extends ConsumerWidget {
     if (confirm == true) {
       if (context.mounted) context.pop(); // 先退出页面，避免 StreamBuilder 收到 null 导致转圈
       await ref.read(inventoryRepositoryProvider).deleteItem(id);
-      await NotificationService().cancelNotification(id);
     }
   }
 
   Future<void> _consumeItem(BuildContext context, WidgetRef ref, Item item) async {
     await ref.read(inventoryRepositoryProvider).consumeItem(item);
-    await NotificationService().cancelNotification(item.id);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.itemConsumed)));
       context.pop();
