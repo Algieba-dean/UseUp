@@ -9,6 +9,7 @@ import '../../../data/providers/database_provider.dart';
 import '../../../config/constants.dart';
 import '../../../services/notification_service.dart';
 import '../../settings/data/preferences_repository.dart';
+import '../../../utils/image_path_helper.dart';
 
 class InventoryRepository {
   final Isar _isar;
@@ -35,9 +36,12 @@ class InventoryRepository {
     final item = await _isar.items.get(id);
     if (item != null && item.imagePath != null) {
       try {
-        final file = File(item.imagePath!);
-        if (await file.exists()) {
-          await file.delete();
+        final path = await ImagePathHelper.getDisplayPath(item.imagePath);
+        if (path != null) {
+          final file = File(path);
+          if (await file.exists()) {
+            await file.delete();
+          }
         }
       } catch (e) {
         debugPrint('Error deleting image: $e');

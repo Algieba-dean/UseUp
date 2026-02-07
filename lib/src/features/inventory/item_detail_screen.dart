@@ -12,6 +12,7 @@ import '../../services/notification_service.dart';
 import '../../data/providers/database_provider.dart';
 import 'data/inventory_repository.dart';
 import '../../utils/localized_utils.dart';
+import 'widgets/item_image.dart';
 
 class ItemDetailScreen extends ConsumerWidget {
   final int itemId;
@@ -59,11 +60,7 @@ class ItemDetailScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (item.imagePath != null)
-                  Container(
-                    width: double.infinity, height: 200, margin: const EdgeInsets.only(bottom: 24),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), image: DecorationImage(image: FileImage(File(item.imagePath!)), fit: BoxFit.cover)),
-                  ),
+                ItemImage(imagePath: item.imagePath),
                 Text(item.name, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text('${item.quantity} ${LocalizedUtils.getLocalizedUnit(context, item.unit)}', style: TextStyle(fontSize: 20, color: Colors.grey[600])),

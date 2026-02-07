@@ -8,6 +8,7 @@ import '../../../models/category.dart';
 import '../../../models/location.dart';
 import '../data/inventory_repository.dart';
 import '../../../services/notification_service.dart';
+import '../../../utils/image_path_helper.dart';
 
 enum TimeUnit { day, week, month, year }
 
@@ -95,6 +96,8 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
 
   AddItemNotifier(this._repository) : super(AddItemState());
 
+  AddItemState get debugState => state;
+
   // 1. 初始化（编辑模式）
   Future<void> init(Item? item, {bool isRestock = false}) async {
     if (item == null) {
@@ -114,6 +117,12 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
     // 而是直接使用 item 中已经赋值的 value。
     if (!isRestock) {
       await _repository.loadLinks(item);
+    }
+    
+    // Resolve image path for display
+    String? resolvedImagePath;
+    if (item.imagePath != null) {
+      resolvedImagePath = await ImagePathHelper.getDisplayPath(item.imagePath);
     }
     
     // 智能推断保质期单位和初始输入值
@@ -147,7 +156,7 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
       shelfLifeUnit: bestUnit,
       shelfLifeInputValue: initialInput, // 初始化输入值
       notifyDaysList: List.from(item.notifyDaysList),
-      imagePath: item.imagePath,
+      imagePath: resolvedImagePath,
       selectedCategory: item.categoryLink.value,
       selectedLocation: item.locationLink.value,
       isProductionMode: item.productionDate != null,
@@ -264,6 +273,20 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
 
     state = state.copyWith(isLoading: true);
     try {
+      // Logic to save only filename to DB
+      String? imageToSave = state.imagePath;
+      if (imageToSave != null) {
+        try {
+          final directory = await getApplicationDocumentsDirectory();
+          if (imageToSave.startsWith(directory.path)) {
+            // Only save the filename
+            imageToSave = p.basename(imageToSave);
+          }
+        } catch (_) {
+          // Ignore errors, keep original path
+        }
+      }
+
       Item item;
       if (itemToEdit != null && !addNext) {
         item = itemToEdit;
@@ -276,7 +299,7 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
         item.productionDate = state.isProductionMode ? state.productionDate : null;
         item.shelfLifeDays = state.isProductionMode ? state.shelfLifeDays : null;
         item.notifyDaysList = state.notifyDaysList;
-        item.imagePath = state.imagePath;
+        item.imagePath = imageToSave;
       } else {
         item = Item(
           name: state.name,
@@ -288,7 +311,7 @@ class AddItemNotifier extends StateNotifier<AddItemState> {
           productionDate: state.isProductionMode ? state.productionDate : null,
           shelfLifeDays: state.isProductionMode ? state.shelfLifeDays : null,
           notifyDaysList: state.notifyDaysList,
-          imagePath: state.imagePath,
+          imagePath: imageToSave,
         );
       }
 

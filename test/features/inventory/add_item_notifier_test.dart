@@ -36,6 +36,38 @@ void main() {
     notifier = AddItemNotifier(mockRepo);
   });
 
+  group('AddItemNotifier - Basic Updates', () {
+    test('updateName updates state', () {
+      notifier.updateName('New Name');
+      expect(notifier.debugState.name, 'New Name');
+    });
+
+    test('updateQuantity updates state', () {
+      notifier.updateQuantity('5.5');
+      expect(notifier.debugState.quantity, 5.5);
+    });
+
+    test('updateQuantity handles invalid input', () {
+      notifier.updateQuantity('abc');
+      expect(notifier.debugState.quantity, 1.0); // Default
+    });
+
+    test('updateUnit updates state', () {
+      notifier.updateUnit('kg');
+      expect(notifier.debugState.unit, 'kg');
+    });
+
+    test('updatePrice updates state', () {
+      notifier.updatePrice('12.99');
+      expect(notifier.debugState.price, 12.99);
+    });
+    
+    test('toggleProductionMode updates state', () {
+      notifier.toggleProductionMode(true);
+      expect(notifier.debugState.isProductionMode, true);
+    });
+  });
+
   group('AddItemNotifier - Shelf Life & Unit Tests', () {
     test('Initial state is correct', () {
       final state = notifier.debugState;
@@ -45,10 +77,12 @@ void main() {
 
     test('updateShelfLifeAndUnit (Month) calculates days and expiry correctly', () {
       final now = DateTime(2023, 1, 1);
+      notifier.toggleProductionMode(true);
       notifier.updateProductionDate(now);
       
       // Update to 2 Months (2 * 30 = 60 days)
-      notifier.updateShelfLifeAndUnit('2', TimeUnit.month);
+      notifier.updateShelfLife('2');
+      notifier.updateShelfLifeUnit(TimeUnit.month);
       
       final state = notifier.debugState;
       expect(state.shelfLifeDays, 60);
@@ -58,10 +92,12 @@ void main() {
 
     test('updateShelfLifeAndUnit (Year) calculates days and expiry correctly', () {
       final now = DateTime(2023, 1, 1);
+      notifier.toggleProductionMode(true);
       notifier.updateProductionDate(now);
       
       // Update to 1 Year (365 days)
-      notifier.updateShelfLifeAndUnit('1', TimeUnit.year);
+      notifier.updateShelfLife('1');
+      notifier.updateShelfLifeUnit(TimeUnit.year);
       
       final state = notifier.debugState;
       expect(state.shelfLifeDays, 365);
@@ -71,10 +107,12 @@ void main() {
     
     test('updateShelfLifeAndUnit (Week) calculates days and expiry correctly', () {
       final now = DateTime(2023, 1, 1);
+      notifier.toggleProductionMode(true);
       notifier.updateProductionDate(now);
       
       // Update to 3 Weeks (21 days)
-      notifier.updateShelfLifeAndUnit('3', TimeUnit.week);
+      notifier.updateShelfLife('3');
+      notifier.updateShelfLifeUnit(TimeUnit.week);
       
       final state = notifier.debugState;
       expect(state.shelfLifeDays, 21);
@@ -84,8 +122,10 @@ void main() {
 
     test('Updating production date recalculates expiry with existing shelf life', () {
       final now = DateTime(2023, 1, 1);
+      notifier.toggleProductionMode(true);
       notifier.updateProductionDate(now);
-      notifier.updateShelfLifeAndUnit('10', TimeUnit.day);
+      notifier.updateShelfLife('10');
+      notifier.updateShelfLifeUnit(TimeUnit.day);
       
       var state = notifier.debugState;
       expect(state.expiryDate, DateTime(2023, 1, 11));

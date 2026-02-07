@@ -117,12 +117,15 @@ class ExpiringCard extends StatelessWidget {
               children: [
                 Icon(Icons.access_time, size: 12, color: color),
                 const SizedBox(width: 4),
-                Text(
-                  ExpiryUtils.getExpiryString(context, days),
-                  style: TextStyle(
-                    color: color,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+                Expanded(
+                  child: Text(
+                    ExpiryUtils.getExpiryString(context, days),
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
