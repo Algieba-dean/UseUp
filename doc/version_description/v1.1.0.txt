@@ -1,0 +1,95 @@
+<en-US>
+- New: Added support for 15 new languages including French, German, Japanese, and more.
+- Update: Full offline font support with bundled assets.
+- Privacy: Removed sensitive alarm permissions for better Google Play compliance.
+</en-US>
+<de-DE>
+- Neu: Unterstützung für 15 neue Sprachen hinzugefügt, darunter Französisch, Deutsch, Japanisch und mehr.
+- Update: Volle Offline-Schriftunterstützung mit gebündelten Assets.
+- Privatsphäre: Sensible Alarmberechtigungen für bessere Google Play-Konformität entfernt.
+</de-DE>
+<en-AU>
+- New: Added support for 15 new languages including French, German, Japanese, and more.
+- Update: Full offline font support with bundled assets.
+- Privacy: Removed sensitive alarm permissions for better Google Play compliance.
+</en-AU>
+<en-CA>
+- New: Added support for 15 new languages including French, German, Japanese, and more.
+- Update: Full offline font support with bundled assets.
+- Privacy: Removed sensitive alarm permissions for better Google Play compliance.
+</en-CA>
+<en-GB>
+- New: Added support for 15 new languages including French, German, Japanese, and more.
+- Update: Full offline font support with bundled assets.
+- Privacy: Removed sensitive alarm permissions for better Google Play compliance.
+</en-GB>
+<en-IN>
+- New: Added support for 15 new languages including French, German, Japanese, and more.
+- Update: Full offline font support with bundled assets.
+- Privacy: Removed sensitive alarm permissions for better Google Play compliance.
+</en-IN>
+<en-SG>
+- New: Added support for 15 new languages including French, German, Japanese, and more.
+- Update: Full offline font support with bundled assets.
+- Privacy: Removed sensitive alarm permissions for better Google Play compliance.
+</en-SG>
+<en-ZA>
+- New: Added support for 15 new languages including French, German, Japanese, and more.
+- Update: Full offline font support with bundled assets.
+- Privacy: Removed sensitive alarm permissions for better Google Play compliance.
+</en-ZA>
+<es-419>
+- Nuevo: Se agregó soporte para 15 nuevos idiomas, incluidos francés, alemán, japonés y más.
+- Actualización: Soporte completo de fuentes sin conexión con activos integrados.
+- Privacidad: Se eliminaron permisos de alarma sensibles para un mejor cumplimiento con Google Play.
+</es-419>
+<es-ES>
+- Nuevo: Se ha añadido soporte para 15 nuevos idiomas, incluidos francés, alemán, japonés y más.
+- Actualización: Soporte completo de fuentes sin conexión con activos integrados.
+- Privacidad: Se han eliminado permisos de alarma sensibles para un mejor cumplimiento con Google Play.
+</es-ES>
+<es-US>
+- Nuevo: Se agregó soporte para 15 nuevos idiomas, incluidos francés, alemán, japonés y más.
+- Actualización: Soporte completo de fuentes sin conexión con activos integrados.
+- Privacidad: Se eliminaron permisos de alarma sensibles para un mejor cumplimiento con Google Play.
+</es-US>
+<fr-CA>
+- Nouveau : Ajout de la prise en charge de 15 nouvelles langues, dont le français, l'allemand, le japonais, etc.
+- Mise à jour : Prise en charge complète des polices hors ligne avec des ressources intégrées.
+- Confidentialité : Suppression des autorisations d'alarme sensibles para une meilleure conformité avec Google Play.
+</fr-CA>
+<fr-FR>
+- Nouveau : Ajout de la prise en charge de 15 nouvelles langues, dont le français, l'allemand, le japonais, etc.
+- Mise à jour : Prise en charge complète des polices hors ligne avec des ressources intégrées.
+- Confidentialité : Suppression des autorisations d'alarme sensibles pour une meilleure conformité avec Google Play.
+</fr-FR>
+<ja-JP>
+- 新機能：フランス語、ドイツ語、日本語など、新たに15言語に対応。
+- 更新：フォントをアプリに内蔵し、完全オフラインでの利用に対応。
+- プライバシー：Google Playのポリシーに準拠するため、不要なアラーム権限を削除。
+</ja-JP>
+<pt-BR>
+- Novo: Adicionado suporte para 15 novos idiomas, incluindo francês, alemão, japonês e mais.
+- Atualização: Suporte completo a fontes offline com ativos integrados.
+- Privacidade: Removidas permissões de alarme sensíveis para melhor conformidade com o Google Play.
+</pt-BR>
+<pt-PT>
+- Novo: Adicionado suporte para 15 novos idiomas, incluindo francês, alemão, japonês e mais.
+- Atualização: Suporte completo a fontes offline com ativos integrados.
+- Privacidade: Removidas permissões de alarme sensíveis para melhor conformidade com o Google Play.
+</pt-PT>
+<zh-CN>
+- 新增：支持法语、德语、日语等 15 种新语言。
+- 更新：内置字体资源，实现完全离线支持。
+- 隐私：移除敏感闹钟权限，符合 Google Play 最新审核规范。
+</zh-CN>
+<zh-HK>
+- 新增：支持法語、德語、日語等 15 種新語言。
+- 更新：內置字體資源，實現完全離線支持。
+- 隱私：移除敏感鬧鐘權限，符合 Google Play 最新審核規範。
+</zh-HK>
+<zh-TW>
+- 新增：支持法語、德語、日語等 15 種新語言。
+- 更新：內置字體資源，實現完全離線支持。
+- 隱私：移除敏感鬧鐘權限，符合 Google Play 最新審核規範。
+</zh-TW>

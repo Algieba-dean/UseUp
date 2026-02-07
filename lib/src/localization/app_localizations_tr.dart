@@ -21,16 +21,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get navSettings => 'Ayarlar';
 
   @override
-  String get history => 'History';
+  String get history => 'Geçmiş';
 
   @override
-  String get sectionExpiringSoon => 'Expiring Soon';
+  String get sectionExpiringSoon => 'Süresi Yaklaşanlar';
 
   @override
-  String get sectionAllItems => 'All Items';
+  String get sectionAllItems => 'Tüm Ürünler';
 
   @override
-  String get scanItem => 'Scan Item';
+  String get scanItem => 'Ürünü Tara';
 
   @override
   String daysLeft(num count) {
@@ -45,259 +45,257 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get expired => 'Süresi Dolmuş';
+  String get expired => 'Süresi Doldu';
 
   @override
-  String get statusUrgent => 'Urgent';
+  String get statusUrgent => 'Acil';
 
   @override
-  String get statusWarning => 'Warning';
+  String get statusWarning => 'Uyarı';
 
   @override
-  String get statusSafe => 'Safe';
+  String get statusSafe => 'Güvenli';
 
   @override
-  String get name => 'Name';
+  String get name => 'İsim';
 
   @override
-  String get quantity => 'Quantity';
+  String get quantity => 'Miktar';
 
   @override
-  String get category => 'Category';
+  String get category => 'Kategori';
 
   @override
-  String get location => 'Location';
+  String get location => 'Konum';
 
   @override
-  String get price => 'Unit Price';
+  String get price => 'Birim Fiyat';
 
   @override
-  String get expiryDate => 'Expiry Date';
+  String get expiryDate => 'Son Kullanma Tarihi';
 
   @override
-  String get productionDate => 'Production Date';
+  String get productionDate => 'Üretim Tarihi';
 
   @override
-  String get shelfLife => 'Shelf Life (Days)';
+  String get shelfLife => 'Raf Ömrü (Gün)';
 
   @override
-  String get purchaseDate => 'Purchase Date';
+  String get purchaseDate => 'Satın Alma Tarihi';
 
   @override
-  String get pickDate => 'Pick Date';
+  String get pickDate => 'Tarih Seç';
 
   @override
-  String get toggleExpiryDate => 'Expiry Date';
+  String get toggleExpiryDate => 'Son Kullanma Tarihi';
 
   @override
-  String get toggleProductionDate => 'Prod. Date + Shelf Life';
+  String get toggleProductionDate => 'Üretim Tarihi + Raf Ömrü';
 
   @override
-  String get reminderLabel => 'Reminder';
+  String get reminderLabel => 'Hatırlatıcı';
 
   @override
-  String get reminder1Day => '1 day before';
+  String get reminder1Day => '1 gün önce';
 
   @override
-  String get reminder3Days => '3 days before';
+  String get reminder3Days => '3 gün önce';
 
   @override
-  String get reminder7Days => '1 week before';
+  String get reminder7Days => '1 hafta önce';
 
   @override
-  String get advancedDetails => 'Advanced Details';
+  String get advancedDetails => 'Gelişmiş Detaylar';
 
   @override
-  String get advancedSubtitle => 'Quantity, Location, Price...';
+  String get advancedSubtitle => 'Miktar, konum, fiyat...';
 
   @override
   String calculatedExpiry(Object date) {
-    return 'Calculated Expiry: $date';
+    return 'Hesaplanan SKT: $date';
   }
 
   @override
-  String get testNotification => 'Test Notification';
+  String get testNotification => 'Test Bildirimi';
 
   @override
-  String get testNotificationSubtitle => 'Click to fire an instant alert';
+  String get testNotificationSubtitle => 'Uyarıyı tetiklemek için tıkla';
 
   @override
-  String get addItem => 'Ekle';
+  String get addItem => 'Ürün Ekle';
 
   @override
-  String get editItem => 'Edit Item';
+  String get editItem => 'Ürünü Düzenle';
 
   @override
   String get save => 'Kaydet';
 
   @override
-  String get saveAndNext => 'Save & Next';
+  String get saveAndNext => 'Kaydet ve Sonraki';
 
   @override
-  String get updateItem => 'Update Item';
+  String get updateItem => 'Ürünü Güncelle';
 
   @override
-  String get cancel => 'Cancel';
+  String get cancel => 'İptal';
 
   @override
-  String get confirm => 'Confirm';
+  String get confirm => 'Onayla';
 
   @override
-  String get delete => 'Delete';
+  String get delete => 'Sil';
 
   @override
-  String get markAsUsed => 'Mark as Used';
+  String get markAsUsed => 'Kullanıldı';
 
   @override
-  String get restock => 'Restock';
+  String get restock => 'Stok Yenile';
 
   @override
-  String get filter => 'Filter';
+  String get filter => 'Filtre';
 
   @override
-  String get reset => 'Reset';
+  String get reset => 'Sıfırla';
 
   @override
-  String get settingsTitle => 'Settings';
+  String get settingsTitle => 'Ayarlar';
 
   @override
-  String get language => 'Language';
+  String get language => 'Dil';
 
   @override
-  String get switchLanguage => 'Switch Language';
+  String get switchLanguage => 'Dili Değiştir';
 
   @override
-  String get selectLanguage => 'Select Language';
+  String get selectLanguage => 'Dil Seç';
 
   @override
-  String get manageCategories => 'Manage Categories';
+  String get manageCategories => 'Kategorileri Yönet';
 
   @override
-  String get manageLocations => 'Manage Locations';
+  String get manageLocations => 'Konumları Yönet';
 
   @override
-  String get manageMode => 'Manage Mode';
+  String get manageMode => 'Yönetim Modu';
 
   @override
-  String get locationSelect => 'Select Location';
+  String get locationSelect => 'Konum Seç';
 
   @override
-  String get locationAdd => 'Add Location';
+  String get locationAdd => 'Konum Ekle';
 
   @override
-  String get locationAddSub => 'Add Sub-Location';
+  String get locationAddSub => 'Alt Konum Ekle';
 
   @override
-  String get locationRename => 'Rename Location';
+  String get locationRename => 'Konumu Yeniden Adlandır';
 
   @override
-  String get locationDeleteTitle => 'Delete Location?';
+  String get locationDeleteTitle => 'Konumu Sil?';
 
   @override
-  String get locationName => 'Location Name';
+  String get locationName => 'Konum Adı';
 
   @override
-  String get categorySelect => 'Select Category';
+  String get categorySelect => 'Kategori Seç';
 
   @override
-  String get categoryAdd => 'Add Category';
+  String get categoryAdd => 'Kategori Ekle';
 
   @override
-  String get categoryAddSub => 'Add Sub-Category';
+  String get categoryAddSub => 'Alt Kategori Ekle';
 
   @override
-  String get categoryRename => 'Rename Category';
+  String get categoryRename => 'Kategoriyi Yeniden Adlandır';
 
   @override
-  String get categoryDeleteTitle => 'Delete Category?';
+  String get categoryDeleteTitle => 'Kategoriyi Sil?';
 
   @override
-  String get itemConsumed => 'Item marked as consumed!';
+  String get itemConsumed => 'Ürün tüketildi olarak işaretlendi!';
 
   @override
-  String get deleteConfirm =>
-      'This location/category contains items or sub-items. Cannot delete.';
+  String get deleteConfirm => 'Ürün içeriyor. Silinemez.';
 
   @override
-  String get confirmDelete => 'Are you sure you want to delete?';
+  String get confirmDelete => 'Silmek istediğinizden emin misiniz?';
 
   @override
-  String get deleteEmptyConfirm =>
-      'This item is empty and will be deleted directly.';
+  String get deleteEmptyConfirm => 'Bu ürün boş ve doğrudan silinecek.';
 
   @override
   String deleteMoveConfirm(Object count, Object target) {
-    return 'Contains $count items. Items will be moved to $target.';
+    return '$count ürünü $target konumuna taşı.';
   }
 
   @override
-  String get deleteMigrateTitle => 'Delete & Migrate?';
+  String get deleteMigrateTitle => 'Sil ve Taşı?';
 
   @override
   String deleteMigrateContent(Object items, Object subs, Object target) {
-    return 'This item contains $items items and $subs sub-items.\nThey will be moved to \'$target\'.';
+    return '$items ürünü \'$target\' konumuna taşı.';
   }
 
   @override
-  String get confirmAndMove => 'Confirm & Move';
+  String get confirmAndMove => 'Onayla ve Taşı';
 
   @override
-  String get cannotDeleteDefault => 'Cannot delete the default item!';
+  String get cannotDeleteDefault => 'Varsayılan öğe silinemez!';
 
   @override
-  String get containsSubItems => 'Contains sub-items. Delete them first.';
+  String get containsSubItems => 'Alt öğeler içeriyor.';
 
   @override
   String errorDefaultNotFound(Object name) {
-    return 'Error: Default $name not found.';
+    return 'Varsayılan $name bulunamadı.';
   }
 
   @override
-  String get errorNameExists => 'Name already exists in this level.';
+  String get errorNameExists => 'Bu isim zaten mevcut.';
 
   @override
-  String get searchHint => 'Search items...';
+  String get searchHint => 'Ara...';
 
   @override
-  String get noItemsFound => 'No items found';
+  String get noItemsFound => 'Ürün bulunamadı';
 
   @override
   String noItemsFoundFor(Object query) {
-    return 'No items found for $query';
+    return '$query için sonuç bulunamadı';
   }
 
   @override
-  String get filtersHeader => 'Filters: ';
+  String get filtersHeader => 'Filtreler: ';
 
   @override
-  String get emptyList => 'Empty';
+  String get emptyList => 'Boş';
 
   @override
-  String get catVegetable => 'Vegetable';
+  String get catVegetable => 'Sebze';
 
   @override
-  String get catFruit => 'Fruit';
+  String get catFruit => 'Meyve';
 
   @override
-  String get catMeat => 'Meat';
+  String get catMeat => 'Et';
 
   @override
-  String get catDairy => 'Dairy';
+  String get catDairy => 'Süt Ürünleri';
 
   @override
-  String get catPantry => 'Pantry';
+  String get catPantry => 'Kiler';
 
   @override
-  String get catSnack => 'Snack';
+  String get catSnack => 'Atıştırmalık';
 
   @override
-  String get catHealth => 'Health';
+  String get catHealth => 'Sağlık';
 
   @override
-  String get catUtility => 'Utility';
+  String get catUtility => 'Gereçler';
 
   @override
-  String get unitPcs => 'pcs';
+  String get unitPcs => 'adet';
 
   @override
   String get unitKg => 'kg';
@@ -312,111 +310,111 @@ class AppLocalizationsTr extends AppLocalizations {
   String get unitMl => 'ml';
 
   @override
-  String get unitPack => 'pack';
+  String get unitPack => 'paket';
 
   @override
-  String get unitBox => 'box';
+  String get unitBox => 'kutu';
 
   @override
-  String get unitBag => 'bag';
+  String get unitBag => 'torba';
 
   @override
-  String get unitBottle => 'bottle';
+  String get unitBottle => 'şişe';
 
   @override
-  String get valOther => 'Other';
+  String get valOther => 'Diğer';
 
   @override
-  String get valMisc => 'Misc';
+  String get valMisc => 'Çeşitli';
 
   @override
-  String get valKitchen => 'Kitchen';
+  String get valKitchen => 'Mutfak';
 
   @override
-  String get valFridge => 'Fridge';
+  String get valFridge => 'Buzdolabı';
 
   @override
-  String get valPantry => 'Pantry';
+  String get valPantry => 'Kiler';
 
   @override
-  String get valBathroom => 'Bathroom';
+  String get valBathroom => 'Banyo';
 
   @override
-  String get valFood => 'Food';
+  String get valFood => 'Gıda';
 
   @override
-  String get valBattery => 'Battery';
+  String get valBattery => 'Pil';
 
   @override
-  String get imageGallery => 'Gallery';
+  String get imageGallery => 'Galeri';
 
   @override
-  String get imageCamera => 'Camera';
+  String get imageCamera => 'Kamera';
 
   @override
-  String get errorNameRequired => 'Name is required';
+  String get errorNameRequired => 'İsim gerekli';
 
   @override
-  String get timeUnitDay => 'Day';
+  String get timeUnitDay => 'Gün';
 
   @override
-  String get timeUnitWeek => 'Week';
+  String get timeUnitWeek => 'Hafta';
 
   @override
-  String get timeUnitMonth => 'Month';
+  String get timeUnitMonth => 'Ay';
 
   @override
-  String get timeUnitYear => 'Year';
+  String get timeUnitYear => 'Yıl';
 
   @override
-  String get addReminder => 'Add Reminder';
+  String get addReminder => 'Hatırlatıcı Ekle';
 
   @override
-  String get customReminderTitle => 'Custom Reminder';
+  String get customReminderTitle => 'Özel Hatırlatıcı';
 
   @override
-  String get enterValue => 'Enter value';
+  String get enterValue => 'Değer girin';
 
   @override
-  String get privacyPolicy => 'Privacy Policy';
+  String get privacyPolicy => 'Gizlilik Politikası';
 
   @override
-  String get errorExpiryRequired => 'Expiry date is required';
+  String get errorExpiryRequired => 'SKT gerekli';
 
   @override
-  String get deleteItemTitle => 'Delete Item?';
+  String get deleteItemTitle => 'Ürünü Sil?';
 
   @override
-  String get deleteItemContent => 'This cannot be undone.';
+  String get deleteItemContent => 'Bu işlem geri alınamaz.';
 
   @override
-  String get filterExpired => 'Expired';
+  String get filterExpired => 'Süresi Doldu';
 
   @override
-  String get filterExpiringSoon => 'Expiring Soon';
+  String get filterExpiringSoon => 'Süresi Yaklaşanlar';
 
   @override
-  String get emptyInventoryPrompt =>
-      'Your fridge is empty! Try adding the first item.';
+  String get emptyInventoryPrompt => 'Envanter boş! İlk ürünü eklemeyi dene.';
 
   @override
-  String get noExpiringItems => 'No items expiring soon';
+  String get noExpiringItems => 'Süresi yaklaşan ürün yok';
 
   @override
-  String get noExpiredItems => 'No expired items';
+  String get noExpiredItems => 'Süresi dolmuş ürün yok';
 
   @override
-  String get feedbackTitle => 'Send Feedback / Rate Us';
+  String get feedbackTitle => 'Geri Bildirim Gönder';
 
   @override
-  String get feedbackDialogTitle => 'Enjoying UseUp?';
+  String get feedbackDialogTitle => 'UseUp\'ı sevdiniz mi?';
 
   @override
-  String get feedbackDialogContent => 'Your feedback helps us improve!';
+  String get feedbackDialogContent =>
+      'Geri bildirimleriniz gelişmemize yardımcı olur!';
 
   @override
-  String get feedbackActionLove => 'Love it!';
+  String get feedbackActionLove => 'Çok sevdim!';
 
   @override
-  String get feedbackActionImprove => 'Could be better';
+  String get feedbackActionImprove => 'Daha iyi olabilir';
 }

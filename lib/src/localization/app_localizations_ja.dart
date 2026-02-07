@@ -21,16 +21,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get navSettings => '設定';
 
   @override
-  String get history => 'History';
+  String get history => '履歴';
 
   @override
-  String get sectionExpiringSoon => 'Expiring Soon';
+  String get sectionExpiringSoon => 'もうすぐ期限切れ';
 
   @override
-  String get sectionAllItems => 'All Items';
+  String get sectionAllItems => 'すべてのアイテム';
 
   @override
-  String get scanItem => 'Scan Item';
+  String get scanItem => 'アイテムをスキャン';
 
   @override
   String daysLeft(num count) {
@@ -48,256 +48,254 @@ class AppLocalizationsJa extends AppLocalizations {
   String get expired => '期限切れ';
 
   @override
-  String get statusUrgent => 'Urgent';
+  String get statusUrgent => '緊急';
 
   @override
-  String get statusWarning => 'Warning';
+  String get statusWarning => '警告';
 
   @override
-  String get statusSafe => 'Safe';
+  String get statusSafe => '安全';
 
   @override
-  String get name => 'Name';
+  String get name => '名前';
 
   @override
-  String get quantity => 'Quantity';
+  String get quantity => '数量';
 
   @override
-  String get category => 'Category';
+  String get category => 'カテゴリー';
 
   @override
-  String get location => 'Location';
+  String get location => '場所';
 
   @override
-  String get price => 'Unit Price';
+  String get price => '単価';
 
   @override
-  String get expiryDate => 'Expiry Date';
+  String get expiryDate => '消費期限';
 
   @override
-  String get productionDate => 'Production Date';
+  String get productionDate => '製造日';
 
   @override
-  String get shelfLife => 'Shelf Life (Days)';
+  String get shelfLife => '賞味期限（日）';
 
   @override
-  String get purchaseDate => 'Purchase Date';
+  String get purchaseDate => '購入日';
 
   @override
-  String get pickDate => 'Pick Date';
+  String get pickDate => '日付を選択';
 
   @override
-  String get toggleExpiryDate => 'Expiry Date';
+  String get toggleExpiryDate => '消費期限';
 
   @override
-  String get toggleProductionDate => 'Prod. Date + Shelf Life';
+  String get toggleProductionDate => '製造日 + 賞味期限';
 
   @override
-  String get reminderLabel => 'Reminder';
+  String get reminderLabel => 'リマインダー';
 
   @override
-  String get reminder1Day => '1 day before';
+  String get reminder1Day => '1日前';
 
   @override
-  String get reminder3Days => '3 days before';
+  String get reminder3Days => '3日前';
 
   @override
-  String get reminder7Days => '1 week before';
+  String get reminder7Days => '1週間前';
 
   @override
-  String get advancedDetails => 'Advanced Details';
+  String get advancedDetails => '詳細設定';
 
   @override
-  String get advancedSubtitle => 'Quantity, Location, Price...';
+  String get advancedSubtitle => '数量、場所、価格など...';
 
   @override
   String calculatedExpiry(Object date) {
-    return 'Calculated Expiry: $date';
+    return '計算された期限: $date';
   }
 
   @override
-  String get testNotification => 'Test Notification';
+  String get testNotification => 'テスト通知';
 
   @override
-  String get testNotificationSubtitle => 'Click to fire an instant alert';
+  String get testNotificationSubtitle => 'クリックして通知をテスト';
 
   @override
-  String get addItem => '追加';
+  String get addItem => 'アイテムを追加';
 
   @override
-  String get editItem => 'Edit Item';
+  String get editItem => 'アイテムを編集';
 
   @override
   String get save => '保存';
 
   @override
-  String get saveAndNext => 'Save & Next';
+  String get saveAndNext => '保存して次へ';
 
   @override
-  String get updateItem => 'Update Item';
+  String get updateItem => 'アイテムを更新';
 
   @override
-  String get cancel => 'Cancel';
+  String get cancel => 'キャンセル';
 
   @override
-  String get confirm => 'Confirm';
+  String get confirm => '確認';
 
   @override
-  String get delete => 'Delete';
+  String get delete => '削除';
 
   @override
-  String get markAsUsed => 'Mark as Used';
+  String get markAsUsed => '使用済み';
 
   @override
-  String get restock => 'Restock';
+  String get restock => '補充';
 
   @override
-  String get filter => 'Filter';
+  String get filter => 'フィルター';
 
   @override
-  String get reset => 'Reset';
+  String get reset => 'リセット';
 
   @override
-  String get settingsTitle => 'Settings';
+  String get settingsTitle => '設定';
 
   @override
-  String get language => 'Language';
+  String get language => '言語';
 
   @override
-  String get switchLanguage => 'Switch Language';
+  String get switchLanguage => '言語を切り替え';
 
   @override
-  String get selectLanguage => 'Select Language';
+  String get selectLanguage => '言語を選択';
 
   @override
-  String get manageCategories => 'Manage Categories';
+  String get manageCategories => 'カテゴリー管理';
 
   @override
-  String get manageLocations => 'Manage Locations';
+  String get manageLocations => '場所の管理';
 
   @override
-  String get manageMode => 'Manage Mode';
+  String get manageMode => '管理モード';
 
   @override
-  String get locationSelect => 'Select Location';
+  String get locationSelect => '場所を選択';
 
   @override
-  String get locationAdd => 'Add Location';
+  String get locationAdd => '場所を追加';
 
   @override
-  String get locationAddSub => 'Add Sub-Location';
+  String get locationAddSub => 'サブの場所を追加';
 
   @override
-  String get locationRename => 'Rename Location';
+  String get locationRename => '名前を変更';
 
   @override
-  String get locationDeleteTitle => 'Delete Location?';
+  String get locationDeleteTitle => '場所を削除しますか？';
 
   @override
-  String get locationName => 'Location Name';
+  String get locationName => '場所の名前';
 
   @override
-  String get categorySelect => 'Select Category';
+  String get categorySelect => 'カテゴリーを選択';
 
   @override
-  String get categoryAdd => 'Add Category';
+  String get categoryAdd => 'カテゴリーを追加';
 
   @override
-  String get categoryAddSub => 'Add Sub-Category';
+  String get categoryAddSub => 'サブカテゴリーを追加';
 
   @override
-  String get categoryRename => 'Rename Category';
+  String get categoryRename => 'カテゴリー名を変更';
 
   @override
-  String get categoryDeleteTitle => 'Delete Category?';
+  String get categoryDeleteTitle => 'カテゴリーを削除しますか？';
 
   @override
-  String get itemConsumed => 'Item marked as consumed!';
+  String get itemConsumed => '使用済みにしました！';
 
   @override
-  String get deleteConfirm =>
-      'This location/category contains items or sub-items. Cannot delete.';
+  String get deleteConfirm => 'アイテムが含まれているため削除できません。';
 
   @override
-  String get confirmDelete => 'Are you sure you want to delete?';
+  String get confirmDelete => '本当に削除しますか？';
 
   @override
-  String get deleteEmptyConfirm =>
-      'This item is empty and will be deleted directly.';
+  String get deleteEmptyConfirm => 'このアイテムは空のため、直接削除されます。';
 
   @override
   String deleteMoveConfirm(Object count, Object target) {
-    return 'Contains $count items. Items will be moved to $target.';
+    return '$count 個のアイテムを $target に移動します。';
   }
 
   @override
-  String get deleteMigrateTitle => 'Delete & Migrate?';
+  String get deleteMigrateTitle => '削除して移行？';
 
   @override
   String deleteMigrateContent(Object items, Object subs, Object target) {
-    return 'This item contains $items items and $subs sub-items.\nThey will be moved to \'$target\'.';
+    return '$items 個のアイテムを \'$target\' に移動します。';
   }
 
   @override
-  String get confirmAndMove => 'Confirm & Move';
+  String get confirmAndMove => '確認して移動';
 
   @override
-  String get cannotDeleteDefault => 'Cannot delete the default item!';
+  String get cannotDeleteDefault => 'デフォルトの項目は削除できません！';
 
   @override
-  String get containsSubItems => 'Contains sub-items. Delete them first.';
+  String get containsSubItems => 'サブ項目が含まれています。';
 
   @override
   String errorDefaultNotFound(Object name) {
-    return 'Error: Default $name not found.';
+    return 'デフォルトの $name が見つかりません。';
   }
 
   @override
-  String get errorNameExists => 'Name already exists in this level.';
+  String get errorNameExists => '名前が既に存在します。';
 
   @override
-  String get searchHint => 'Search items...';
+  String get searchHint => '検索...';
 
   @override
-  String get noItemsFound => 'No items found';
+  String get noItemsFound => 'アイテムが見つかりません';
 
   @override
   String noItemsFoundFor(Object query) {
-    return 'No items found for $query';
+    return '$query の検索結果はありません';
   }
 
   @override
-  String get filtersHeader => 'Filters: ';
+  String get filtersHeader => 'フィルター: ';
 
   @override
-  String get emptyList => 'Empty';
+  String get emptyList => 'データなし';
 
   @override
-  String get catVegetable => 'Vegetable';
+  String get catVegetable => '野菜';
 
   @override
-  String get catFruit => 'Fruit';
+  String get catFruit => '果物';
 
   @override
-  String get catMeat => 'Meat';
+  String get catMeat => '肉類';
 
   @override
-  String get catDairy => 'Dairy';
+  String get catDairy => '乳製品';
 
   @override
-  String get catPantry => 'Pantry';
+  String get catPantry => '食料庫';
 
   @override
-  String get catSnack => 'Snack';
+  String get catSnack => 'お菓子';
 
   @override
-  String get catHealth => 'Health';
+  String get catHealth => '健康食品';
 
   @override
-  String get catUtility => 'Utility';
+  String get catUtility => '日用品';
 
   @override
-  String get unitPcs => 'pcs';
+  String get unitPcs => '個';
 
   @override
   String get unitKg => 'kg';
@@ -312,111 +310,110 @@ class AppLocalizationsJa extends AppLocalizations {
   String get unitMl => 'ml';
 
   @override
-  String get unitPack => 'pack';
+  String get unitPack => 'パック';
 
   @override
-  String get unitBox => 'box';
+  String get unitBox => '箱';
 
   @override
-  String get unitBag => 'bag';
+  String get unitBag => '袋';
 
   @override
-  String get unitBottle => 'bottle';
+  String get unitBottle => '本';
 
   @override
-  String get valOther => 'Other';
+  String get valOther => 'その他';
 
   @override
-  String get valMisc => 'Misc';
+  String get valMisc => '未分類';
 
   @override
-  String get valKitchen => 'Kitchen';
+  String get valKitchen => '台所';
 
   @override
-  String get valFridge => 'Fridge';
+  String get valFridge => '冷蔵庫';
 
   @override
-  String get valPantry => 'Pantry';
+  String get valPantry => 'パントリー';
 
   @override
-  String get valBathroom => 'Bathroom';
+  String get valBathroom => '浴室';
 
   @override
-  String get valFood => 'Food';
+  String get valFood => '食品';
 
   @override
-  String get valBattery => 'Battery';
+  String get valBattery => '電池';
 
   @override
-  String get imageGallery => 'Gallery';
+  String get imageGallery => 'ギャラリー';
 
   @override
-  String get imageCamera => 'Camera';
+  String get imageCamera => 'カメラ';
 
   @override
-  String get errorNameRequired => 'Name is required';
+  String get errorNameRequired => '名前を入力してください';
 
   @override
-  String get timeUnitDay => 'Day';
+  String get timeUnitDay => '日';
 
   @override
-  String get timeUnitWeek => 'Week';
+  String get timeUnitWeek => '週';
 
   @override
-  String get timeUnitMonth => 'Month';
+  String get timeUnitMonth => '月';
 
   @override
-  String get timeUnitYear => 'Year';
+  String get timeUnitYear => '年';
 
   @override
-  String get addReminder => 'Add Reminder';
+  String get addReminder => 'リマインダーを追加';
 
   @override
-  String get customReminderTitle => 'Custom Reminder';
+  String get customReminderTitle => 'カスタムリマインダー';
 
   @override
-  String get enterValue => 'Enter value';
+  String get enterValue => '数値を入力';
 
   @override
-  String get privacyPolicy => 'Privacy Policy';
+  String get privacyPolicy => 'プライバシーポリシー';
 
   @override
-  String get errorExpiryRequired => 'Expiry date is required';
+  String get errorExpiryRequired => '期限日は必須です';
 
   @override
-  String get deleteItemTitle => 'Delete Item?';
+  String get deleteItemTitle => 'アイテムを削除しますか？';
 
   @override
-  String get deleteItemContent => 'This cannot be undone.';
+  String get deleteItemContent => 'この操作は取り消せません。';
 
   @override
-  String get filterExpired => 'Expired';
+  String get filterExpired => '期限切れ';
 
   @override
-  String get filterExpiringSoon => 'Expiring Soon';
+  String get filterExpiringSoon => 'もうすぐ期限切れ';
 
   @override
-  String get emptyInventoryPrompt =>
-      'Your fridge is empty! Try adding the first item.';
+  String get emptyInventoryPrompt => '在庫がありません！最初のアイテムを追加しましょう。';
 
   @override
-  String get noExpiringItems => 'No items expiring soon';
+  String get noExpiringItems => 'もうすぐ期限切れのアイテムはありません';
 
   @override
-  String get noExpiredItems => 'No expired items';
+  String get noExpiredItems => '期限切れのアイテムはありません';
 
   @override
-  String get feedbackTitle => 'Send Feedback / Rate Us';
+  String get feedbackTitle => 'フィードバックを送る';
 
   @override
-  String get feedbackDialogTitle => 'Enjoying UseUp?';
+  String get feedbackDialogTitle => 'UseUp を気に入りましたか？';
 
   @override
-  String get feedbackDialogContent => 'Your feedback helps us improve!';
+  String get feedbackDialogContent => 'フィードバックをお寄せください！';
 
   @override
-  String get feedbackActionLove => 'Love it!';
+  String get feedbackActionLove => '大好きです！';
 
   @override
-  String get feedbackActionImprove => 'Could be better';
+  String get feedbackActionImprove => '改善してほしい';
 }

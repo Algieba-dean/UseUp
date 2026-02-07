@@ -21,16 +21,16 @@ class AppLocalizationsEl extends AppLocalizations {
   String get navSettings => 'Ρυθμίσεις';
 
   @override
-  String get history => 'History';
+  String get history => 'Ιστορικό';
 
   @override
-  String get sectionExpiringSoon => 'Expiring Soon';
+  String get sectionExpiringSoon => 'Λήγουν σύντομα';
 
   @override
-  String get sectionAllItems => 'All Items';
+  String get sectionAllItems => 'Όλα τα είδη';
 
   @override
-  String get scanItem => 'Scan Item';
+  String get scanItem => 'Σάρωση είδους';
 
   @override
   String daysLeft(num count) {
@@ -48,256 +48,255 @@ class AppLocalizationsEl extends AppLocalizations {
   String get expired => 'Έληξε';
 
   @override
-  String get statusUrgent => 'Urgent';
+  String get statusUrgent => 'Επείγον';
 
   @override
-  String get statusWarning => 'Warning';
+  String get statusWarning => 'Προειδοποίηση';
 
   @override
-  String get statusSafe => 'Safe';
+  String get statusSafe => 'Ασφαλές';
 
   @override
-  String get name => 'Name';
+  String get name => 'Όνομα';
 
   @override
-  String get quantity => 'Quantity';
+  String get quantity => 'Ποσότητα';
 
   @override
-  String get category => 'Category';
+  String get category => 'Κατηγορία';
 
   @override
-  String get location => 'Location';
+  String get location => 'Τοποθεσία';
 
   @override
-  String get price => 'Unit Price';
+  String get price => 'Τιμή μονάδας';
 
   @override
-  String get expiryDate => 'Expiry Date';
+  String get expiryDate => 'Ημερομηνία λήξης';
 
   @override
-  String get productionDate => 'Production Date';
+  String get productionDate => 'Ημερομηνία παραγωγής';
 
   @override
-  String get shelfLife => 'Shelf Life (Days)';
+  String get shelfLife => 'Διάρκεια ζωής (Ημέρες)';
 
   @override
-  String get purchaseDate => 'Purchase Date';
+  String get purchaseDate => 'Ημερομηνία αγοράς';
 
   @override
-  String get pickDate => 'Pick Date';
+  String get pickDate => 'Επιλογή ημερομηνίας';
 
   @override
-  String get toggleExpiryDate => 'Expiry Date';
+  String get toggleExpiryDate => 'Ημερομηνία λήξης';
 
   @override
-  String get toggleProductionDate => 'Prod. Date + Shelf Life';
+  String get toggleProductionDate => 'Ημ. παραγωγής + Διάρκεια';
 
   @override
-  String get reminderLabel => 'Reminder';
+  String get reminderLabel => 'Υπενθύμιση';
 
   @override
-  String get reminder1Day => '1 day before';
+  String get reminder1Day => '1 ημέρα πριν';
 
   @override
-  String get reminder3Days => '3 days before';
+  String get reminder3Days => '3 ημέρες πριν';
 
   @override
-  String get reminder7Days => '1 week before';
+  String get reminder7Days => '1 εβδομάδα πριν';
 
   @override
-  String get advancedDetails => 'Advanced Details';
+  String get advancedDetails => 'Προηγμένες λεπτομέρειες';
 
   @override
-  String get advancedSubtitle => 'Quantity, Location, Price...';
+  String get advancedSubtitle => 'Ποσότητα, τοποθεσία, τιμή...';
 
   @override
   String calculatedExpiry(Object date) {
-    return 'Calculated Expiry: $date';
+    return 'Υπολογισμένη λήξη: $date';
   }
 
   @override
-  String get testNotification => 'Test Notification';
+  String get testNotification => 'Δοκιμαστική ειδοποίηση';
 
   @override
-  String get testNotificationSubtitle => 'Click to fire an instant alert';
+  String get testNotificationSubtitle => 'Κάντε κλικ για ενεργοποίηση';
 
   @override
-  String get addItem => 'Προσθήκη';
+  String get addItem => 'Προσθήκη είδους';
 
   @override
-  String get editItem => 'Edit Item';
+  String get editItem => 'Επεξεργασία είδους';
 
   @override
   String get save => 'Αποθήκευση';
 
   @override
-  String get saveAndNext => 'Save & Next';
+  String get saveAndNext => 'Αποθήκευση & Επόμενο';
 
   @override
-  String get updateItem => 'Update Item';
+  String get updateItem => 'Ενημέρωση είδους';
 
   @override
-  String get cancel => 'Cancel';
+  String get cancel => 'Ακύρωση';
 
   @override
-  String get confirm => 'Confirm';
+  String get confirm => 'Επιβεβαίωση';
 
   @override
-  String get delete => 'Delete';
+  String get delete => 'Διαγραφή';
 
   @override
-  String get markAsUsed => 'Mark as Used';
+  String get markAsUsed => 'Χρησιμοποιήθηκε';
 
   @override
-  String get restock => 'Restock';
+  String get restock => 'Αναπλήρωση';
 
   @override
-  String get filter => 'Filter';
+  String get filter => 'Φίλτρο';
 
   @override
-  String get reset => 'Reset';
+  String get reset => 'Επαναφορά';
 
   @override
-  String get settingsTitle => 'Settings';
+  String get settingsTitle => 'Ρυθμίσεις';
 
   @override
-  String get language => 'Language';
+  String get language => 'Γλώσσα';
 
   @override
-  String get switchLanguage => 'Switch Language';
+  String get switchLanguage => 'Αλλαγή γλώσσας';
 
   @override
-  String get selectLanguage => 'Select Language';
+  String get selectLanguage => 'Επιλογή γλώσσας';
 
   @override
-  String get manageCategories => 'Manage Categories';
+  String get manageCategories => 'Διαχείριση κατηγοριών';
 
   @override
-  String get manageLocations => 'Manage Locations';
+  String get manageLocations => 'Διαχείριση τοποθεσιών';
 
   @override
-  String get manageMode => 'Manage Mode';
+  String get manageMode => 'Λειτουργία διαχείρισης';
 
   @override
-  String get locationSelect => 'Select Location';
+  String get locationSelect => 'Επιλογή τοποθεσίας';
 
   @override
-  String get locationAdd => 'Add Location';
+  String get locationAdd => 'Προσθήκη τοποθεσίας';
 
   @override
-  String get locationAddSub => 'Add Sub-Location';
+  String get locationAddSub => 'Προσθήκη υπο-τοποθεσίας';
 
   @override
-  String get locationRename => 'Rename Location';
+  String get locationRename => 'Μετονομασία τοποθεσίας';
 
   @override
-  String get locationDeleteTitle => 'Delete Location?';
+  String get locationDeleteTitle => 'Διαγραφή τοποθεσίας;';
 
   @override
-  String get locationName => 'Location Name';
+  String get locationName => 'Όνομα τοποθεσίας';
 
   @override
-  String get categorySelect => 'Select Category';
+  String get categorySelect => 'Επιλογή κατηγορίας';
 
   @override
-  String get categoryAdd => 'Add Category';
+  String get categoryAdd => 'Προσθήκη κατηγορίας';
 
   @override
-  String get categoryAddSub => 'Add Sub-Category';
+  String get categoryAddSub => 'Προσθήκη υπο-κατηγορίας';
 
   @override
-  String get categoryRename => 'Rename Category';
+  String get categoryRename => 'Μετονομασία κατηγορίας';
 
   @override
-  String get categoryDeleteTitle => 'Delete Category?';
+  String get categoryDeleteTitle => 'Διαγραφή κατηγορίας;';
 
   @override
-  String get itemConsumed => 'Item marked as consumed!';
+  String get itemConsumed => 'Το είδος σημειώθηκε ως αναλωμένο!';
 
   @override
-  String get deleteConfirm =>
-      'This location/category contains items or sub-items. Cannot delete.';
+  String get deleteConfirm => 'Περιέχει είδη. Αδύνατη η διαγραφή.';
 
   @override
-  String get confirmDelete => 'Are you sure you want to delete?';
+  String get confirmDelete => 'Είστε σίγουροι για τη διαγραφή;';
 
   @override
   String get deleteEmptyConfirm =>
-      'This item is empty and will be deleted directly.';
+      'Αυτό το είδος είναι άδειο και θα διαγραφεί.';
 
   @override
   String deleteMoveConfirm(Object count, Object target) {
-    return 'Contains $count items. Items will be moved to $target.';
+    return 'Μεταφορά $count ειδών στο $target.';
   }
 
   @override
-  String get deleteMigrateTitle => 'Delete & Migrate?';
+  String get deleteMigrateTitle => 'Διαγραφή & Μεταφορά;';
 
   @override
   String deleteMigrateContent(Object items, Object subs, Object target) {
-    return 'This item contains $items items and $subs sub-items.\nThey will be moved to \'$target\'.';
+    return 'Μεταφορά $items ειδών στο \'$target\'.';
   }
 
   @override
-  String get confirmAndMove => 'Confirm & Move';
+  String get confirmAndMove => 'Επιβεβαίωση & Μεταφορά';
 
   @override
-  String get cannotDeleteDefault => 'Cannot delete the default item!';
+  String get cannotDeleteDefault => 'Αδύνατη η διαγραφή του προεπιλεγμένου!';
 
   @override
-  String get containsSubItems => 'Contains sub-items. Delete them first.';
+  String get containsSubItems => 'Περιέχει υπο-στοιχεία.';
 
   @override
   String errorDefaultNotFound(Object name) {
-    return 'Error: Default $name not found.';
+    return 'Το προεπιλεγμένο $name δεν βρέθηκε.';
   }
 
   @override
-  String get errorNameExists => 'Name already exists in this level.';
+  String get errorNameExists => 'Το όνομα υπάρχει ήδη.';
 
   @override
-  String get searchHint => 'Search items...';
+  String get searchHint => 'Αναζήτηση...';
 
   @override
-  String get noItemsFound => 'No items found';
+  String get noItemsFound => 'Δεν βρέθηκαν είδη';
 
   @override
   String noItemsFoundFor(Object query) {
-    return 'No items found for $query';
+    return 'Κανένα αποτέλεσμα για $query';
   }
 
   @override
-  String get filtersHeader => 'Filters: ';
+  String get filtersHeader => 'Φίλτρα: ';
 
   @override
-  String get emptyList => 'Empty';
+  String get emptyList => 'Κενό';
 
   @override
-  String get catVegetable => 'Vegetable';
+  String get catVegetable => 'Λαχανικά';
 
   @override
-  String get catFruit => 'Fruit';
+  String get catFruit => 'Φρούτα';
 
   @override
-  String get catMeat => 'Meat';
+  String get catMeat => 'Κρέας';
 
   @override
-  String get catDairy => 'Dairy';
+  String get catDairy => 'Γαλακτοκομικά';
 
   @override
-  String get catPantry => 'Pantry';
+  String get catPantry => 'Ντουλάπι';
 
   @override
-  String get catSnack => 'Snack';
+  String get catSnack => 'Σνακ';
 
   @override
-  String get catHealth => 'Health';
+  String get catHealth => 'Υγεία';
 
   @override
-  String get catUtility => 'Utility';
+  String get catUtility => 'Χρηστικά';
 
   @override
-  String get unitPcs => 'pcs';
+  String get unitPcs => 'τμχ';
 
   @override
   String get unitKg => 'kg';
@@ -312,111 +311,112 @@ class AppLocalizationsEl extends AppLocalizations {
   String get unitMl => 'ml';
 
   @override
-  String get unitPack => 'pack';
+  String get unitPack => 'πακέτο';
 
   @override
-  String get unitBox => 'box';
+  String get unitBox => 'κουτί';
 
   @override
-  String get unitBag => 'bag';
+  String get unitBag => 'σακούλα';
 
   @override
-  String get unitBottle => 'bottle';
+  String get unitBottle => 'μπουκάλι';
 
   @override
-  String get valOther => 'Other';
+  String get valOther => 'Άλλο';
 
   @override
-  String get valMisc => 'Misc';
+  String get valMisc => 'Διάφορα';
 
   @override
-  String get valKitchen => 'Kitchen';
+  String get valKitchen => 'Κουζίνα';
 
   @override
-  String get valFridge => 'Fridge';
+  String get valFridge => 'Ψυγείο';
 
   @override
-  String get valPantry => 'Pantry';
+  String get valPantry => 'Ντουλάπι';
 
   @override
-  String get valBathroom => 'Bathroom';
+  String get valBathroom => 'Μπάνιο';
 
   @override
-  String get valFood => 'Food';
+  String get valFood => 'Φαγητό';
 
   @override
-  String get valBattery => 'Battery';
+  String get valBattery => 'Μπαταρία';
 
   @override
-  String get imageGallery => 'Gallery';
+  String get imageGallery => 'Συλλογή';
 
   @override
-  String get imageCamera => 'Camera';
+  String get imageCamera => 'Κάμερα';
 
   @override
-  String get errorNameRequired => 'Name is required';
+  String get errorNameRequired => 'Το όνομα είναι υποχρεωτικό';
 
   @override
-  String get timeUnitDay => 'Day';
+  String get timeUnitDay => 'Ημέρα';
 
   @override
-  String get timeUnitWeek => 'Week';
+  String get timeUnitWeek => 'Εβδομάδα';
 
   @override
-  String get timeUnitMonth => 'Month';
+  String get timeUnitMonth => 'Μήνας';
 
   @override
-  String get timeUnitYear => 'Year';
+  String get timeUnitYear => 'Έτος';
 
   @override
-  String get addReminder => 'Add Reminder';
+  String get addReminder => 'Προσθήκη υπενθύμισης';
 
   @override
-  String get customReminderTitle => 'Custom Reminder';
+  String get customReminderTitle => 'Προσαρμοσμένη υπενθύμιση';
 
   @override
-  String get enterValue => 'Enter value';
+  String get enterValue => 'Εισάγετε τιμή';
 
   @override
-  String get privacyPolicy => 'Privacy Policy';
+  String get privacyPolicy => 'Πολιτική απορρήτου';
 
   @override
-  String get errorExpiryRequired => 'Expiry date is required';
+  String get errorExpiryRequired => 'Η ημερομηνία λήξης είναι υποχρεωτική';
 
   @override
-  String get deleteItemTitle => 'Delete Item?';
+  String get deleteItemTitle => 'Διαγραφή είδους;';
 
   @override
-  String get deleteItemContent => 'This cannot be undone.';
+  String get deleteItemContent => 'Αυτή η ενέργεια δεν αναιρείται.';
 
   @override
-  String get filterExpired => 'Expired';
+  String get filterExpired => 'Έληξε';
 
   @override
-  String get filterExpiringSoon => 'Expiring Soon';
+  String get filterExpiringSoon => 'Λήγουν σύντομα';
 
   @override
   String get emptyInventoryPrompt =>
-      'Your fridge is empty! Try adding the first item.';
+      'Το απόθεμα είναι άδειο! Προσθέστε το πρώτο είδος.';
 
   @override
-  String get noExpiringItems => 'No items expiring soon';
+  String get noExpiringItems => 'Δεν υπάρχουν είδη που λήγουν σύντομα';
 
   @override
-  String get noExpiredItems => 'No expired items';
+  String get noExpiredItems => 'Δεν υπάρχουν ληγμένα είδη';
 
   @override
-  String get feedbackTitle => 'Send Feedback / Rate Us';
+  String get feedbackTitle => 'Αποστολή σχολίων';
 
   @override
-  String get feedbackDialogTitle => 'Enjoying UseUp?';
+  String get feedbackDialogTitle => 'Σας αρέσει το UseUp;';
 
   @override
-  String get feedbackDialogContent => 'Your feedback helps us improve!';
+  String get feedbackDialogContent =>
+      'Τα σχόλιά σας μας βοηθούν να βελτιωθούμε!';
 
   @override
-  String get feedbackActionLove => 'Love it!';
+  String get feedbackActionLove => 'Το λατρεύω!';
 
   @override
-  String get feedbackActionImprove => 'Could be better';
+  String get feedbackActionImprove => 'Θέλει βελτίωση';
 }

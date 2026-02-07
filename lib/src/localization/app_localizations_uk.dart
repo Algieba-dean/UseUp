@@ -21,16 +21,16 @@ class AppLocalizationsUk extends AppLocalizations {
   String get navSettings => 'Налаштування';
 
   @override
-  String get history => 'History';
+  String get history => 'Історія';
 
   @override
-  String get sectionExpiringSoon => 'Expiring Soon';
+  String get sectionExpiringSoon => 'Скоро закінчиться';
 
   @override
-  String get sectionAllItems => 'All Items';
+  String get sectionAllItems => 'Усі предмети';
 
   @override
-  String get scanItem => 'Scan Item';
+  String get scanItem => 'Сканувати предмет';
 
   @override
   String daysLeft(num count) {
@@ -48,375 +48,374 @@ class AppLocalizationsUk extends AppLocalizations {
   String get expired => 'Термін вийшов';
 
   @override
-  String get statusUrgent => 'Urgent';
+  String get statusUrgent => 'Терміново';
 
   @override
-  String get statusWarning => 'Warning';
+  String get statusWarning => 'Увага';
 
   @override
-  String get statusSafe => 'Safe';
+  String get statusSafe => 'Безпечно';
 
   @override
-  String get name => 'Name';
+  String get name => 'Назва';
 
   @override
-  String get quantity => 'Quantity';
+  String get quantity => 'Кількість';
 
   @override
-  String get category => 'Category';
+  String get category => 'Категорія';
 
   @override
-  String get location => 'Location';
+  String get location => 'Місце';
 
   @override
-  String get price => 'Unit Price';
+  String get price => 'Ціна за од.';
 
   @override
-  String get expiryDate => 'Expiry Date';
+  String get expiryDate => 'Термін придатності';
 
   @override
-  String get productionDate => 'Production Date';
+  String get productionDate => 'Дата виробництва';
 
   @override
-  String get shelfLife => 'Shelf Life (Days)';
+  String get shelfLife => 'Термін зберігання (дн.)';
 
   @override
-  String get purchaseDate => 'Purchase Date';
+  String get purchaseDate => 'Дата покупки';
 
   @override
-  String get pickDate => 'Pick Date';
+  String get pickDate => 'Вибрати дату';
 
   @override
-  String get toggleExpiryDate => 'Expiry Date';
+  String get toggleExpiryDate => 'Термін придатності';
 
   @override
-  String get toggleProductionDate => 'Prod. Date + Shelf Life';
+  String get toggleProductionDate => 'Дата вир-ва + термін';
 
   @override
-  String get reminderLabel => 'Reminder';
+  String get reminderLabel => 'Нагадування';
 
   @override
-  String get reminder1Day => '1 day before';
+  String get reminder1Day => 'За 1 день';
 
   @override
-  String get reminder3Days => '3 days before';
+  String get reminder3Days => 'За 3 дні';
 
   @override
-  String get reminder7Days => '1 week before';
+  String get reminder7Days => 'За 1 тиждень';
 
   @override
-  String get advancedDetails => 'Advanced Details';
+  String get advancedDetails => 'Додатково';
 
   @override
-  String get advancedSubtitle => 'Quantity, Location, Price...';
+  String get advancedSubtitle => 'К-сть, місце, ціна...';
 
   @override
   String calculatedExpiry(Object date) {
-    return 'Calculated Expiry: $date';
+    return 'Розрахунковий термін: $date';
   }
 
   @override
-  String get testNotification => 'Test Notification';
+  String get testNotification => 'Тестове сповіщення';
 
   @override
-  String get testNotificationSubtitle => 'Click to fire an instant alert';
+  String get testNotificationSubtitle => 'Натисніть для перевірки';
 
   @override
-  String get addItem => 'Додати';
+  String get addItem => 'Додати предмет';
 
   @override
-  String get editItem => 'Edit Item';
+  String get editItem => 'Редагувати';
 
   @override
   String get save => 'Зберегти';
 
   @override
-  String get saveAndNext => 'Save & Next';
+  String get saveAndNext => 'Зберегти і далі';
 
   @override
-  String get updateItem => 'Update Item';
+  String get updateItem => 'Оновити';
 
   @override
-  String get cancel => 'Cancel';
+  String get cancel => 'Скасувати';
 
   @override
-  String get confirm => 'Confirm';
+  String get confirm => 'Підтвердити';
 
   @override
-  String get delete => 'Delete';
+  String get delete => 'Видалити';
 
   @override
-  String get markAsUsed => 'Mark as Used';
+  String get markAsUsed => 'Використано';
 
   @override
-  String get restock => 'Restock';
+  String get restock => 'Поповнити';
 
   @override
-  String get filter => 'Filter';
+  String get filter => 'Фільтр';
 
   @override
-  String get reset => 'Reset';
+  String get reset => 'Скинути';
 
   @override
-  String get settingsTitle => 'Settings';
+  String get settingsTitle => 'Налаштування';
 
   @override
   String get language => 'Мова';
 
   @override
-  String get switchLanguage => 'Switch Language';
+  String get switchLanguage => 'Змінити мову';
 
   @override
-  String get selectLanguage => 'Select Language';
+  String get selectLanguage => 'Вибрати мову';
 
   @override
-  String get manageCategories => 'Manage Categories';
+  String get manageCategories => 'Керування категоріями';
 
   @override
-  String get manageLocations => 'Manage Locations';
+  String get manageLocations => 'Керування місцями';
 
   @override
-  String get manageMode => 'Manage Mode';
+  String get manageMode => 'Режим керування';
 
   @override
-  String get locationSelect => 'Select Location';
+  String get locationSelect => 'Вибрати місце';
 
   @override
-  String get locationAdd => 'Add Location';
+  String get locationAdd => 'Додати місце';
 
   @override
-  String get locationAddSub => 'Add Sub-Location';
+  String get locationAddSub => 'Додати під-місце';
 
   @override
-  String get locationRename => 'Rename Location';
+  String get locationRename => 'Перейменувати';
 
   @override
-  String get locationDeleteTitle => 'Delete Location?';
+  String get locationDeleteTitle => 'Видалити місце?';
 
   @override
-  String get locationName => 'Location Name';
+  String get locationName => 'Назва місця';
 
   @override
-  String get categorySelect => 'Select Category';
+  String get categorySelect => 'Вибрати категорію';
 
   @override
-  String get categoryAdd => 'Add Category';
+  String get categoryAdd => 'Додати категорію';
 
   @override
-  String get categoryAddSub => 'Add Sub-Category';
+  String get categoryAddSub => 'Добавить під-категорію';
 
   @override
-  String get categoryRename => 'Rename Category';
+  String get categoryRename => 'Перейменувати';
 
   @override
-  String get categoryDeleteTitle => 'Delete Category?';
+  String get categoryDeleteTitle => 'Видалити категорію?';
 
   @override
-  String get itemConsumed => 'Item marked as consumed!';
+  String get itemConsumed => 'Предмет позначено як використаний!';
 
   @override
-  String get deleteConfirm =>
-      'This location/category contains items or sub-items. Cannot delete.';
+  String get deleteConfirm => 'Містить предмети. Видалення неможливе.';
 
   @override
-  String get confirmDelete => 'Are you sure you want to delete?';
+  String get confirmDelete => 'Ви впевнені, що хочете видалити?';
 
   @override
-  String get deleteEmptyConfirm =>
-      'This item is empty and will be deleted directly.';
+  String get deleteEmptyConfirm => 'Цей предмет порожній і буде видалений.';
 
   @override
   String deleteMoveConfirm(Object count, Object target) {
-    return 'Contains $count items. Items will be moved to $target.';
+    return 'Перемістити $count предм. у $target.';
   }
 
   @override
-  String get deleteMigrateTitle => 'Delete & Migrate?';
+  String get deleteMigrateTitle => 'Видалити і перемістити?';
 
   @override
   String deleteMigrateContent(Object items, Object subs, Object target) {
-    return 'This item contains $items items and $subs sub-items.\nThey will be moved to \'$target\'.';
+    return 'Перемістити $items предм. у \'$target\'.';
   }
 
   @override
-  String get confirmAndMove => 'Confirm & Move';
+  String get confirmAndMove => 'Підтвердити і перемістити';
 
   @override
-  String get cannotDeleteDefault => 'Cannot delete the default item!';
+  String get cannotDeleteDefault => 'Неможливо видалити стандартний елемент!';
 
   @override
-  String get containsSubItems => 'Contains sub-items. Delete them first.';
+  String get containsSubItems => 'Містить під-елементи.';
 
   @override
   String errorDefaultNotFound(Object name) {
-    return 'Error: Default $name not found.';
+    return 'Стандартний $name не знайдено.';
   }
 
   @override
-  String get errorNameExists => 'Name already exists in this level.';
+  String get errorNameExists => 'Ім\'я вже існує.';
 
   @override
-  String get searchHint => 'Search items...';
+  String get searchHint => 'Пошук...';
 
   @override
-  String get noItemsFound => 'No items found';
+  String get noItemsFound => 'Предмети не знайдено';
 
   @override
   String noItemsFoundFor(Object query) {
-    return 'No items found for $query';
+    return 'Нічого не знайдено за запитом $query';
   }
 
   @override
-  String get filtersHeader => 'Filters: ';
+  String get filtersHeader => 'Фільтри: ';
 
   @override
-  String get emptyList => 'Empty';
+  String get emptyList => 'Порожньо';
 
   @override
-  String get catVegetable => 'Vegetable';
+  String get catVegetable => 'Овочі';
 
   @override
-  String get catFruit => 'Fruit';
+  String get catFruit => 'Фрукти';
 
   @override
-  String get catMeat => 'Meat';
+  String get catMeat => 'М\'ясо';
 
   @override
-  String get catDairy => 'Dairy';
+  String get catDairy => 'Молочні продукти';
 
   @override
-  String get catPantry => 'Pantry';
+  String get catPantry => 'Комора';
 
   @override
-  String get catSnack => 'Snack';
+  String get catSnack => 'Снеки';
 
   @override
-  String get catHealth => 'Health';
+  String get catHealth => 'Здоров\'я';
 
   @override
-  String get catUtility => 'Utility';
+  String get catUtility => 'Госптовари';
 
   @override
-  String get unitPcs => 'pcs';
+  String get unitPcs => 'шт';
 
   @override
-  String get unitKg => 'kg';
+  String get unitKg => 'кг';
 
   @override
-  String get unitG => 'g';
+  String get unitG => 'г';
 
   @override
-  String get unitL => 'L';
+  String get unitL => 'л';
 
   @override
-  String get unitMl => 'ml';
+  String get unitMl => 'мл';
 
   @override
-  String get unitPack => 'pack';
+  String get unitPack => 'уп';
 
   @override
-  String get unitBox => 'box';
+  String get unitBox => 'кор';
 
   @override
-  String get unitBag => 'bag';
+  String get unitBag => 'пакет';
 
   @override
-  String get unitBottle => 'bottle';
+  String get unitBottle => 'пляшка';
 
   @override
-  String get valOther => 'Other';
+  String get valOther => 'Інше';
 
   @override
-  String get valMisc => 'Misc';
+  String get valMisc => 'Різне';
 
   @override
-  String get valKitchen => 'Kitchen';
+  String get valKitchen => 'Кухня';
 
   @override
-  String get valFridge => 'Fridge';
+  String get valFridge => 'Холодильник';
 
   @override
-  String get valPantry => 'Pantry';
+  String get valPantry => 'Комора';
 
   @override
-  String get valBathroom => 'Bathroom';
+  String get valBathroom => 'Ванна';
 
   @override
-  String get valFood => 'Food';
+  String get valFood => 'Їжа';
 
   @override
-  String get valBattery => 'Battery';
+  String get valBattery => 'Батарейка';
 
   @override
-  String get imageGallery => 'Gallery';
+  String get imageGallery => 'Галерея';
 
   @override
-  String get imageCamera => 'Camera';
+  String get imageCamera => 'Камера';
 
   @override
-  String get errorNameRequired => 'Name is required';
+  String get errorNameRequired => 'Введіть назву';
 
   @override
-  String get timeUnitDay => 'Day';
+  String get timeUnitDay => 'День';
 
   @override
-  String get timeUnitWeek => 'Week';
+  String get timeUnitWeek => 'Тиждень';
 
   @override
-  String get timeUnitMonth => 'Month';
+  String get timeUnitMonth => 'Місяць';
 
   @override
-  String get timeUnitYear => 'Year';
+  String get timeUnitYear => 'Рік';
 
   @override
-  String get addReminder => 'Add Reminder';
+  String get addReminder => 'Додати нагадування';
 
   @override
-  String get customReminderTitle => 'Custom Reminder';
+  String get customReminderTitle => 'Своє нагадування';
 
   @override
-  String get enterValue => 'Enter value';
+  String get enterValue => 'Введіть значення';
 
   @override
-  String get privacyPolicy => 'Privacy Policy';
+  String get privacyPolicy => 'Конфіденційність';
 
   @override
-  String get errorExpiryRequired => 'Expiry date is required';
+  String get errorExpiryRequired => 'Вкажіть термін придатності';
 
   @override
-  String get deleteItemTitle => 'Delete Item?';
+  String get deleteItemTitle => 'Видалити предмет?';
 
   @override
-  String get deleteItemContent => 'This cannot be undone.';
+  String get deleteItemContent => 'Цю дію неможливо скасувати.';
 
   @override
-  String get filterExpired => 'Expired';
+  String get filterExpired => 'Термін вийшов';
 
   @override
-  String get filterExpiringSoon => 'Expiring Soon';
+  String get filterExpiringSoon => 'Скоро закінчиться';
 
   @override
   String get emptyInventoryPrompt =>
-      'Your fridge is empty! Try adding the first item.';
+      'Ваш список порожній! Додайте перший предмет.';
 
   @override
-  String get noExpiringItems => 'No items expiring soon';
+  String get noExpiringItems => 'Немає предметів, термін яких добігає кінця';
 
   @override
-  String get noExpiredItems => 'No expired items';
+  String get noExpiredItems => 'Немає прострочених предметів';
 
   @override
-  String get feedbackTitle => 'Send Feedback / Rate Us';
+  String get feedbackTitle => 'Залишити відгук';
 
   @override
-  String get feedbackDialogTitle => 'Enjoying UseUp?';
+  String get feedbackDialogTitle => 'Подобається UseUp?';
 
   @override
-  String get feedbackDialogContent => 'Your feedback helps us improve!';
+  String get feedbackDialogContent =>
+      'Ваш відгук допомагає нам ставати кращими!';
 
   @override
-  String get feedbackActionLove => 'Love it!';
+  String get feedbackActionLove => 'Дуже подобається!';
 
   @override
-  String get feedbackActionImprove => 'Could be better';
+  String get feedbackActionImprove => 'Потрібно покращити';
 }

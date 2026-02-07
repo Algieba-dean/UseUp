@@ -219,26 +219,58 @@ class SettingsScreen extends ConsumerWidget {
   void _showLanguagePicker(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true, // 关键：允许弹窗高度超过默认限制
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (ctx) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: AppLocalizations.supportedLocales.map((locale) {
-              return ListTile(
-                title: Text(_getLanguageName(locale)),
-                trailing: ref.read(localeProvider)?.languageCode == locale.languageCode
-                    ? const Icon(Icons.check, color: AppTheme.primaryGreen)
-                    : null,
-                onTap: () {
-                  ref.read(localeProvider.notifier).setLocale(locale);
-                  context.pop();
-                },
-              );
-            }).toList(),
-          ),
+        return DraggableScrollableSheet(
+          initialChildSize: 0.5, // 初始高度占屏幕 50%
+          minChildSize: 0.3,     // 最小高度
+          maxChildSize: 0.9,     // 最大高度
+          expand: false,
+          builder: (context, scrollController) {
+            return Column(
+              children: [
+                // 顶部小横条提示可以拖动
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  height: 4,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    AppLocalizations.of(context)!.selectLanguage,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    controller: scrollController, // 关键：绑定滚动控制器
+                    itemCount: AppLocalizations.supportedLocales.length,
+                    itemBuilder: (context, index) {
+                      final locale = AppLocalizations.supportedLocales[index];
+                      return ListTile(
+                        title: Text(_getLanguageName(locale)),
+                        trailing: ref.read(localeProvider)?.languageCode == locale.languageCode
+                            ? const Icon(Icons.check, color: AppTheme.primaryGreen)
+                            : null,
+                        onTap: () {
+                          ref.read(localeProvider.notifier).setLocale(locale);
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );

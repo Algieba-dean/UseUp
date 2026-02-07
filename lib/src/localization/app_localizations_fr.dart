@@ -108,7 +108,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get advancedDetails => 'Détails avancés';
 
   @override
-  String get advancedSubtitle => 'Quantité, Emplacement, Prix...';
+  String get advancedSubtitle => 'Quantité, emplacement, prix...';
 
   @override
   String calculatedExpiry(Object date) {
@@ -119,7 +119,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get testNotification => 'Notification de test';
 
   @override
-  String get testNotificationSubtitle => 'Click to fire an instant alert';
+  String get testNotificationSubtitle => 'Cliquez pour déclencher une alerte';
 
   @override
   String get addItem => 'Ajouter un article';
@@ -146,16 +146,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get delete => 'Supprimer';
 
   @override
-  String get markAsUsed => 'Marquer comme utilisé';
+  String get markAsUsed => 'Utilisé';
 
   @override
-  String get restock => 'Restock';
+  String get restock => 'Réapprovisionner';
 
   @override
-  String get filter => 'Filter';
+  String get filter => 'Filtrer';
 
   @override
-  String get reset => 'Reset';
+  String get reset => 'Réinitialiser';
 
   @override
   String get settingsTitle => 'Paramètres';
@@ -176,101 +176,100 @@ class AppLocalizationsFr extends AppLocalizations {
   String get manageLocations => 'Gérer les emplacements';
 
   @override
-  String get manageMode => 'Manage Mode';
+  String get manageMode => 'Mode gestion';
 
   @override
-  String get locationSelect => 'Select Location';
+  String get locationSelect => 'Choisir l\'emplacement';
 
   @override
-  String get locationAdd => 'Add Location';
+  String get locationAdd => 'Ajouter un emplacement';
 
   @override
-  String get locationAddSub => 'Add Sub-Location';
+  String get locationAddSub => 'Ajouter un sous-emplacement';
 
   @override
-  String get locationRename => 'Rename Location';
+  String get locationRename => 'Renommer l\'emplacement';
 
   @override
-  String get locationDeleteTitle => 'Delete Location?';
+  String get locationDeleteTitle => 'Supprimer l\'emplacement ?';
 
   @override
-  String get locationName => 'Location Name';
+  String get locationName => 'Nom de l\'emplacement';
 
   @override
-  String get categorySelect => 'Select Category';
+  String get categorySelect => 'Choisir la catégorie';
 
   @override
-  String get categoryAdd => 'Add Category';
+  String get categoryAdd => 'Ajouter une catégorie';
 
   @override
-  String get categoryAddSub => 'Add Sub-Category';
+  String get categoryAddSub => 'Ajouter une sous-catégorie';
 
   @override
-  String get categoryRename => 'Rename Category';
+  String get categoryRename => 'Renommer la catégorie';
 
   @override
-  String get categoryDeleteTitle => 'Delete Category?';
+  String get categoryDeleteTitle => 'Supprimer la catégorie ?';
 
   @override
-  String get itemConsumed => 'Item marked as consumed!';
+  String get itemConsumed => 'Article marqué comme consommé !';
 
   @override
-  String get deleteConfirm =>
-      'This location/category contains items or sub-items. Cannot delete.';
+  String get deleteConfirm => 'Contient des articles. Suppression impossible.';
 
   @override
-  String get confirmDelete => 'Are you sure you want to delete?';
+  String get confirmDelete => 'Voulez-vous vraiment supprimer ?';
 
   @override
-  String get deleteEmptyConfirm =>
-      'This item is empty and will be deleted directly.';
+  String get deleteEmptyConfirm => 'Cet article est vide et sera supprimé.';
 
   @override
   String deleteMoveConfirm(Object count, Object target) {
-    return 'Contains $count items. Items will be moved to $target.';
+    return 'Déplacer $count articles vers $target.';
   }
 
   @override
-  String get deleteMigrateTitle => 'Delete & Migrate?';
+  String get deleteMigrateTitle => 'Supprimer et migrer ?';
 
   @override
   String deleteMigrateContent(Object items, Object subs, Object target) {
-    return 'This item contains $items items and $subs sub-items.\nThey will be moved to \'$target\'.';
+    return 'Déplacer $items articles vers \'$target\'.';
   }
 
   @override
-  String get confirmAndMove => 'Confirm & Move';
+  String get confirmAndMove => 'Confirmer et déplacer';
 
   @override
-  String get cannotDeleteDefault => 'Cannot delete the default item!';
+  String get cannotDeleteDefault =>
+      'Impossible de supprimer l\'élément par défaut !';
 
   @override
-  String get containsSubItems => 'Contains sub-items. Delete them first.';
+  String get containsSubItems => 'Contient des sous-éléments.';
 
   @override
   String errorDefaultNotFound(Object name) {
-    return 'Error: Default $name not found.';
+    return 'Défaut $name non trouvé.';
   }
 
   @override
-  String get errorNameExists => 'Name already exists in this level.';
+  String get errorNameExists => 'Ce nom existe déjà.';
 
   @override
   String get searchHint => 'Rechercher...';
 
   @override
-  String get noItemsFound => 'No items found';
+  String get noItemsFound => 'Aucun article trouvé';
 
   @override
   String noItemsFoundFor(Object query) {
-    return 'No items found for $query';
+    return 'Rien trouvé pour $query';
   }
 
   @override
-  String get filtersHeader => 'Filters: ';
+  String get filtersHeader => 'Filtres : ';
 
   @override
-  String get emptyList => 'Empty';
+  String get emptyList => 'Vide';
 
   @override
   String get catVegetable => 'Légumes';
@@ -312,16 +311,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get unitMl => 'ml';
 
   @override
-  String get unitPack => 'pack';
+  String get unitPack => 'paquet';
 
   @override
-  String get unitBox => 'box';
+  String get unitBox => 'boîte';
 
   @override
-  String get unitBag => 'bag';
+  String get unitBag => 'sac';
 
   @override
-  String get unitBottle => 'bottle';
+  String get unitBottle => 'bouteille';
 
   @override
   String get valOther => 'Autre';
@@ -336,87 +335,87 @@ class AppLocalizationsFr extends AppLocalizations {
   String get valFridge => 'Réfrigérateur';
 
   @override
-  String get valPantry => 'Pantry';
+  String get valPantry => 'Garde-manger';
 
   @override
   String get valBathroom => 'Salle de bain';
 
   @override
-  String get valFood => 'Food';
+  String get valFood => 'Nourriture';
 
   @override
-  String get valBattery => 'Battery';
+  String get valBattery => 'Pile';
 
   @override
-  String get imageGallery => 'Gallery';
+  String get imageGallery => 'Galerie';
 
   @override
-  String get imageCamera => 'Camera';
+  String get imageCamera => 'Appareil photo';
 
   @override
-  String get errorNameRequired => 'Name is required';
+  String get errorNameRequired => 'Nom requis';
 
   @override
-  String get timeUnitDay => 'Day';
+  String get timeUnitDay => 'Jour';
 
   @override
-  String get timeUnitWeek => 'Week';
+  String get timeUnitWeek => 'Semaine';
 
   @override
-  String get timeUnitMonth => 'Month';
+  String get timeUnitMonth => 'Mois';
 
   @override
-  String get timeUnitYear => 'Year';
+  String get timeUnitYear => 'An';
 
   @override
-  String get addReminder => 'Add Reminder';
+  String get addReminder => 'Ajouter un rappel';
 
   @override
-  String get customReminderTitle => 'Custom Reminder';
+  String get customReminderTitle => 'Rappel personnalisé';
 
   @override
-  String get enterValue => 'Enter value';
+  String get enterValue => 'Entrez une valeur';
 
   @override
-  String get privacyPolicy => 'Privacy Policy';
+  String get privacyPolicy => 'Confidentialité';
 
   @override
-  String get errorExpiryRequired => 'Expiry date is required';
+  String get errorExpiryRequired => 'Date d\'expiration requise';
 
   @override
-  String get deleteItemTitle => 'Delete Item?';
+  String get deleteItemTitle => 'Supprimer l\'article ?';
 
   @override
-  String get deleteItemContent => 'This cannot be undone.';
+  String get deleteItemContent => 'Cette action est irréversible.';
 
   @override
-  String get filterExpired => 'Expired';
+  String get filterExpired => 'Expiré';
 
   @override
-  String get filterExpiringSoon => 'Expiring Soon';
+  String get filterExpiringSoon => 'Expire bientôt';
 
   @override
   String get emptyInventoryPrompt =>
-      'Votre inventaire est vide ! Ajoutez votre premier article.';
+      'Inventaire vide ! Ajoutez votre premier article.';
 
   @override
-  String get noExpiringItems => 'No items expiring soon';
+  String get noExpiringItems => 'Aucun article n\'expire bientôt';
 
   @override
-  String get noExpiredItems => 'No expired items';
+  String get noExpiredItems => 'Aucun article expiré';
 
   @override
-  String get feedbackTitle => 'Send Feedback / Rate Us';
+  String get feedbackTitle => 'Envoyer un avis';
 
   @override
-  String get feedbackDialogTitle => 'Enjoying UseUp?';
+  String get feedbackDialogTitle => 'Vous aimez UseUp ?';
 
   @override
-  String get feedbackDialogContent => 'Your feedback helps us improve!';
+  String get feedbackDialogContent => 'Votre avis nous aide à nous améliorer !';
 
   @override
-  String get feedbackActionLove => 'Love it!';
+  String get feedbackActionLove => 'J\'adore !';
 
   @override
-  String get feedbackActionImprove => 'Could be better';
+  String get feedbackActionImprove => 'Peut mieux faire';
 }
