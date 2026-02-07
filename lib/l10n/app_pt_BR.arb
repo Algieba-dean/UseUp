@@ -1,0 +1,13 @@
+{
+  "@@locale": "pt_BR",
+  "appTitle": "UseUp",
+  "welcomeGreeting": "Bom dia",
+  "navHome": "Início",
+  "navSettings": "Configurações",
+  "sectionExpiringSoon": "Vencendo em breve",
+  "daysLeft": "{count, plural, =0{Hoje} =1{Amanhã} other{Faltam {count} dias}}",
+  "expired": "Vencido",
+  "addItem": "Adicionar Item",
+  "save": "Salvar",
+  "language": "Idioma"
+}

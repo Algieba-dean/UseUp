@@ -1,0 +1,11 @@
+{
+  "@@locale": "ja",
+  "appTitle": "UseUp",
+  "welcomeGreeting": "おはようございます",
+  "navHome": "ホーム",
+  "navSettings": "設定",
+  "daysLeft": "{count, plural, =0{今日} =1{明日} other{残り {count} 日}}",
+  "expired": "期限切れ",
+  "addItem": "追加",
+  "save": "保存"
+}

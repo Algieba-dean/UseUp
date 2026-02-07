@@ -1,0 +1,11 @@
+{
+  "@@locale": "el",
+  "appTitle": "UseUp",
+  "welcomeGreeting": "Καλημέρα",
+  "navHome": "Αρχική",
+  "navSettings": "Ρυθμίσεις",
+  "daysLeft": "{count, plural, =0{Σήμερα} =1{Αύριο} other{Απομένουν {count} ημέρες}}",
+  "expired": "Έληξε",
+  "addItem": "Προσθήκη",
+  "save": "Αποθήκευση"
+}

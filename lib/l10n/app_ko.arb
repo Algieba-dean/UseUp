@@ -1,0 +1,11 @@
+{
+  "@@locale": "ko",
+  "appTitle": "UseUp",
+  "welcomeGreeting": "안녕하세요",
+  "navHome": "홈",
+  "navSettings": "설정",
+  "daysLeft": "{count, plural, =0{오늘} =1{내일} other{{count}일 남음}}",
+  "expired": "만료됨",
+  "addItem": "추가",
+  "save": "저장"
+}

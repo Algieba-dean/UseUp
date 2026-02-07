@@ -1,0 +1,12 @@
+{
+  "@@locale": "nl",
+  "appTitle": "UseUp",
+  "welcomeGreeting": "Goedemorgen",
+  "navHome": "Home",
+  "navSettings": "Instellingen",
+  "daysLeft": "{count, plural, =0{Vandaag} =1{Morgen} other{Nog {count} dagen}}",
+  "expired": "Verlopen",
+  "addItem": "Toevoegen",
+  "save": "Opslaan",
+  "language": "Taal"
+}

@@ -1,0 +1,12 @@
+{
+  "@@locale": "uk",
+  "appTitle": "UseUp",
+  "welcomeGreeting": "Доброго ранку",
+  "navHome": "Головна",
+  "navSettings": "Налаштування",
+  "daysLeft": "{count, plural, =0{Сьогодні} =1{Завтра} other{Залишилось {count} дн.}}",
+  "expired": "Термін вийшов",
+  "addItem": "Додати",
+  "save": "Зберегти",
+  "language": "Мова"
+}

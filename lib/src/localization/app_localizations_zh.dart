@@ -417,3 +417,41 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get feedbackActionImprove => '有待改进';
 }
+
+/// The translations for Chinese, as used in Taiwan (`zh_TW`).
+class AppLocalizationsZhTw extends AppLocalizationsZh {
+  AppLocalizationsZhTw() : super('zh_TW');
+
+  @override
+  String get appTitle => 'UseUp';
+
+  @override
+  String get welcomeGreeting => '早安';
+
+  @override
+  String get navHome => '首頁';
+
+  @override
+  String get navSettings => '設定';
+
+  @override
+  String daysLeft(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '剩餘 $count 天',
+      one: '明天',
+      zero: '今天',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get expired => '已過期';
+
+  @override
+  String get addItem => '新增物品';
+
+  @override
+  String get save => '儲存';
+}

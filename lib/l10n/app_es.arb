@@ -1,0 +1,19 @@
+{
+  "@@locale": "es",
+  "appTitle": "UseUp",
+  "welcomeGreeting": "Buenos días",
+  "navHome": "Inicio",
+  "navSettings": "Ajustes",
+  "sectionExpiringSoon": "Caduca pronto",
+  "sectionAllItems": "Todos los artículos",
+  "daysLeft": "{count, plural, =0{Hoy} =1{Mañana} other{Faltan {count} días}}",
+  "expired": "Caducado",
+  "name": "Nombre",
+  "category": "Categoría",
+  "location": "Ubicación",
+  "expiryDate": "Fecha de caducidad",
+  "addItem": "Añadir artículo",
+  "save": "Guardar",
+  "language": "Idioma",
+  "settingsTitle": "Ajustes"
+}

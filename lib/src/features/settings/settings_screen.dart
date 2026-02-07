@@ -194,8 +194,24 @@ class SettingsScreen extends ConsumerWidget {
   String _getLanguageName(Locale locale) {
     switch (locale.languageCode) {
       case 'en': return 'English';
-      case 'zh': return '简体中文';
-      // Future languages can be added here, or fall back to languageCode
+      case 'zh': 
+        if (locale.countryCode == 'TW') return '繁體中文';
+        return '简体中文';
+      case 'de': return 'Deutsch';
+      case 'fr': return 'Français';
+      case 'it': return 'Italiano';
+      case 'es': return 'Español';
+      case 'pt': 
+        if (locale.countryCode == 'BR') return 'Português (Brasil)';
+        return 'Português';
+      case 'el': return 'Ελληνικά';
+      case 'tr': return 'Türkçe';
+      case 'ja': return '日本語';
+      case 'ko': return '한국어';
+      case 'ru': return 'Русский';
+      case 'nl': return 'Nederlands';
+      case 'pl': return 'Polski';
+      case 'uk': return 'Українська';
       default: return locale.languageCode;
     }
   }

@@ -1,0 +1,12 @@
+{
+  "@@locale": "ru",
+  "appTitle": "UseUp",
+  "welcomeGreeting": "Доброе утро",
+  "navHome": "Главная",
+  "navSettings": "Настройки",
+  "daysLeft": "{count, plural, =0{Сегодня} =1{Завтра} other{Осталось {count} дн.}}",
+  "expired": "Истек срок",
+  "addItem": "Добавить",
+  "save": "Сохранить",
+  "language": "Язык"
+}

@@ -34,6 +34,21 @@ class UseUpApp extends ConsumerWidget {
       supportedLocales: const [
         Locale('en'), // English
         Locale('zh'), // Chinese
+        Locale('de'), // German
+        Locale('fr'), // French
+        Locale('it'), // Italian
+        Locale('es'), // Spanish
+        Locale('pt'), // Portuguese
+        Locale('pt', 'BR'), // Brazil Portuguese
+        Locale('el'), // Greek
+        Locale('tr'), // Turkish
+        Locale('ja'), // Japanese
+        Locale('ko'), // Korean
+        Locale('zh', 'TW'), // Traditional Chinese
+        Locale('ru'), // Russian
+        Locale('nl'), // Dutch
+        Locale('pl'), // Polish
+        Locale('uk'), // Ukrainian
       ],
     );
   }

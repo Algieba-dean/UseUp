@@ -1,0 +1,12 @@
+{
+  "@@locale": "pl",
+  "appTitle": "UseUp",
+  "welcomeGreeting": "Dzień dobry",
+  "navHome": "Główna",
+  "navSettings": "Ustawienia",
+  "daysLeft": "{count, plural, =0{Dzisiaj} =1{Jutro} other{Pozostało {count} dni}}",
+  "expired": "Wygasło",
+  "addItem": "Dodaj",
+  "save": "Zapisz",
+  "language": "Język"
+}
